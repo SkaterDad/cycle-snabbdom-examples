@@ -49,13 +49,13 @@ function main(responses) {
   //build full DOM
   const view$ = content$
     .filter(dialogue => dialogue.DOM)
-    .flatMap(dialogue => dialogue.DOM)
+    .flatMapLatest(dialogue => dialogue.DOM)
     .map((cDOM) => view(headerDOM, cDOM))
 
   //http requests - if exists
   const http$ = content$
     .filter(dialogue => dialogue.HTTP)
-    .flatMap(dialogue => dialogue.HTTP)
+    .flatMapLatest(dialogue => dialogue.HTTP)
 
   //build object to return
   return {

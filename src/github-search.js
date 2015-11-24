@@ -30,7 +30,7 @@ function githubSearch({DOM, HTTP}) {
   // Convert the stream of HTTP responses to virtual DOM elements.
   const vtree$ = HTTP
     .filter(res$ => res$.request.url.indexOf(GITHUB_SEARCH_API) === 0)
-    .flatMap(x => x) //Needed because HTTP gives an Observable when you map it
+    .flatMapLatest(x => x) //Needed because HTTP gives an Observable when you map it
     .map(res => res.body.items)
     .startWith([])
     .map(results =>
