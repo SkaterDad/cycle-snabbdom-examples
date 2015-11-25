@@ -27,7 +27,7 @@ const headerDOM =
   )
 
 const view = (header, content) =>
-  h('div.app-wrapper', {}, [header, content])
+  h('div.app-wrapper', {}, [header, h('main.content-holder', {}, [content])])
 
 function main(responses) {
   //which example to run?

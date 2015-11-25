@@ -1,5 +1,14 @@
+$headerHeight: 2rem;
+$headerBottom: 1rem;
+$overallHeaderHeight: $headerHeight + $headerBottom;
+$pageBtmMarg: 1rem;
+$standardShadow: 1px 1px 2px 0px black;
+
 * {
   box-sizing: border-box;
+}
+html, body {
+  height: 100%;
 }
 h1 {
   margin: 0
@@ -8,6 +17,7 @@ body {
   background-color: rgb(150,170,130);
   font-family: Helvetica, Sans;
   padding: 0;
+  margin: 0;
 }
 a {
   color: inherit;
@@ -17,14 +27,31 @@ a {
   }
 }
 header {
-  background: black;
-  margin: 0;
+  background: rgb(60,60,60);
+  line-height: $headerHeight;
+  margin-bottom: $headerBottom;
+  box-shadow: 1px 1px 1px 1px black;
   color: white;
-  padding: 1rem;
+  padding: 0rem 1rem;
 }
-main {
-  display: block;
-  padding: 1rem;
+.app-wrapper {
+  position: relative;
+  height: 100%;
+}
+.content-holder {
+  height: calc(100% - #{$overallHeaderHeight});
+  position: relative;
+}
+.page-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.page {
+  max-width: 960px;
+  margin: 0 auto;
 }
 .flexcenter {
   display: flex;
@@ -41,21 +68,32 @@ main {
   border-radius: 2px;
   box-shadow: 1px 2px 5px 0px rgba(black,0.75);
   margin: 1rem;
+  width: 25%;
   transition: background-color 0.25s ease-in-out;
   &:hover {
     background-color: white;
   }
 }
-.anim-bg-color {
+.color-change-container {
   transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
   padding: 2rem;
+  box-shadow: $standardShadow;
+}
+.github-search-container {
+  background: white;
+  padding: 1rem;
+  box-shadow: $standardShadow;
+  height: calc(100% - #{$pageBtmMarg});
 }
 .search-results {
   position: relative;
+  overflow-y: auto;
+  height: calc(100% - #{$pageBtmMarg}*2);
 }
 .search-result {
   display: block;
-  background-color: white;
+  background-color: rgb(245,250,245);
+  border: 1px solid rgb(100,150,100);
   color: black;
   padding: 0.5rem;
   margin-bottom: 0.25rem;

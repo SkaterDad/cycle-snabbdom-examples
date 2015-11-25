@@ -1,4 +1,5 @@
 import {h} from 'cycle-snabbdom'
+import fadeInOutStyle from './global-styles'
 
 function resultView(result) {
   return h('div.search-result', {
@@ -34,11 +35,13 @@ function githubSearch({DOM, HTTP}) {
     .map(res => res.body.items)
     .startWith([])
     .map(results =>
-      h('div.wrapper', {}, [
-        h('label.label', {}, 'Search:'),
-        h('input.field', {props: {type: 'text'}}),
-        h('hr'),
-        h('section.search-results', {}, results.map(resultView)),
+      h('div.page-wrapper', {key: `ghpage`, style: fadeInOutStyle}, [
+        h('div.page.github-search-container', {}, [
+          h('label.label', {}, 'Search:'),
+          h('input.field', {props: {type: 'text'}}),
+          h('hr'),
+          h('section.search-results', {}, results.map(resultView)),
+        ])
       ])
     )
 

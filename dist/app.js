@@ -61,7 +61,7 @@
 	
 	var _colorChange2 = _interopRequireDefault(_colorChange);
 	
-	var _githubSearch = __webpack_require__(/*! ./github-search */ 26);
+	var _githubSearch = __webpack_require__(/*! ./github-search */ 27);
 	
 	var _githubSearch2 = _interopRequireDefault(_githubSearch);
 	
@@ -80,7 +80,7 @@
 	var headerDOM = (0, _cycleSnabbdom.h)('header', [(0, _cycleSnabbdom.h)('select.examples', {}, examples.map(optionDef))]);
 	
 	var view = function view(header, content) {
-	  return (0, _cycleSnabbdom.h)('div.app-wrapper', {}, [header, content]);
+	  return (0, _cycleSnabbdom.h)('div.app-wrapper', {}, [header, (0, _cycleSnabbdom.h)('main.content-holder', {}, [content])]);
 	};
 	
 	function main(responses) {
@@ -15259,28 +15259,39 @@
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
+	var _globalStyles = __webpack_require__(/*! ./global-styles */ 26);
+	
+	var _globalStyles2 = _interopRequireDefault(_globalStyles);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var colors = [{ bg: 'white', font: 'black' }, { bg: 'gray', font: 'white' }, { bg: 'green', font: 'yellow' }, { bg: 'red', font: 'black' }, { bg: 'black', font: 'white' }];
+	var colors = [{ bg: 'White', font: 'Black' }, { bg: 'Gray', font: 'White' }, { bg: 'Green', font: 'Yellow' }, { bg: 'Red', font: 'Black' }, { bg: 'Black', font: 'White' }];
+	
+	var increment = 1;
+	
+	function nextColorIndex(curr, inc) {
+	  var newColor = curr + inc;
+	  if (newColor < 0) {
+	    return colors.length - 1;
+	  }
+	  if (newColor > colors.length - 1) {
+	    return 0;
+	  }
+	  return newColor;
+	}
 	
 	function home(_ref) {
 	  var DOM = _ref.DOM;
 	
-	  var action$ = _rx2.default.Observable.merge(DOM.select('button.colorBtn.next').events('click').map(1), DOM.select('button.colorBtn.prev').events('click').map(-1));
+	  var action$ = _rx2.default.Observable.merge(DOM.select('button.colorBtn.next').events('click').map(increment), DOM.select('button.colorBtn.prev').events('click').map(-increment));
 	
-	  var color$ = action$.startWith(0).scan(function (acc, seed) {
-	    var newColor = acc + seed;
-	    if (newColor < 0) {
-	      return colors.length - 1;
-	    }
-	    if (newColor > colors.length - 1) {
-	      return 0;
-	    }
-	    return newColor;
-	  });
+	  var color$ = action$.startWith(0).scan(nextColorIndex);
 	
 	  var vTree$ = color$.map(function (color) {
-	    return (0, _cycleSnabbdom.h)('div.anim-bg-color.flexcenter', { style: { backgroundColor: colors[color].bg } }, [(0, _cycleSnabbdom.h)('h3', { style: { color: colors[color].font } }, 'Magic Color Changer'), (0, _cycleSnabbdom.h)('button.colorBtn.next', {}, 'Click here for a good time!'), (0, _cycleSnabbdom.h)('button.colorBtn.prev', {}, 'Click here for a worse time!')]);
+	    var nextBg = nextColorIndex(color, increment);
+	    var prevBg = nextColorIndex(color, -increment);
+	
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'colorpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page', {}, [(0, _cycleSnabbdom.h)('div.color-change-container.flexcenter', { style: { backgroundColor: colors[color].bg } }, [(0, _cycleSnabbdom.h)('h3', { style: { color: colors[color].font } }, 'Magic Color Changer'), (0, _cycleSnabbdom.h)('em', { style: { color: colors[color].font } }, 'Cycle (get it?) through 5 colors.'), (0, _cycleSnabbdom.h)('button.colorBtn.next', {}, 'Go to ' + colors[nextBg].bg), (0, _cycleSnabbdom.h)('button.colorBtn.prev', {}, 'Back to ' + colors[prevBg].bg)])])]);
 	  });
 	
 	  return { DOM: vTree$ };
@@ -15290,6 +15301,34 @@
 
 /***/ },
 /* 26 */
+/*!******************************!*\
+  !*** ./src/global-styles.js ***!
+  \******************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var fadeInOutStyle = {
+	  opacity: 0,
+	  transition: 'opacity 0.5s ease-in-out',
+	  delayed: {
+	    opacity: 1
+	  },
+	  remove: {
+	    opacity: 0
+	  },
+	  destroy: {
+	    opacity: 0
+	  }
+	};
+	
+	exports.default = fadeInOutStyle;
+
+/***/ },
+/* 27 */
 /*!******************************!*\
   !*** ./src/github-search.js ***!
   \******************************/
@@ -15302,6 +15341,12 @@
 	});
 	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 10);
+	
+	var _globalStyles = __webpack_require__(/*! ./global-styles */ 26);
+	
+	var _globalStyles2 = _interopRequireDefault(_globalStyles);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function resultView(result) {
 	  return (0, _cycleSnabbdom.h)('div.search-result', {
@@ -15341,7 +15386,7 @@
 	  .map(function (res) {
 	    return res.body.items;
 	  }).startWith([]).map(function (results) {
-	    return (0, _cycleSnabbdom.h)('div.wrapper', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.map(resultView))]);
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'ghpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page.github-search-container', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.map(resultView))])]);
 	  });
 	
 	  return {

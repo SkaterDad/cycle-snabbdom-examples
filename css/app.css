@@ -1,45 +1,57 @@
-/* line 1, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
 * {
   box-sizing: border-box; }
 
-/* line 4, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
+html, body {
+  height: 100%; }
+
 h1 {
   margin: 0; }
 
-/* line 7, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
 body {
   background-color: #96aa82;
   font-family: Helvetica, Sans;
-  padding: 0; }
+  padding: 0;
+  margin: 0; }
 
-/* line 12, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
 a {
   color: inherit;
   text-decoration: none; }
-  /* line 15, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
   a:hover {
     text-decoration: underline; }
 
-/* line 19, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
 header {
-  background: black;
-  margin: 0;
+  background: #3c3c3c;
+  line-height: 2rem;
+  margin-bottom: 1rem;
+  box-shadow: 1px 1px 1px 1px black;
   color: white;
-  padding: 1rem; }
+  padding: 0rem 1rem; }
 
-/* line 25, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
-main {
-  display: block;
-  padding: 1rem; }
+.app-wrapper {
+  position: relative;
+  height: 100%; }
 
-/* line 29, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
+.content-holder {
+  height: calc(100% - 3rem);
+  position: relative; }
+
+.page-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0; }
+
+.page {
+  max-width: 960px;
+  margin: 0 auto; }
+
 .flexcenter {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center; }
 
-/* line 35, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
 .colorBtn {
   border: none;
   position: relative;
@@ -49,24 +61,31 @@ main {
   border-radius: 2px;
   box-shadow: 1px 2px 5px 0px rgba(0, 0, 0, 0.75);
   margin: 1rem;
+  width: 25%;
   transition: background-color 0.25s ease-in-out; }
-  /* line 45, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
   .colorBtn:hover {
     background-color: white; }
 
-/* line 49, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
-.anim-bg-color {
+.color-change-container {
   transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
-  padding: 2rem; }
+  padding: 2rem;
+  box-shadow: 1px 1px 2px 0px black; }
 
-/* line 53, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
+.github-search-container {
+  background: white;
+  padding: 1rem;
+  box-shadow: 1px 1px 2px 0px black;
+  height: calc(100% - 1rem); }
+
 .search-results {
-  position: relative; }
+  position: relative;
+  overflow-y: auto;
+  height: calc(100% - 1rem*2); }
 
-/* line 56, C:/Users/Miguel/webdev/cycle-snabbdom-examples/css/app.scss */
 .search-result {
   display: block;
-  background-color: white;
+  background-color: #f5faf5;
+  border: 1px solid #649664;
   color: black;
   padding: 0.5rem;
   margin-bottom: 0.25rem;
