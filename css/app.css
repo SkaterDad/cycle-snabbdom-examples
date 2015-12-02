@@ -75,7 +75,16 @@ header {
   background: white;
   padding: 1rem;
   box-shadow: 1px 1px 2px 0px black;
-  height: calc(100% - 1rem); }
+  height: calc(100% - 1rem);
+  color: #3c3c3c; }
+  .github-search-container .label {
+    margin-right: 0.5rem; }
+  .github-search-container .field {
+    background: none;
+    border: none;
+    border-bottom: 2px solid #3c3c3c;
+    padding: 0.25rem;
+    font-size: 1rem; }
 
 .search-results {
   position: relative;
@@ -83,12 +92,31 @@ header {
   height: calc(100% - 1rem*2); }
 
 .search-result {
-  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   background-color: #f5faf5;
   border: 1px solid #649664;
   color: black;
   padding: 0.5rem;
   margin-bottom: 0.25rem;
   transition: opacity 0.5s ease-in-out, transform 0.5s linear; }
+
+.gh-owner-link {
+  padding: 0.25rem;
+  text-align: center;
+  width: 15%; }
+  .gh-owner-link .gh-avatar {
+    display: block;
+    width: 50px;
+    height: 50px;
+    margin: 0.25rem auto; }
+
+.gh-link {
+  width: 85%;
+  padding: 0.25rem; }
+  .gh-link h1 {
+    font-size: 1.2rem;
+    margin: 0; }
 
 /*# sourceMappingURL=app.css.map */

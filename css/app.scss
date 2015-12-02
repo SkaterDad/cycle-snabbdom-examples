@@ -3,6 +3,7 @@ $headerBottom: 1rem;
 $overallHeaderHeight: $headerHeight + $headerBottom;
 $pageBtmMarg: 1rem;
 $standardShadow: 1px 1px 2px 0px black;
+$darkGray: rgb(60,60,60);
 
 * {
   box-sizing: border-box;
@@ -27,7 +28,7 @@ a {
   }
 }
 header {
-  background: rgb(60,60,60);
+  background: $darkGray;
   line-height: $headerHeight;
   margin-bottom: $headerBottom;
   box-shadow: 1px 1px 1px 1px black;
@@ -84,6 +85,18 @@ header {
   padding: 1rem;
   box-shadow: $standardShadow;
   height: calc(100% - #{$pageBtmMarg});
+  color: $darkGray;
+  
+  .label {
+    margin-right: 0.5rem;
+  }
+  .field {
+    background: none;
+    border: none;
+    border-bottom: 2px solid $darkGray;
+    padding: 0.25rem;
+    font-size: 1rem;
+  }
 }
 .search-results {
   position: relative;
@@ -91,11 +104,34 @@ header {
   height: calc(100% - #{$pageBtmMarg}*2);
 }
 .search-result {
-  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   background-color: rgb(245,250,245);
   border: 1px solid rgb(100,150,100);
   color: black;
   padding: 0.5rem;
   margin-bottom: 0.25rem;
   transition: opacity 0.5s ease-in-out, transform 0.5s linear;
+}
+.gh-owner-link {
+  padding: 0.25rem;
+  text-align: center;
+  width: 15%;
+
+  .gh-avatar {
+    display: block;
+    width: 50px;
+    height: 50px;
+    margin: 0.25rem auto;
+  }
+}
+.gh-link {
+  width: 85%;
+  padding: 0.25rem;
+  
+  h1 {
+    font-size: 1.2rem;
+    margin: 0;
+  }
 }

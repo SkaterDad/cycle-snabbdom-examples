@@ -15348,21 +15348,44 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function resultView(result) {
-	  return (0, _cycleSnabbdom.h)('div.search-result', {
-	    key: result.id,
-	    props: { href: result.html_url },
+	function resultView(_ref) {
+	  var id = _ref.id;
+	  var _ref$html_url = _ref.html_url;
+	  var html_url = _ref$html_url === undefined ? 'https://github.com/' : _ref$html_url;
+	  var _ref$full_name = _ref.full_name;
+	  var full_name = _ref$full_name === undefined ? 'Unknown Repo Name' : _ref$full_name;
+	  var _ref$description = _ref.description;
+	  var description = _ref$description === undefined ? 'No description given.' : _ref$description;
+	  var _ref$owner = _ref.owner;
+	  var owner = _ref$owner === undefined ? {
+	    html_url: 'https://github.com/',
+	    avatar_url: 'http://fullmurray.com/50/50',
+	    login: '?'
+	  } : _ref$owner;
+	
+	  //Function param defaults think null is a good value...
+	  //Since these variables will placed directly inside their containers
+	  // (not wrapped in a <span> or anything), we must check if they are null
+	  // to avoid errors.
+	  //It would be less code to just wrap them in <span> or <p> tags,
+	  // but this illustrates an easy gotcha which wasn't fun to debug.
+	  var safeDescription = description === null ? 'No description given.' : description;
+	  var safeLogin = owner.login === null ? '?' : owner.login;
+	
+	  var html = (0, _cycleSnabbdom.h)('div.search-result', {
+	    key: id,
 	    style: {
-	      opacity: 0,
-	      delayed: { opacity: 1 },
+	      opacity: 0, transform: 'translateY(-100px)',
+	      delayed: { opacity: 1, transform: 'translateY(0px)' },
 	      remove: { opacity: 0, transform: 'translateY(-100px)' }
 	    }
-	  }, [(0, _cycleSnabbdom.h)('a.gh-link', {}, result.full_name), ' by @' + result.owner.login]);
+	  }, [(0, _cycleSnabbdom.h)('a.gh-owner-link', { props: { href: owner.html_url } }, [(0, _cycleSnabbdom.h)('img.gh-avatar', { props: { src: owner.avatar_url } }), safeLogin]), (0, _cycleSnabbdom.h)('a.gh-link', { props: { href: html_url } }, [(0, _cycleSnabbdom.h)('h1', {}, full_name), safeDescription])]);
+	  return html;
 	}
 	
-	function githubSearch(_ref) {
-	  var DOM = _ref.DOM;
-	  var HTTP = _ref.HTTP;
+	function githubSearch(_ref2) {
+	  var DOM = _ref2.DOM;
+	  var HTTP = _ref2.HTTP;
 	
 	  var GITHUB_SEARCH_API = 'https://api.github.com/search/repositories?q=';
 	
@@ -15378,14 +15401,17 @@
 	  }).distinctUntilChanged();
 	
 	  // Convert the stream of HTTP responses to virtual DOM elements.
-	  var vtree$ = HTTP.filter(function (res$) {
+	  var searchResponse$ = HTTP.filter(function (res$) {
 	    return res$.request.url.indexOf(GITHUB_SEARCH_API) === 0;
 	  }).flatMapLatest(function (x) {
 	    return x;
 	  }) //Needed because HTTP gives an Observable when you map it
 	  .map(function (res) {
 	    return res.body.items;
-	  }).startWith([]).map(function (results) {
+	  }).startWith([]);
+	
+	  //TODO: Prevent this from having initial state when re-entering page.
+	  var vtree$ = searchResponse$.map(function (results) {
 	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'ghpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page.github-search-container', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.map(resultView))])]);
 	  });
 	
