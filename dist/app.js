@@ -15340,6 +15340,10 @@
 	  value: true
 	});
 	
+	var _rx = __webpack_require__(/*! rx */ 2);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 10);
 	
 	var _globalStyles = __webpack_require__(/*! ./global-styles */ 26);
@@ -15347,6 +15351,10 @@
 	var _globalStyles2 = _interopRequireDefault(_globalStyles);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function loadingSpinner() {
+	  return (0, _cycleSnabbdom.h)('div.spinner-container', { style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.spinner', [(0, _cycleSnabbdom.h)('div.rect1'), (0, _cycleSnabbdom.h)('div.rect2'), (0, _cycleSnabbdom.h)('div.rect3'), (0, _cycleSnabbdom.h)('div.rect4'), (0, _cycleSnabbdom.h)('div.rect5')])]);
+	}
 	
 	function resultView(_ref) {
 	  var id = _ref.id;
@@ -15408,11 +15416,23 @@
 	  }) //Needed because HTTP gives an Observable when you map it
 	  .map(function (res) {
 	    return res.body.items;
+	  }).map(function (items) {
+	    return items.map(resultView);
 	  }).startWith([]);
 	
+	  //loading indication.  true if request is newer than response
+	  var loading$ = searchRequest$.map(true).merge(searchResponse$.map(false));
+	
+	  //Combined state observable which triggers view updates
+	  var state$ = _rx2.default.Observable.combineLatest(searchResponse$, loading$, function (res, loading) {
+	    return { results: res, loading: loading };
+	  });
+	
 	  //TODO: Prevent this from having initial state when re-entering page.
-	  var vtree$ = searchResponse$.map(function (results) {
-	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'ghpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page.github-search-container', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.map(resultView))])]);
+	  var vtree$ = state$.map(function (_ref3) {
+	    var results = _ref3.results;
+	    var loading = _ref3.loading;
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'ghpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page.github-search-container', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.concat(loading ? loadingSpinner() : ''))])]);
 	  });
 	
 	  return {

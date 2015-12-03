@@ -1,5 +1,18 @@
+import Rx from 'rx'
 import {h} from 'cycle-snabbdom'
 import fadeInOutStyle from './global-styles'
+
+function loadingSpinner() {
+  return h('div.spinner-container', {style: fadeInOutStyle}, [
+    h('div.spinner', [
+      h('div.rect1'),
+      h('div.rect2'),
+      h('div.rect3'),
+      h('div.rect4'),
+      h('div.rect5'),
+    ])
+  ])
+}
 
 function resultView({
   id,
@@ -57,17 +70,27 @@ function githubSearch({DOM, HTTP}) {
     .filter(res$ => res$.request.url.indexOf(GITHUB_SEARCH_API) === 0)
     .flatMapLatest(x => x) //Needed because HTTP gives an Observable when you map it
     .map(res => res.body.items)
+    .map(items => items.map(resultView))
     .startWith([])
 
+  //loading indication.  true if request is newer than response
+  const loading$ = searchRequest$.map(true).merge(searchResponse$.map(false))
+
+  //Combined state observable which triggers view updates
+  const state$ = Rx.Observable.combineLatest(searchResponse$, loading$,
+    (res, loading) => {
+      return {results: res, loading: loading}
+    })
+
   //TODO: Prevent this from having initial state when re-entering page.
-  const vtree$ = searchResponse$
-    .map(results =>
+  const vtree$ = state$
+    .map(({results, loading}) =>
       h('div.page-wrapper', {key: `ghpage`, style: fadeInOutStyle}, [
         h('div.page.github-search-container', {}, [
           h('label.label', {}, 'Search:'),
           h('input.field', {props: {type: 'text'}}),
           h('hr'),
-          h('section.search-results', {}, results.map(resultView)),
+          h('section.search-results', {}, results.concat(loading ? loadingSpinner() : '')),
         ])
       ])
     )
