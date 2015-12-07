@@ -57,11 +57,11 @@
 	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 10);
 	
-	var _colorChange = __webpack_require__(/*! ./color-change */ 25);
+	var _colorChange = __webpack_require__(/*! ./color-change */ 29);
 	
 	var _colorChange2 = _interopRequireDefault(_colorChange);
 	
-	var _githubSearch = __webpack_require__(/*! ./github-search */ 27);
+	var _githubSearch = __webpack_require__(/*! ./github-search */ 31);
 	
 	var _githubSearch2 = _interopRequireDefault(_githubSearch);
 	
@@ -12473,7 +12473,7 @@
 	
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../webpack/buildin/module.js */ 3)(module), (function() { return this; }()), __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 4)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../webpack/buildin/module.js */ 3)(module), (function() { return this; }()), __webpack_require__(/*! ./~/process/browser.js */ 4)))
 
 /***/ },
 /* 3 */
@@ -12496,9 +12496,9 @@
 
 /***/ },
 /* 4 */
-/*!**********************************************************!*\
-  !*** (webpack)/~/node-libs-browser/~/process/browser.js ***!
-  \**********************************************************/
+/*!******************************!*\
+  !*** ./~/process/browser.js ***!
+  \******************************/
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -12837,9 +12837,9 @@
 
 /***/ },
 /* 7 */
-/*!**************************************************!*\
-  !*** ./~/@cycle/http/~/superagent/lib/client.js ***!
-  \**************************************************/
+/*!************************************!*\
+  !*** ./~/superagent/lib/client.js ***!
+  \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -14003,9 +14003,9 @@
 
 /***/ },
 /* 8 */
-/*!*****************************************************************!*\
-  !*** ./~/@cycle/http/~/superagent/~/component-emitter/index.js ***!
-  \*****************************************************************/
+/*!**************************************!*\
+  !*** ./~/component-emitter/index.js ***!
+  \**************************************/
 /***/ function(module, exports) {
 
 	
@@ -14176,9 +14176,9 @@
 
 /***/ },
 /* 9 */
-/*!****************************************************************!*\
-  !*** ./~/@cycle/http/~/superagent/~/reduce-component/index.js ***!
-  \****************************************************************/
+/*!*************************************!*\
+  !*** ./~/reduce-component/index.js ***!
+  \*************************************/
 /***/ function(module, exports) {
 
 	
@@ -14234,19 +14234,35 @@
 	
 	var _h2 = _interopRequireDefault(_h);
 	
-	var _utils = __webpack_require__(/*! ./utils */ 15);
+	var _map = __webpack_require__(/*! fast.js/array/map */ 15);
 	
-	var _fromEvent = __webpack_require__(/*! ./fromEvent */ 16);
+	var _map2 = _interopRequireDefault(_map);
+	
+	var _reduce = __webpack_require__(/*! fast.js/array/reduce */ 17);
+	
+	var _reduce2 = _interopRequireDefault(_reduce);
+	
+	var _filter = __webpack_require__(/*! fast.js/array/filter */ 19);
+	
+	var _filter2 = _interopRequireDefault(_filter);
+	
+	var _matchesSelector = __webpack_require__(/*! matches-selector */ 20);
+	
+	var _matchesSelector2 = _interopRequireDefault(_matchesSelector);
+	
+	var _utils = __webpack_require__(/*! ./utils */ 21);
+	
+	var _fromEvent = __webpack_require__(/*! ./fromEvent */ 22);
 	
 	var _fromEvent2 = _interopRequireDefault(_fromEvent);
 	
-	var _parseTree = __webpack_require__(/*! ./parseTree */ 17);
+	var _parseTree = __webpack_require__(/*! ./parseTree */ 23);
 	
 	var _parseTree2 = _interopRequireDefault(_parseTree);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var _require = __webpack_require__(/*! hyperscript-helpers */ 20)(_h2.default);
+	var _require = __webpack_require__(/*! hyperscript-helpers */ 24)(_h2.default);
 	
 	var a = _require.a;
 	var abbr = _require.abbr;
@@ -14347,6 +14363,38 @@
 	var ul = _require.ul;
 	var video = _require.video;
 	
+	var isolateSource = function isolateSource(_source, _scope) {
+	  return _source.select('.cycle-scope-' + _scope);
+	};
+	
+	var isolateSink = function isolateSink(sink, scope) {
+	  return sink.map(function (vtree) {
+	    var c = (vtree.sel + ' cycle-scope-' + scope).trim();
+	    vtree.sel = c;
+	    return vtree;
+	  });
+	};
+	
+	var makeIsStrictlyInRootScope = function makeIsStrictlyInRootScope(rootList, namespace) {
+	  return function (leaf) {
+	    var classIsForeign = function classIsForeign(c) {
+	      var matched = c.match(/cycle-scope-(\S+)/);
+	      return matched && namespace.indexOf('.' + c) === -1;
+	    };
+	
+	    for (var el = leaf.parentElement; el !== null; el = el.parentElement) {
+	      if (rootList.indexOf(el) >= 0) {
+	        return true;
+	      }
+	      var classList = el.className.split(' ');
+	      if (classList.some(classIsForeign)) {
+	        return false;
+	      }
+	    }
+	    return true;
+	  };
+	};
+	
 	var makeEventsSelector = function makeEventsSelector(element$) {
 	  return function (eventName) {
 	    var useCapture = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
@@ -14363,20 +14411,37 @@
 	  };
 	};
 	
-	var makeElementSelector = function makeElementSelector(rootElem$) {
-	  return function (selector) {
+	// Use function not 'const = x => {}' for this.namespace below
+	function makeElementSelector(rootElem$) {
+	  return function DOMSelect(selector) {
 	    if (typeof selector !== 'string') {
 	      throw new Error('DOM drivers select() expects first argument to be a ' + 'string as a CSS selector');
 	    }
-	    var element$ = selector.trim() === ':root' ? rootElem$ : rootElem$.map(function (rootElem) {
-	      return rootElem.querySelectorAll(selector);
+	    var namespace = this.namespace;
+	    var scopedSelector = (namespace.join(' ') + ' ' + selector).trim();
+	    var element$ = selector.trim() === ':root' ? rootElem$ : rootElem$.map(function (x) {
+	      var array = Array.isArray(x) ? x : [x];
+	      return (0, _filter2.default)((0, _reduce2.default)((0, _map2.default)(array, function (element) {
+	        if ((0, _matchesSelector2.default)(element, scopedSelector)) {
+	          return [element];
+	        } else {
+	          var nodeList = element.querySelectorAll(scopedSelector);
+	          return Array.prototype.slice.call(nodeList);
+	        }
+	      }), function (prev, curr) {
+	        return prev.concat(curr);
+	      }, []), makeIsStrictlyInRootScope(array, namespace));
 	    });
 	    return {
 	      observable: element$,
-	      events: makeEventsSelector(element$)
+	      namespace: namespace.concat(selector),
+	      select: makeElementSelector(element$),
+	      events: makeEventsSelector(element$),
+	      isolateSource: isolateSource,
+	      isolateSink: isolateSink
 	    };
 	  };
-	};
+	}
 	
 	var validateDOMDriverInput = function validateDOMDriverInput(view$) {
 	  if (!view$ || typeof view$.subscribe !== 'function') {
@@ -14385,7 +14450,7 @@
 	};
 	
 	var makeDOMDriver = function makeDOMDriver(container) {
-	  var modules = arguments.length <= 1 || arguments[1] === undefined ? [__webpack_require__(/*! snabbdom/modules/class */ 21), __webpack_require__(/*! snabbdom/modules/props */ 22), __webpack_require__(/*! snabbdom/modules/attributes */ 23), __webpack_require__(/*! snabbdom/modules/style */ 24)] : arguments[1];
+	  var modules = arguments.length <= 1 || arguments[1] === undefined ? [__webpack_require__(/*! snabbdom/modules/class */ 25), __webpack_require__(/*! snabbdom/modules/props */ 26), __webpack_require__(/*! snabbdom/modules/attributes */ 27), __webpack_require__(/*! snabbdom/modules/style */ 28)] : arguments[1];
 	
 	  var patch = _snabbdom2.default.init(modules);
 	  var rootElem = (0, _utils.getDomElement)(container);
@@ -14393,7 +14458,7 @@
 	  var DOMDriver = function DOMDriver(view$) {
 	    validateDOMDriverInput(view$);
 	
-	    var rootElem$ = view$.flatMap(_parseTree2.default).startWith(rootElem).pairwise().map(function (_ref) {
+	    var rootElem$ = view$.flatMapLatest(_parseTree2.default).startWith(rootElem).pairwise().map(function (_ref) {
 	      var _ref2 = _slicedToArray(_ref, 2);
 	
 	      var prevView = _ref2[0];
@@ -14405,8 +14470,11 @@
 	
 	    var disposable = rootElem$.connect();
 	    return {
+	      namespace: [],
 	      select: makeElementSelector(rootElem$),
-	      dispose: disposable.dispose.bind(disposable)
+	      dispose: disposable.dispose.bind(disposable),
+	      isolateSink: isolateSink,
+	      isolateSource: isolateSource
 	    };
 	  };
 	  return DOMDriver;
@@ -14515,9 +14583,9 @@
 
 /***/ },
 /* 11 */
-/*!*************************************************!*\
-  !*** ./~/cycle-snabbdom/~/snabbdom/snabbdom.js ***!
-  \*************************************************/
+/*!********************************!*\
+  !*** ./~/snabbdom/snabbdom.js ***!
+  \********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	// jshint newcap: false
@@ -14757,9 +14825,9 @@
 
 /***/ },
 /* 12 */
-/*!**********************************************!*\
-  !*** ./~/cycle-snabbdom/~/snabbdom/vnode.js ***!
-  \**********************************************/
+/*!*****************************!*\
+  !*** ./~/snabbdom/vnode.js ***!
+  \*****************************/
 /***/ function(module, exports) {
 
 	module.exports = function(sel, data, children, text, elm) {
@@ -14771,9 +14839,9 @@
 
 /***/ },
 /* 13 */
-/*!*******************************************!*\
-  !*** ./~/cycle-snabbdom/~/snabbdom/is.js ***!
-  \*******************************************/
+/*!**************************!*\
+  !*** ./~/snabbdom/is.js ***!
+  \**************************/
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -14784,9 +14852,9 @@
 
 /***/ },
 /* 14 */
-/*!******************************************!*\
-  !*** ./~/cycle-snabbdom/~/snabbdom/h.js ***!
-  \******************************************/
+/*!*************************!*\
+  !*** ./~/snabbdom/h.js ***!
+  \*************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var VNode = __webpack_require__(/*! ./vnode */ 12);
@@ -14814,6 +14882,195 @@
 
 /***/ },
 /* 15 */
+/*!********************************!*\
+  !*** ./~/fast.js/array/map.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 16);
+	
+	/**
+	 * # Map
+	 *
+	 * A fast `.map()` implementation.
+	 *
+	 * @param  {Array}    subject     The array (or array-like) to map over.
+	 * @param  {Function} fn          The mapper function.
+	 * @param  {Object}   thisContext The context for the mapper.
+	 * @return {Array}                The array containing the results.
+	 */
+	module.exports = function fastMap (subject, fn, thisContext) {
+	  var length = subject.length,
+	      result = new Array(length),
+	      iterator = thisContext !== undefined ? bindInternal3(fn, thisContext) : fn,
+	      i;
+	  for (i = 0; i < length; i++) {
+	    result[i] = iterator(subject[i], i, subject);
+	  }
+	  return result;
+	};
+
+
+/***/ },
+/* 16 */
+/*!*********************************************!*\
+  !*** ./~/fast.js/function/bindInternal3.js ***!
+  \*********************************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Internal helper to bind a function known to have 3 arguments
+	 * to a given context.
+	 */
+	module.exports = function bindInternal3 (func, thisContext) {
+	  return function (a, b, c) {
+	    return func.call(thisContext, a, b, c);
+	  };
+	};
+
+
+/***/ },
+/* 17 */
+/*!***********************************!*\
+  !*** ./~/fast.js/array/reduce.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var bindInternal4 = __webpack_require__(/*! ../function/bindInternal4 */ 18);
+	
+	/**
+	 * # Reduce
+	 *
+	 * A fast `.reduce()` implementation.
+	 *
+	 * @param  {Array}    subject      The array (or array-like) to reduce.
+	 * @param  {Function} fn           The reducer function.
+	 * @param  {mixed}    initialValue The initial value for the reducer, defaults to subject[0].
+	 * @param  {Object}   thisContext  The context for the reducer.
+	 * @return {mixed}                 The final result.
+	 */
+	module.exports = function fastReduce (subject, fn, initialValue, thisContext) {
+	  var length = subject.length,
+	      iterator = thisContext !== undefined ? bindInternal4(fn, thisContext) : fn,
+	      i, result;
+	
+	  if (initialValue === undefined) {
+	    i = 1;
+	    result = subject[0];
+	  }
+	  else {
+	    i = 0;
+	    result = initialValue;
+	  }
+	
+	  for (; i < length; i++) {
+	    result = iterator(result, subject[i], i, subject);
+	  }
+	
+	  return result;
+	};
+
+
+/***/ },
+/* 18 */
+/*!*********************************************!*\
+  !*** ./~/fast.js/function/bindInternal4.js ***!
+  \*********************************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Internal helper to bind a function known to have 4 arguments
+	 * to a given context.
+	 */
+	module.exports = function bindInternal4 (func, thisContext) {
+	  return function (a, b, c, d) {
+	    return func.call(thisContext, a, b, c, d);
+	  };
+	};
+
+
+/***/ },
+/* 19 */
+/*!***********************************!*\
+  !*** ./~/fast.js/array/filter.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 16);
+	
+	/**
+	 * # Filter
+	 *
+	 * A fast `.filter()` implementation.
+	 *
+	 * @param  {Array}    subject     The array (or array-like) to filter.
+	 * @param  {Function} fn          The filter function.
+	 * @param  {Object}   thisContext The context for the filter.
+	 * @return {Array}                The array containing the results.
+	 */
+	module.exports = function fastFilter (subject, fn, thisContext) {
+	  var length = subject.length,
+	      result = [],
+	      iterator = thisContext !== undefined ? bindInternal3(fn, thisContext) : fn,
+	      i;
+	  for (i = 0; i < length; i++) {
+	    if (iterator(subject[i], i, subject)) {
+	      result.push(subject[i]);
+	    }
+	  }
+	  return result;
+	};
+
+
+/***/ },
+/* 20 */
+/*!*************************************!*\
+  !*** ./~/matches-selector/index.js ***!
+  \*************************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var proto = Element.prototype;
+	var vendor = proto.matches
+	  || proto.matchesSelector
+	  || proto.webkitMatchesSelector
+	  || proto.mozMatchesSelector
+	  || proto.msMatchesSelector
+	  || proto.oMatchesSelector;
+	
+	module.exports = match;
+	
+	/**
+	 * Match `el` to `selector`.
+	 *
+	 * @param {Element} el
+	 * @param {String} selector
+	 * @return {Boolean}
+	 * @api public
+	 */
+	
+	function match(el, selector) {
+	  if (vendor) return vendor.call(el, selector);
+	  var nodes = el.parentNode.querySelectorAll(selector);
+	  for (var i = 0; i < nodes.length; i++) {
+	    if (nodes[i] == el) return true;
+	  }
+	  return false;
+	}
+
+/***/ },
+/* 21 */
 /*!***************************************!*\
   !*** ./~/cycle-snabbdom/lib/utils.js ***!
   \***************************************/
@@ -14842,27 +15099,19 @@
 	exports.getDomElement = getDomElement;
 
 /***/ },
-/* 16 */
+/* 22 */
 /*!*******************************************!*\
   !*** ./~/cycle-snabbdom/lib/fromEvent.js ***!
   \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	var Rx = __webpack_require__(/*! rx */ 2);
 	
-	var _rx = __webpack_require__(/*! rx */ 2);
-	
-	var _rx2 = _interopRequireDefault(_rx);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var disposableCreate = _rx2.default.Disposable.create;
-	var CompositeDisposable = _rx2.default.CompositeDisposable;
-	var AnonymousObservable = _rx2.default.AnonymousObservable;
+	var disposableCreate = Rx.Disposable.create;
+	var CompositeDisposable = Rx.CompositeDisposable;
+	var AnonymousObservable = Rx.AnonymousObservable;
 	
 	function createListener(_ref) {
 	  var element = _ref.element;
@@ -14876,7 +15125,7 @@
 	      element.removeEventListener(eventName, handler, useCapture);
 	    });
 	  }
-	  throw new Error('No listener found');
+	  throw new Error("No listener found");
 	}
 	
 	function createEventListener(_ref2) {
@@ -14887,14 +15136,14 @@
 	
 	  var disposables = new CompositeDisposable();
 	
-	  var toStr = Object.prototype.toString;
-	  if (toStr.call(element) === '[object NodeList]' || toStr.call(element) === '[object HTMLCollection]') {
+	  if (Array.isArray(element)) {
 	    for (var i = 0, len = element.length; i < len; i++) {
 	      disposables.add(createEventListener({
-	        element: element.item(i),
+	        element: element[i],
 	        eventName: eventName,
 	        handler: handler,
-	        useCapture: useCapture }));
+	        useCapture: useCapture
+	      }));
 	    }
 	  } else if (element) {
 	    disposables.add(createListener({ element: element, eventName: eventName, handler: handler, useCapture: useCapture }));
@@ -14912,14 +15161,15 @@
 	      handler: function handler() {
 	        observer.onNext(arguments[0]);
 	      },
-	      useCapture: useCapture });
-	  }).publish().refCount();
+	      useCapture: useCapture
+	    });
+	  }).share();
 	}
 	
-	exports.default = fromEvent;
+	module.exports = fromEvent;
 
 /***/ },
-/* 17 */
+/* 23 */
 /*!*******************************************!*\
   !*** ./~/cycle-snabbdom/lib/parseTree.js ***!
   \*******************************************/
@@ -14935,9 +15185,13 @@
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _map = __webpack_require__(/*! fast.js/array/map */ 18);
+	var _map = __webpack_require__(/*! fast.js/array/map */ 15);
 	
 	var _map2 = _interopRequireDefault(_map);
+	
+	var _filter = __webpack_require__(/*! fast.js/array/filter */ 19);
+	
+	var _filter2 = _interopRequireDefault(_filter);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -14961,14 +15215,18 @@
 	};
 	
 	var parseTree = function parseTree(vTree) {
-	  if (vTree.observe) {
-	    return vTree.flatMap(parseTree);
+	  if (!vTree) {
+	    return null;
+	  } else if (vTree.subscribe) {
+	    return vTree.flatMapLatest(parseTree);
 	  } else if ('object' === (typeof vTree === 'undefined' ? 'undefined' : _typeof(vTree))) {
 	    var vtree$ = _rx2.default.Observable.just(vTree);
 	    if (vTree.children && vTree.children.length > 0) {
 	      var _Rx$Observable;
 	
-	      return (_Rx$Observable = _rx2.default.Observable).combineLatest.apply(_Rx$Observable, [vtree$].concat(_toConsumableArray((0, _map2.default)(vTree.children, parseTree)), [combineVTreeStreams]));
+	      return (_Rx$Observable = _rx2.default.Observable).combineLatest.apply(_Rx$Observable, [vtree$].concat(_toConsumableArray((0, _filter2.default)((0, _map2.default)(vTree.children, parseTree), function (x) {
+	        return x !== null;
+	      })), [combineVTreeStreams]));
 	    }
 	    return vtree$;
 	  } else {
@@ -14979,63 +15237,10 @@
 	exports.default = parseTree;
 
 /***/ },
-/* 18 */
-/*!*************************************************!*\
-  !*** ./~/cycle-snabbdom/~/fast.js/array/map.js ***!
-  \*************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 19);
-	
-	/**
-	 * # Map
-	 *
-	 * A fast `.map()` implementation.
-	 *
-	 * @param  {Array}    subject     The array (or array-like) to map over.
-	 * @param  {Function} fn          The mapper function.
-	 * @param  {Object}   thisContext The context for the mapper.
-	 * @return {Array}                The array containing the results.
-	 */
-	module.exports = function fastMap (subject, fn, thisContext) {
-	  var length = subject.length,
-	      result = new Array(length),
-	      iterator = thisContext !== undefined ? bindInternal3(fn, thisContext) : fn,
-	      i;
-	  for (i = 0; i < length; i++) {
-	    result[i] = iterator(subject[i], i, subject);
-	  }
-	  return result;
-	};
-
-
-/***/ },
-/* 19 */
-/*!**************************************************************!*\
-  !*** ./~/cycle-snabbdom/~/fast.js/function/bindInternal3.js ***!
-  \**************************************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Internal helper to bind a function known to have 3 arguments
-	 * to a given context.
-	 */
-	module.exports = function bindInternal3 (func, thisContext) {
-	  return function (a, b, c) {
-	    return func.call(thisContext, a, b, c);
-	  };
-	};
-
-
-/***/ },
-/* 20 */
-/*!**************************************************************!*\
-  !*** ./~/cycle-snabbdom/~/hyperscript-helpers/dist/index.js ***!
-  \**************************************************************/
+/* 24 */
+/*!*********************************************!*\
+  !*** ./~/hyperscript-helpers/dist/index.js ***!
+  \*********************************************/
 /***/ function(module, exports) {
 
 	'use strict';
@@ -15081,10 +15286,10 @@
 
 
 /***/ },
-/* 21 */
-/*!******************************************************!*\
-  !*** ./~/cycle-snabbdom/~/snabbdom/modules/class.js ***!
-  \******************************************************/
+/* 25 */
+/*!*************************************!*\
+  !*** ./~/snabbdom/modules/class.js ***!
+  \*************************************/
 /***/ function(module, exports) {
 
 	function updateClass(oldVnode, vnode) {
@@ -15103,10 +15308,10 @@
 
 
 /***/ },
-/* 22 */
-/*!******************************************************!*\
-  !*** ./~/cycle-snabbdom/~/snabbdom/modules/props.js ***!
-  \******************************************************/
+/* 26 */
+/*!*************************************!*\
+  !*** ./~/snabbdom/modules/props.js ***!
+  \*************************************/
 /***/ function(module, exports) {
 
 	function updateProps(oldVnode, vnode) {
@@ -15125,10 +15330,10 @@
 
 
 /***/ },
-/* 23 */
-/*!***********************************************************!*\
-  !*** ./~/cycle-snabbdom/~/snabbdom/modules/attributes.js ***!
-  \***********************************************************/
+/* 27 */
+/*!******************************************!*\
+  !*** ./~/snabbdom/modules/attributes.js ***!
+  \******************************************/
 /***/ function(module, exports) {
 
 	var booleanAttrs = ["allowfullscreen", "async", "autofocus", "autoplay", "checked", "compact", "controls", "declare", 
@@ -15173,10 +15378,10 @@
 
 
 /***/ },
-/* 24 */
-/*!******************************************************!*\
-  !*** ./~/cycle-snabbdom/~/snabbdom/modules/style.js ***!
-  \******************************************************/
+/* 28 */
+/*!*************************************!*\
+  !*** ./~/snabbdom/modules/style.js ***!
+  \*************************************/
 /***/ function(module, exports) {
 
 	var raf = requestAnimationFrame || setTimeout;
@@ -15241,7 +15446,7 @@
 
 
 /***/ },
-/* 25 */
+/* 29 */
 /*!*****************************!*\
   !*** ./src/color-change.js ***!
   \*****************************/
@@ -15259,7 +15464,7 @@
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _globalStyles = __webpack_require__(/*! ./global-styles */ 26);
+	var _globalStyles = __webpack_require__(/*! ./global-styles */ 30);
 	
 	var _globalStyles2 = _interopRequireDefault(_globalStyles);
 	
@@ -15300,7 +15505,7 @@
 	exports.default = home;
 
 /***/ },
-/* 26 */
+/* 30 */
 /*!******************************!*\
   !*** ./src/global-styles.js ***!
   \******************************/
@@ -15328,7 +15533,7 @@
 	exports.default = fadeInOutStyle;
 
 /***/ },
-/* 27 */
+/* 31 */
 /*!******************************!*\
   !*** ./src/github-search.js ***!
   \******************************/
@@ -15346,7 +15551,7 @@
 	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 10);
 	
-	var _globalStyles = __webpack_require__(/*! ./global-styles */ 26);
+	var _globalStyles = __webpack_require__(/*! ./global-styles */ 30);
 	
 	var _globalStyles2 = _interopRequireDefault(_globalStyles);
 	
@@ -15371,15 +15576,6 @@
 	    login: '?'
 	  } : _ref$owner;
 	
-	  //Function param defaults think null is a good value...
-	  //Since these variables will placed directly inside their containers
-	  // (not wrapped in a <span> or anything), we must check if they are null
-	  // to avoid errors.
-	  //It would be less code to just wrap them in <span> or <p> tags,
-	  // but this illustrates an easy gotcha which wasn't fun to debug.
-	  var safeDescription = description === null ? 'No description given.' : description;
-	  var safeLogin = owner.login === null ? '?' : owner.login;
-	
 	  var html = (0, _cycleSnabbdom.h)('div.search-result', {
 	    key: id,
 	    style: {
@@ -15387,7 +15583,7 @@
 	      delayed: { opacity: 1, transform: 'translateY(0px)' },
 	      remove: { opacity: 0, transform: 'translateY(-100px)' }
 	    }
-	  }, [(0, _cycleSnabbdom.h)('a.gh-owner-link', { props: { href: owner.html_url } }, [(0, _cycleSnabbdom.h)('img.gh-avatar', { props: { src: owner.avatar_url } }), safeLogin]), (0, _cycleSnabbdom.h)('a.gh-link', { props: { href: html_url } }, [(0, _cycleSnabbdom.h)('h1', {}, full_name), safeDescription])]);
+	  }, [(0, _cycleSnabbdom.h)('a.gh-owner-link', { props: { href: owner.html_url } }, [(0, _cycleSnabbdom.h)('img.gh-avatar', { props: { src: owner.avatar_url } }), owner.login]), (0, _cycleSnabbdom.h)('a.gh-link', { props: { href: html_url } }, [(0, _cycleSnabbdom.h)('h1', {}, full_name), description])]);
 	  return html;
 	}
 	

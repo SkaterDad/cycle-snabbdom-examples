@@ -24,15 +24,6 @@ function resultView({
     avatar_url: 'http://fullmurray.com/50/50',
     login: '?',
   }}) {
-  //Function param defaults think null is a good value...
-  //Since these variables will placed directly inside their containers
-  // (not wrapped in a <span> or anything), we must check if they are null
-  // to avoid errors.
-  //It would be less code to just wrap them in <span> or <p> tags,
-  // but this illustrates an easy gotcha which wasn't fun to debug.
-  const safeDescription = description === null ? 'No description given.' : description
-  const safeLogin = owner.login === null ? '?' : owner.login
-
   const html = h('div.search-result', {
     key: id,
     style: {
@@ -43,11 +34,11 @@ function resultView({
   }, [
     h('a.gh-owner-link', {props: {href: owner.html_url}}, [
       h('img.gh-avatar',{props: {src: owner.avatar_url}}),
-      safeLogin,
+      owner.login,
     ]),
     h('a.gh-link', {props: {href: html_url}}, [
       h('h1', {}, full_name),
-      safeDescription,
+      description,
     ]),
   ])
   return html
