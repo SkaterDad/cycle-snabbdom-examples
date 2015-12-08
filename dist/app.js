@@ -69,18 +69,6 @@
 	
 	var header = (0, _cycleSnabbdom.h)('header', {}, [(0, _cycleSnabbdom.h)('span', { style: { marginRight: '1rem' } }, 'Example Chooser:'), (0, _cycleSnabbdom.h)('select.switcher', {}, [(0, _cycleSnabbdom.h)('option', { attrs: { value: 0, selected: true } }, 'Checkbox'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 1 } }, 'Color Changer'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 2 } }, 'Github Search')])]);
 	
-	// function header(responses) { //eslint-disable-line
-	//   return {DOM: Rx.Observable.just(h('header', {}, [
-	//     h('span', {style: {marginRight: '1rem'}}, 'Example Chooser:'),
-	//     h('select.switcher', {}, [
-	//       h('option', {attrs: {value: 0, selected: true}}, 'Checkbox'),
-	//       h('option', {attrs: {value: 1}}, 'Color Changer'),
-	//       h('option', {attrs: {value: 2}}, 'Github Search'),
-	//     ]),
-	//   ])).do(() => { console.log(`Header DOM emitted`)}) //eslint-disable-line
-	//   }
-	// }
-	
 	var view = function view(hdr, cont) {
 	  return (0, _cycleSnabbdom.h)('div.app-wrapper', {}, [hdr, (0, _cycleSnabbdom.h)('main.content-holder', {}, [cont])]);
 	};
@@ -15436,15 +15424,15 @@
 	  value: true
 	});
 	
-	var _checkbox = __webpack_require__(/*! ./examples/checkbox */ 34);
+	var _checkbox = __webpack_require__(/*! ./examples/checkbox */ 30);
 	
 	var _checkbox2 = _interopRequireDefault(_checkbox);
 	
-	var _colorChange = __webpack_require__(/*! ./examples/color-change */ 35);
+	var _colorChange = __webpack_require__(/*! ./examples/color-change */ 31);
 	
 	var _colorChange2 = _interopRequireDefault(_colorChange);
 	
-	var _githubSearch = __webpack_require__(/*! ./examples/github-search */ 36);
+	var _githubSearch = __webpack_require__(/*! ./examples/github-search */ 33);
 	
 	var _githubSearch2 = _interopRequireDefault(_githubSearch);
 	
@@ -15495,38 +15483,7 @@
 	exports.default = content;
 
 /***/ },
-/* 30 */,
-/* 31 */,
-/* 32 */
-/*!******************************!*\
-  !*** ./src/global-styles.js ***!
-  \******************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var fadeInOutStyle = {
-	  opacity: 0,
-	  transition: 'opacity 0.5s ease-in-out',
-	  delayed: {
-	    opacity: 1
-	  },
-	  remove: {
-	    opacity: 0
-	  },
-	  destroy: {
-	    opacity: 0
-	  }
-	};
-	
-	exports.default = fadeInOutStyle;
-
-/***/ },
-/* 33 */,
-/* 34 */
+/* 30 */
 /*!**********************************!*\
   !*** ./src/examples/checkbox.js ***!
   \**********************************/
@@ -15559,7 +15516,7 @@
 	exports.default = checkbox;
 
 /***/ },
-/* 35 */
+/* 31 */
 /*!**************************************!*\
   !*** ./src/examples/color-change.js ***!
   \**************************************/
@@ -15624,7 +15581,35 @@
 	exports.default = home;
 
 /***/ },
-/* 36 */
+/* 32 */
+/*!******************************!*\
+  !*** ./src/global-styles.js ***!
+  \******************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var fadeInOutStyle = {
+	  opacity: 0,
+	  transition: 'opacity 0.5s ease-in-out',
+	  delayed: {
+	    opacity: 1
+	  },
+	  remove: {
+	    opacity: 0
+	  },
+	  destroy: {
+	    opacity: 0
+	  }
+	};
+	
+	exports.default = fadeInOutStyle;
+
+/***/ },
+/* 33 */
 /*!***************************************!*\
   !*** ./src/examples/github-search.js ***!
   \***************************************/

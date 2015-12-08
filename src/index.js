@@ -13,18 +13,6 @@ const header = h('header', {}, [
   ]),
 ])
 
-// function header(responses) { //eslint-disable-line
-//   return {DOM: Rx.Observable.just(h('header', {}, [
-//     h('span', {style: {marginRight: '1rem'}}, 'Example Chooser:'),
-//     h('select.switcher', {}, [
-//       h('option', {attrs: {value: 0, selected: true}}, 'Checkbox'),
-//       h('option', {attrs: {value: 1}}, 'Color Changer'),
-//       h('option', {attrs: {value: 2}}, 'Github Search'),
-//     ]),
-//   ])).do(() => { console.log(`Header DOM emitted`)}) //eslint-disable-line
-//   }
-// }
-
 const view = (hdr, cont) =>
   h('div.app-wrapper', {}, [hdr, h('main.content-holder', {}, [cont])])
 
