@@ -35,6 +35,10 @@ header {
   box-shadow: 1px 1px 1px 1px black;
   color: white;
   padding: 0rem 1rem;
+  
+  select {
+    padding: 0.2rem;
+  }
 }
 .app-wrapper {
   position: relative;

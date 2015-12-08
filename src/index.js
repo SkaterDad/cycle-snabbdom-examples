@@ -1,67 +1,45 @@
-//import Rx from 'rx'
+import Rx from 'rx'
 import Cycle from '@cycle/core'
-import {makeHTTPDriver} from '@cycle/http'
 import {h, makeDOMDriver} from 'cycle-snabbdom'
-import colorChange from './color-change'
-import github from './github-search'
+import {makeHTTPDriver} from '@cycle/http'
+import content from './content'
 
-//list of available examples
-const examples = [
-  {value: 'colors', text: 'Magic Color Changer'},
-  {value: 'github', text: 'Github HTTP Search'},
-]
+const header = h('header', {}, [
+  h('span', {style: {marginRight: '1rem'}}, 'Example Chooser:'),
+  h('select.switcher', {}, [
+    h('option', {attrs: {value: 0, selected: true}}, 'Checkbox'),
+    h('option', {attrs: {value: 1}}, 'Color Changer'),
+    h('option', {attrs: {value: 2}}, 'Github Search'),
+  ]),
+])
 
-//individual options for example selection
-const optionDef = (example) => {
-  return h('option',
-    {props: {value: example.value}},
-    example.text)
-}
+// function header(responses) { //eslint-disable-line
+//   return {DOM: Rx.Observable.just(h('header', {}, [
+//     h('span', {style: {marginRight: '1rem'}}, 'Example Chooser:'),
+//     h('select.switcher', {}, [
+//       h('option', {attrs: {value: 0, selected: true}}, 'Checkbox'),
+//       h('option', {attrs: {value: 1}}, 'Color Changer'),
+//       h('option', {attrs: {value: 2}}, 'Github Search'),
+//     ]),
+//   ])).do(() => { console.log(`Header DOM emitted`)}) //eslint-disable-line
+//   }
+// }
 
-//top header which contains example selector
-const headerDOM =
-  h('header', [
-    h('select.examples', {},
-      examples.map(optionDef)
-    )]
-  )
-
-const view = (header, content) =>
-  h('div.app-wrapper', {}, [header, h('main.content-holder', {}, [content])])
+const view = (hdr, cont) =>
+  h('div.app-wrapper', {}, [hdr, h('main.content-holder', {}, [cont])])
 
 function main(responses) {
-  //which example to run?
-  const selection$ = responses.DOM.select('select.examples').events('change')
+  let toggle$ = responses.DOM.select('.switcher').events('change')
     .map(ev => ev.target.value)
-    .startWith(examples[0].value)
+    .startWith(0)
+    .do((x) => {console.log(`Example Selector = ${x}`)}) //eslint-disable-line
 
-  //observable of nested dialogues, which have observable return values
-  const content$ = selection$
-    .map(sel => {
-      switch (sel) {
-      case 'github':
-        return github(responses)
-      default:
-        return colorChange(responses)
-      }
-    })
+  //const theHeader = header(responses)
+  const theContent = content(responses, toggle$)
 
-  //build full DOM
-  const view$ = content$
-    .filter(dialogue => dialogue.DOM)
-    .flatMapLatest(dialogue => dialogue.DOM)
-    .map((cDOM) => view(headerDOM, cDOM))
+  const view$ = Rx.Observable.just(view(header, theContent.DOM))
 
-  //http requests - if exists
-  const http$ = content$
-    .filter(dialogue => dialogue.HTTP)
-    .flatMapLatest(dialogue => dialogue.HTTP)
-
-  //build object to return
-  return {
-    DOM: view$,
-    HTTP: http$,
-  }
+  return {DOM: view$, HTTP: theContent.HTTP}
 }
 
 Cycle.run(main, {

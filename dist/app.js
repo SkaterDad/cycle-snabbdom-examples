@@ -49,77 +49,55 @@
 
 	'use strict';
 	
-	var _core = __webpack_require__(/*! @cycle/core */ 1);
+	var _rx = __webpack_require__(/*! rx */ 1);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _core = __webpack_require__(/*! @cycle/core */ 4);
 	
 	var _core2 = _interopRequireDefault(_core);
 	
-	var _http = __webpack_require__(/*! @cycle/http */ 5);
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 10);
+	var _http = __webpack_require__(/*! @cycle/http */ 24);
 	
-	var _colorChange = __webpack_require__(/*! ./color-change */ 29);
+	var _content = __webpack_require__(/*! ./content */ 29);
 	
-	var _colorChange2 = _interopRequireDefault(_colorChange);
-	
-	var _githubSearch = __webpack_require__(/*! ./github-search */ 31);
-	
-	var _githubSearch2 = _interopRequireDefault(_githubSearch);
+	var _content2 = _interopRequireDefault(_content);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	//list of available examples
-	var examples = [{ value: 'colors', text: 'Magic Color Changer' }, { value: 'github', text: 'Github HTTP Search' }];
+	var header = (0, _cycleSnabbdom.h)('header', {}, [(0, _cycleSnabbdom.h)('span', { style: { marginRight: '1rem' } }, 'Example Chooser:'), (0, _cycleSnabbdom.h)('select.switcher', {}, [(0, _cycleSnabbdom.h)('option', { attrs: { value: 0, selected: true } }, 'Checkbox'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 1 } }, 'Color Changer'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 2 } }, 'Github Search')])]);
 	
-	//individual options for example selection
-	//import Rx from 'rx'
-	var optionDef = function optionDef(example) {
-	  return (0, _cycleSnabbdom.h)('option', { props: { value: example.value } }, example.text);
-	};
+	// function header(responses) { //eslint-disable-line
+	//   return {DOM: Rx.Observable.just(h('header', {}, [
+	//     h('span', {style: {marginRight: '1rem'}}, 'Example Chooser:'),
+	//     h('select.switcher', {}, [
+	//       h('option', {attrs: {value: 0, selected: true}}, 'Checkbox'),
+	//       h('option', {attrs: {value: 1}}, 'Color Changer'),
+	//       h('option', {attrs: {value: 2}}, 'Github Search'),
+	//     ]),
+	//   ])).do(() => { console.log(`Header DOM emitted`)}) //eslint-disable-line
+	//   }
+	// }
 	
-	//top header which contains example selector
-	var headerDOM = (0, _cycleSnabbdom.h)('header', [(0, _cycleSnabbdom.h)('select.examples', {}, examples.map(optionDef))]);
-	
-	var view = function view(header, content) {
-	  return (0, _cycleSnabbdom.h)('div.app-wrapper', {}, [header, (0, _cycleSnabbdom.h)('main.content-holder', {}, [content])]);
+	var view = function view(hdr, cont) {
+	  return (0, _cycleSnabbdom.h)('div.app-wrapper', {}, [hdr, (0, _cycleSnabbdom.h)('main.content-holder', {}, [cont])]);
 	};
 	
 	function main(responses) {
-	  //which example to run?
-	  var selection$ = responses.DOM.select('select.examples').events('change').map(function (ev) {
+	  var toggle$ = responses.DOM.select('.switcher').events('change').map(function (ev) {
 	    return ev.target.value;
-	  }).startWith(examples[0].value);
+	  }).startWith(0).do(function (x) {
+	    console.log('Example Selector = ' + x);
+	  }); //eslint-disable-line
 	
-	  //observable of nested dialogues, which have observable return values
-	  var content$ = selection$.map(function (sel) {
-	    switch (sel) {
-	      case 'github':
-	        return (0, _githubSearch2.default)(responses);
-	      default:
-	        return (0, _colorChange2.default)(responses);
-	    }
-	  });
+	  //const theHeader = header(responses)
+	  var theContent = (0, _content2.default)(responses, toggle$);
 	
-	  //build full DOM
-	  var view$ = content$.filter(function (dialogue) {
-	    return dialogue.DOM;
-	  }).flatMapLatest(function (dialogue) {
-	    return dialogue.DOM;
-	  }).map(function (cDOM) {
-	    return view(headerDOM, cDOM);
-	  });
+	  var view$ = _rx2.default.Observable.just(view(header, theContent.DOM));
 	
-	  //http requests - if exists
-	  var http$ = content$.filter(function (dialogue) {
-	    return dialogue.HTTP;
-	  }).flatMapLatest(function (dialogue) {
-	    return dialogue.HTTP;
-	  });
-	
-	  //build object to return
-	  return {
-	    DOM: view$,
-	    HTTP: http$
-	  };
+	  return { DOM: view$, HTTP: theContent.HTTP };
 	}
 	
 	_core2.default.run(main, {
@@ -129,149 +107,6 @@
 
 /***/ },
 /* 1 */
-/*!************************************!*\
-  !*** ./~/@cycle/core/lib/cycle.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	var Rx = __webpack_require__(/*! rx */ 2);
-	
-	function makeRequestProxies(drivers) {
-	  var requestProxies = {};
-	  for (var _name in drivers) {
-	    if (drivers.hasOwnProperty(_name)) {
-	      requestProxies[_name] = new Rx.ReplaySubject(1);
-	    }
-	  }
-	  return requestProxies;
-	}
-	
-	function callDrivers(drivers, requestProxies) {
-	  var responses = {};
-	  for (var _name2 in drivers) {
-	    if (drivers.hasOwnProperty(_name2)) {
-	      responses[_name2] = drivers[_name2](requestProxies[_name2], _name2);
-	    }
-	  }
-	  return responses;
-	}
-	
-	function attachDisposeToRequests(requests, replicationSubscription) {
-	  Object.defineProperty(requests, "dispose", {
-	    enumerable: false,
-	    value: function value() {
-	      replicationSubscription.dispose();
-	    }
-	  });
-	  return requests;
-	}
-	
-	function makeDisposeResponses(responses) {
-	  return function dispose() {
-	    for (var _name3 in responses) {
-	      if (responses.hasOwnProperty(_name3) && typeof responses[_name3].dispose === "function") {
-	        responses[_name3].dispose();
-	      }
-	    }
-	  };
-	}
-	
-	function attachDisposeToResponses(responses) {
-	  Object.defineProperty(responses, "dispose", {
-	    enumerable: false,
-	    value: makeDisposeResponses(responses)
-	  });
-	  return responses;
-	}
-	
-	function logToConsoleError(err) {
-	  var target = err.stack || err;
-	  if (console && console.error) {
-	    console.error(target);
-	  }
-	}
-	
-	function replicateMany(observables, subjects) {
-	  return Rx.Observable.create(function (observer) {
-	    var subscription = new Rx.CompositeDisposable();
-	    setTimeout(function () {
-	      for (var _name4 in observables) {
-	        if (observables.hasOwnProperty(_name4) && subjects.hasOwnProperty(_name4) && !subjects[_name4].isDisposed) {
-	          subscription.add(observables[_name4].doOnError(logToConsoleError).subscribe(subjects[_name4].asObserver()));
-	        }
-	      }
-	      observer.onNext(subscription);
-	    }, 1);
-	
-	    return function dispose() {
-	      subscription.dispose();
-	      for (var x in subjects) {
-	        if (subjects.hasOwnProperty(x)) {
-	          subjects[x].dispose();
-	        }
-	      }
-	    };
-	  });
-	}
-	
-	function isObjectEmpty(obj) {
-	  for (var key in obj) {
-	    if (obj.hasOwnProperty(key)) {
-	      return false;
-	    }
-	  }
-	  return true;
-	}
-	
-	function run(main, drivers) {
-	  if (typeof main !== "function") {
-	    throw new Error("First argument given to Cycle.run() must be the 'main' " + "function.");
-	  }
-	  if (typeof drivers !== "object" || drivers === null) {
-	    throw new Error("Second argument given to Cycle.run() must be an object " + "with driver functions as properties.");
-	  }
-	  if (isObjectEmpty(drivers)) {
-	    throw new Error("Second argument given to Cycle.run() must be an object " + "with at least one driver function declared as a property.");
-	  }
-	
-	  var requestProxies = makeRequestProxies(drivers);
-	  var responses = callDrivers(drivers, requestProxies);
-	  var requests = main(responses);
-	  var subscription = replicateMany(requests, requestProxies).subscribe();
-	  var requestsWithDispose = attachDisposeToRequests(requests, subscription);
-	  var responsesWithDispose = attachDisposeToResponses(responses);
-	  return [requestsWithDispose, responsesWithDispose];
-	}
-	
-	var Cycle = {
-	  /**
-	   * Takes an `main` function and circularly connects it to the given collection
-	   * of driver functions.
-	   *
-	   * The `main` function expects a collection of "driver response" Observables
-	   * as input, and should return a collection of "driver request" Observables.
-	   * A "collection of Observables" is a JavaScript object where
-	   * keys match the driver names registered by the `drivers` object, and values
-	   * are Observables or a collection of Observables.
-	   *
-	   * @param {Function} main a function that takes `responses` as input
-	   * and outputs a collection of `requests` Observables.
-	   * @param {Object} drivers an object where keys are driver names and values
-	   * are driver functions.
-	   * @return {Array} an array where the first object is the collection of driver
-	   * requests, and the second object is the collection of driver responses, that
-	   * can be used for debugging or testing.
-	   * @function run
-	   */
-	  run: run
-	};
-	
-	module.exports = Cycle;
-
-/***/ },
-/* 2 */
 /*!*****************************!*\
   !*** ./~/rx/dist/rx.all.js ***!
   \*****************************/
@@ -12473,10 +12308,10 @@
 	
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../webpack/buildin/module.js */ 3)(module), (function() { return this; }()), __webpack_require__(/*! ./~/process/browser.js */ 4)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../webpack/buildin/module.js */ 2)(module), (function() { return this; }()), __webpack_require__(/*! ./~/process/browser.js */ 3)))
 
 /***/ },
-/* 3 */
+/* 2 */
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
   \***********************************/
@@ -12495,7 +12330,7 @@
 
 
 /***/ },
-/* 4 */
+/* 3 */
 /*!******************************!*\
   !*** ./~/process/browser.js ***!
   \******************************/
@@ -12595,7 +12430,1389 @@
 
 
 /***/ },
+/* 4 */
+/*!************************************!*\
+  !*** ./~/@cycle/core/lib/cycle.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var Rx = __webpack_require__(/*! rx */ 1);
+	
+	function makeSinkProxies(drivers) {
+	  var sinkProxies = {};
+	  for (var _name in drivers) {
+	    if (drivers.hasOwnProperty(_name)) {
+	      sinkProxies[_name] = new Rx.ReplaySubject(1);
+	    }
+	  }
+	  return sinkProxies;
+	}
+	
+	function callDrivers(drivers, sinkProxies) {
+	  var sources = {};
+	  for (var _name2 in drivers) {
+	    if (drivers.hasOwnProperty(_name2)) {
+	      sources[_name2] = drivers[_name2](sinkProxies[_name2], _name2);
+	    }
+	  }
+	  return sources;
+	}
+	
+	function attachDisposeToSinks(sinks, replicationSubscription) {
+	  Object.defineProperty(sinks, "dispose", {
+	    enumerable: false,
+	    value: function value() {
+	      replicationSubscription.dispose();
+	    }
+	  });
+	  return sinks;
+	}
+	
+	function makeDisposeSources(sources) {
+	  return function dispose() {
+	    for (var _name3 in sources) {
+	      if (sources.hasOwnProperty(_name3) && typeof sources[_name3].dispose === "function") {
+	        sources[_name3].dispose();
+	      }
+	    }
+	  };
+	}
+	
+	function attachDisposeToSources(sources) {
+	  Object.defineProperty(sources, "dispose", {
+	    enumerable: false,
+	    value: makeDisposeSources(sources)
+	  });
+	  return sources;
+	}
+	
+	function logToConsoleError(err) {
+	  var target = err.stack || err;
+	  if (console && console.error) {
+	    console.error(target);
+	  }
+	}
+	
+	function replicateMany(observables, subjects) {
+	  return Rx.Observable.create(function (observer) {
+	    var subscription = new Rx.CompositeDisposable();
+	    setTimeout(function () {
+	      for (var _name4 in observables) {
+	        if (observables.hasOwnProperty(_name4) && subjects.hasOwnProperty(_name4) && !subjects[_name4].isDisposed) {
+	          subscription.add(observables[_name4].doOnError(logToConsoleError).subscribe(subjects[_name4].asObserver()));
+	        }
+	      }
+	      observer.onNext(subscription);
+	    }, 1);
+	
+	    return function dispose() {
+	      subscription.dispose();
+	      for (var x in subjects) {
+	        if (subjects.hasOwnProperty(x)) {
+	          subjects[x].dispose();
+	        }
+	      }
+	    };
+	  });
+	}
+	
+	function isObjectEmpty(obj) {
+	  for (var key in obj) {
+	    if (obj.hasOwnProperty(key)) {
+	      return false;
+	    }
+	  }
+	  return true;
+	}
+	
+	function run(main, drivers) {
+	  if (typeof main !== "function") {
+	    throw new Error("First argument given to Cycle.run() must be the 'main' " + "function.");
+	  }
+	  if (typeof drivers !== "object" || drivers === null) {
+	    throw new Error("Second argument given to Cycle.run() must be an object " + "with driver functions as properties.");
+	  }
+	  if (isObjectEmpty(drivers)) {
+	    throw new Error("Second argument given to Cycle.run() must be an object " + "with at least one driver function declared as a property.");
+	  }
+	
+	  var sinkProxies = makeSinkProxies(drivers);
+	  var sources = callDrivers(drivers, sinkProxies);
+	  var sinks = main(sources);
+	  var subscription = replicateMany(sinks, sinkProxies).subscribe();
+	  var sinksWithDispose = attachDisposeToSinks(sinks, subscription);
+	  var sourcesWithDispose = attachDisposeToSources(sources);
+	  return { sources: sourcesWithDispose, sinks: sinksWithDispose };
+	}
+	
+	var Cycle = {
+	  /**
+	   * Takes an `main` function and circularly connects it to the given collection
+	   * of driver functions.
+	   *
+	   * The `main` function expects a collection of "driver source" Observables
+	   * as input, and should return a collection of "driver sink" Observables.
+	   * A "collection of Observables" is a JavaScript object where
+	   * keys match the driver names registered by the `drivers` object, and values
+	   * are Observables or a collection of Observables.
+	   *
+	   * @param {Function} main a function that takes `sources` as input
+	   * and outputs a collection of `sinks` Observables.
+	   * @param {Object} drivers an object where keys are driver names and values
+	   * are driver functions.
+	   * @return {Object} an object with two properties: `sources` and `sinks`.
+	   * `sinks` is the collection of driver sinks, and `sources` is the collection
+	   * of driver sources, that can be used for debugging or testing.
+	   * @function run
+	   */
+	  run: run
+	};
+	
+	module.exports = Cycle;
+
+/***/ },
 /* 5 */
+/*!***************************************!*\
+  !*** ./~/cycle-snabbdom/lib/index.js ***!
+  \***************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.video = exports.ul = exports.u = exports.tr = exports.title = exports.thead = exports.th = exports.tfoot = exports.textarea = exports.td = exports.tbody = exports.table = exports.sup = exports.sub = exports.style = exports.strong = exports.span = exports.source = exports.small = exports.select = exports.section = exports.script = exports.samp = exports.s = exports.ruby = exports.rt = exports.rp = exports.q = exports.pre = exports.param = exports.p = exports.option = exports.optgroup = exports.ol = exports.object = exports.noscript = exports.nav = exports.meta = exports.menu = exports.mark = exports.map = exports.link = exports.li = exports.legend = exports.label = exports.keygen = exports.kbd = exports.ins = exports.input = exports.img = exports.iframe = exports.i = exports.html = exports.hr = exports.hgroup = exports.header = exports.head = exports.h6 = exports.h5 = exports.h4 = exports.h3 = exports.h2 = exports.h1 = exports.form = exports.footer = exports.figure = exports.figcaption = exports.fieldset = exports.embed = exports.em = exports.dt = exports.dl = exports.div = exports.dir = exports.dfn = exports.del = exports.dd = exports.colgroup = exports.col = exports.code = exports.cite = exports.caption = exports.canvas = exports.button = exports.br = exports.body = exports.blockquote = exports.bdo = exports.bdi = exports.base = exports.b = exports.audio = exports.aside = exports.article = exports.area = exports.address = exports.abbr = exports.a = exports.h = exports.makeDOMDriver = undefined;
+	
+	var _rx = __webpack_require__(/*! rx */ 1);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _snabbdom = __webpack_require__(/*! snabbdom */ 6);
+	
+	var _snabbdom2 = _interopRequireDefault(_snabbdom);
+	
+	var _h = __webpack_require__(/*! snabbdom/h */ 9);
+	
+	var _h2 = _interopRequireDefault(_h);
+	
+	var _map = __webpack_require__(/*! fast.js/array/map */ 10);
+	
+	var _map2 = _interopRequireDefault(_map);
+	
+	var _reduce = __webpack_require__(/*! fast.js/array/reduce */ 12);
+	
+	var _reduce2 = _interopRequireDefault(_reduce);
+	
+	var _filter = __webpack_require__(/*! fast.js/array/filter */ 14);
+	
+	var _filter2 = _interopRequireDefault(_filter);
+	
+	var _matchesSelector = __webpack_require__(/*! matches-selector */ 15);
+	
+	var _matchesSelector2 = _interopRequireDefault(_matchesSelector);
+	
+	var _utils = __webpack_require__(/*! ./utils */ 16);
+	
+	var _fromEvent = __webpack_require__(/*! ./fromEvent */ 17);
+	
+	var _fromEvent2 = _interopRequireDefault(_fromEvent);
+	
+	var _parseTree = __webpack_require__(/*! ./parseTree */ 18);
+	
+	var _parseTree2 = _interopRequireDefault(_parseTree);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var _require = __webpack_require__(/*! hyperscript-helpers */ 19)(_h2.default);
+	
+	var a = _require.a;
+	var abbr = _require.abbr;
+	var address = _require.address;
+	var area = _require.area;
+	var article = _require.article;
+	var aside = _require.aside;
+	var audio = _require.audio;
+	var b = _require.b;
+	var base = _require.base;
+	var bdi = _require.bdi;
+	var bdo = _require.bdo;
+	var blockquote = _require.blockquote;
+	var body = _require.body;
+	var br = _require.br;
+	var button = _require.button;
+	var canvas = _require.canvas;
+	var caption = _require.caption;
+	var cite = _require.cite;
+	var code = _require.code;
+	var col = _require.col;
+	var colgroup = _require.colgroup;
+	var dd = _require.dd;
+	var del = _require.del;
+	var dfn = _require.dfn;
+	var dir = _require.dir;
+	var div = _require.div;
+	var dl = _require.dl;
+	var dt = _require.dt;
+	var em = _require.em;
+	var embed = _require.embed;
+	var fieldset = _require.fieldset;
+	var figcaption = _require.figcaption;
+	var figure = _require.figure;
+	var footer = _require.footer;
+	var form = _require.form;
+	var h1 = _require.h1;
+	var h2 = _require.h2;
+	var h3 = _require.h3;
+	var h4 = _require.h4;
+	var h5 = _require.h5;
+	var h6 = _require.h6;
+	var head = _require.head;
+	var header = _require.header;
+	var hgroup = _require.hgroup;
+	var hr = _require.hr;
+	var html = _require.html;
+	var i = _require.i;
+	var iframe = _require.iframe;
+	var img = _require.img;
+	var input = _require.input;
+	var ins = _require.ins;
+	var kbd = _require.kbd;
+	var keygen = _require.keygen;
+	var label = _require.label;
+	var legend = _require.legend;
+	var li = _require.li;
+	var link = _require.link;
+	var map = _require.map;
+	var mark = _require.mark;
+	var menu = _require.menu;
+	var meta = _require.meta;
+	var nav = _require.nav;
+	var noscript = _require.noscript;
+	var object = _require.object;
+	var ol = _require.ol;
+	var optgroup = _require.optgroup;
+	var option = _require.option;
+	var p = _require.p;
+	var param = _require.param;
+	var pre = _require.pre;
+	var q = _require.q;
+	var rp = _require.rp;
+	var rt = _require.rt;
+	var ruby = _require.ruby;
+	var s = _require.s;
+	var samp = _require.samp;
+	var script = _require.script;
+	var section = _require.section;
+	var select = _require.select;
+	var small = _require.small;
+	var source = _require.source;
+	var span = _require.span;
+	var strong = _require.strong;
+	var style = _require.style;
+	var sub = _require.sub;
+	var sup = _require.sup;
+	var table = _require.table;
+	var tbody = _require.tbody;
+	var td = _require.td;
+	var textarea = _require.textarea;
+	var tfoot = _require.tfoot;
+	var th = _require.th;
+	var thead = _require.thead;
+	var title = _require.title;
+	var tr = _require.tr;
+	var u = _require.u;
+	var ul = _require.ul;
+	var video = _require.video;
+	
+	var isolateSource = function isolateSource(_source, _scope) {
+	  return _source.select('.cycle-scope-' + _scope);
+	};
+	
+	var isolateSink = function isolateSink(sink, scope) {
+	  return sink.map(function (vtree) {
+	    var c = (vtree.sel + ' cycle-scope-' + scope).trim();
+	    vtree.sel = c;
+	    return vtree;
+	  });
+	};
+	
+	var makeIsStrictlyInRootScope = function makeIsStrictlyInRootScope(rootList, namespace) {
+	  return function (leaf) {
+	    var classIsForeign = function classIsForeign(c) {
+	      var matched = c.match(/cycle-scope-(\S+)/);
+	      return matched && namespace.indexOf('.' + c) === -1;
+	    };
+	
+	    for (var el = leaf.parentElement; el !== null; el = el.parentElement) {
+	      if (rootList.indexOf(el) >= 0) {
+	        return true;
+	      }
+	      var classList = el.className.split(' ');
+	      if (classList.some(classIsForeign)) {
+	        return false;
+	      }
+	    }
+	    return true;
+	  };
+	};
+	
+	var makeEventsSelector = function makeEventsSelector(element$) {
+	  return function (eventName) {
+	    var useCapture = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+	
+	    if (typeof eventName !== 'string') {
+	      throw new Error('DOM drivers events() expects argument to be a ' + 'string representing the event type to listen for.');
+	    }
+	    return element$.flatMapLatest(function (element) {
+	      if (!element) {
+	        return _rx2.default.Observable.empty();
+	      }
+	      return (0, _fromEvent2.default)(element, eventName, useCapture);
+	    }).share();
+	  };
+	};
+	
+	// Use function not 'const = x => {}' for this.namespace below
+	function makeElementSelector(rootElem$) {
+	  return function DOMSelect(selector) {
+	    if (typeof selector !== 'string') {
+	      throw new Error('DOM drivers select() expects first argument to be a ' + 'string as a CSS selector');
+	    }
+	    var namespace = this.namespace;
+	    var scopedSelector = (namespace.join(' ') + ' ' + selector).trim();
+	    var element$ = selector.trim() === ':root' ? rootElem$ : rootElem$.map(function (x) {
+	      var array = Array.isArray(x) ? x : [x];
+	      return (0, _filter2.default)((0, _reduce2.default)((0, _map2.default)(array, function (element) {
+	        if ((0, _matchesSelector2.default)(element, scopedSelector)) {
+	          return [element];
+	        } else {
+	          var nodeList = element.querySelectorAll(scopedSelector);
+	          return Array.prototype.slice.call(nodeList);
+	        }
+	      }), function (prev, curr) {
+	        return prev.concat(curr);
+	      }, []), makeIsStrictlyInRootScope(array, namespace));
+	    });
+	    return {
+	      observable: element$,
+	      namespace: namespace.concat(selector),
+	      select: makeElementSelector(element$),
+	      events: makeEventsSelector(element$),
+	      isolateSource: isolateSource,
+	      isolateSink: isolateSink
+	    };
+	  };
+	}
+	
+	var validateDOMDriverInput = function validateDOMDriverInput(view$) {
+	  if (!view$ || typeof view$.subscribe !== 'function') {
+	    throw new Error('The DOM driver function expects as input an ' + 'Observable of virtual DOM elements');
+	  }
+	};
+	
+	var makeDOMDriver = function makeDOMDriver(container) {
+	  var modules = arguments.length <= 1 || arguments[1] === undefined ? [__webpack_require__(/*! snabbdom/modules/class */ 20), __webpack_require__(/*! snabbdom/modules/props */ 21), __webpack_require__(/*! snabbdom/modules/attributes */ 22), __webpack_require__(/*! snabbdom/modules/style */ 23)] : arguments[1];
+	
+	  var patch = _snabbdom2.default.init(modules);
+	  var rootElem = (0, _utils.getDomElement)(container);
+	
+	  var DOMDriver = function DOMDriver(view$) {
+	    validateDOMDriverInput(view$);
+	
+	    var rootElem$ = view$.flatMapLatest(_parseTree2.default).startWith(rootElem).pairwise().map(function (_ref) {
+	      var _ref2 = _slicedToArray(_ref, 2);
+	
+	      var prevView = _ref2[0];
+	      var newView = _ref2[1];
+	
+	      patch(prevView, newView);
+	      return newView.elm;
+	    }).replay(null, 1);
+	
+	    var disposable = rootElem$.connect();
+	    return {
+	      namespace: [],
+	      select: makeElementSelector(rootElem$),
+	      dispose: disposable.dispose.bind(disposable),
+	      isolateSink: isolateSink,
+	      isolateSource: isolateSource
+	    };
+	  };
+	  return DOMDriver;
+	};
+	
+	exports.makeDOMDriver = makeDOMDriver;
+	exports.h = _h2.default;
+	exports.a = a;
+	exports.abbr = abbr;
+	exports.address = address;
+	exports.area = area;
+	exports.article = article;
+	exports.aside = aside;
+	exports.audio = audio;
+	exports.b = b;
+	exports.base = base;
+	exports.bdi = bdi;
+	exports.bdo = bdo;
+	exports.blockquote = blockquote;
+	exports.body = body;
+	exports.br = br;
+	exports.button = button;
+	exports.canvas = canvas;
+	exports.caption = caption;
+	exports.cite = cite;
+	exports.code = code;
+	exports.col = col;
+	exports.colgroup = colgroup;
+	exports.dd = dd;
+	exports.del = del;
+	exports.dfn = dfn;
+	exports.dir = dir;
+	exports.div = div;
+	exports.dl = dl;
+	exports.dt = dt;
+	exports.em = em;
+	exports.embed = embed;
+	exports.fieldset = fieldset;
+	exports.figcaption = figcaption;
+	exports.figure = figure;
+	exports.footer = footer;
+	exports.form = form;
+	exports.h1 = h1;
+	exports.h2 = h2;
+	exports.h3 = h3;
+	exports.h4 = h4;
+	exports.h5 = h5;
+	exports.h6 = h6;
+	exports.head = head;
+	exports.header = header;
+	exports.hgroup = hgroup;
+	exports.hr = hr;
+	exports.html = html;
+	exports.i = i;
+	exports.iframe = iframe;
+	exports.img = img;
+	exports.input = input;
+	exports.ins = ins;
+	exports.kbd = kbd;
+	exports.keygen = keygen;
+	exports.label = label;
+	exports.legend = legend;
+	exports.li = li;
+	exports.link = link;
+	exports.map = map;
+	exports.mark = mark;
+	exports.menu = menu;
+	exports.meta = meta;
+	exports.nav = nav;
+	exports.noscript = noscript;
+	exports.object = object;
+	exports.ol = ol;
+	exports.optgroup = optgroup;
+	exports.option = option;
+	exports.p = p;
+	exports.param = param;
+	exports.pre = pre;
+	exports.q = q;
+	exports.rp = rp;
+	exports.rt = rt;
+	exports.ruby = ruby;
+	exports.s = s;
+	exports.samp = samp;
+	exports.script = script;
+	exports.section = section;
+	exports.select = select;
+	exports.small = small;
+	exports.source = source;
+	exports.span = span;
+	exports.strong = strong;
+	exports.style = style;
+	exports.sub = sub;
+	exports.sup = sup;
+	exports.table = table;
+	exports.tbody = tbody;
+	exports.td = td;
+	exports.textarea = textarea;
+	exports.tfoot = tfoot;
+	exports.th = th;
+	exports.thead = thead;
+	exports.title = title;
+	exports.tr = tr;
+	exports.u = u;
+	exports.ul = ul;
+	exports.video = video;
+
+/***/ },
+/* 6 */
+/*!********************************!*\
+  !*** ./~/snabbdom/snabbdom.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// jshint newcap: false
+	/* global require, module, document, Element */
+	'use strict';
+	
+	var VNode = __webpack_require__(/*! ./vnode */ 7);
+	var is = __webpack_require__(/*! ./is */ 8);
+	
+	function isUndef(s) { return s === undefined; }
+	function isDef(s) { return s !== undefined; }
+	
+	function emptyNodeAt(elm) {
+	  return VNode(elm.tagName, {}, [], undefined, elm);
+	}
+	
+	var emptyNode = VNode('', {}, [], undefined, undefined);
+	
+	function sameVnode(vnode1, vnode2) {
+	  return vnode1.key === vnode2.key && vnode1.sel === vnode2.sel;
+	}
+	
+	function createKeyToOldIdx(children, beginIdx, endIdx) {
+	  var i, map = {}, key;
+	  for (i = beginIdx; i <= endIdx; ++i) {
+	    key = children[i].key;
+	    if (isDef(key)) map[key] = i;
+	  }
+	  return map;
+	}
+	
+	function createRmCb(childElm, listeners) {
+	  return function() {
+	    if (--listeners === 0) childElm.parentElement.removeChild(childElm);
+	  };
+	}
+	
+	var hooks = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
+	
+	function init(modules) {
+	  var i, j, cbs = {};
+	  for (i = 0; i < hooks.length; ++i) {
+	    cbs[hooks[i]] = [];
+	    for (j = 0; j < modules.length; ++j) {
+	      if (modules[j][hooks[i]] !== undefined) cbs[hooks[i]].push(modules[j][hooks[i]]);
+	    }
+	  }
+	
+	  function createElm(vnode, insertedVnodeQueue) {
+	    var i, data = vnode.data;
+	    if (isDef(data)) {
+	      if (isDef(i = data.hook) && isDef(i = i.init)) i(vnode);
+	      if (isDef(i = data.vnode)) vnode = i;
+	    }
+	    var elm, children = vnode.children, sel = vnode.sel;
+	    if (isDef(sel)) {
+	      // Parse selector
+	      var hashIdx = sel.indexOf('#');
+	      var dotIdx = sel.indexOf('.', hashIdx);
+	      var hash = hashIdx > 0 ? hashIdx : sel.length;
+	      var dot = dotIdx > 0 ? dotIdx : sel.length;
+	      var tag = hashIdx !== -1 || dotIdx !== -1 ? sel.slice(0, Math.min(hash, dot)) : sel;
+	      elm = vnode.elm = isDef(data) && isDef(i = data.ns) ? document.createElementNS(i, tag)
+	                                                          : document.createElement(tag);
+	      if (hash < dot) elm.id = sel.slice(hash + 1, dot);
+	      if (dotIdx > 0) elm.className = sel.slice(dot+1).replace(/\./g, ' ');
+	      if (is.array(children)) {
+	        for (i = 0; i < children.length; ++i) {
+	          elm.appendChild(createElm(children[i], insertedVnodeQueue));
+	        }
+	      } else if (is.primitive(vnode.text)) {
+	        elm.appendChild(document.createTextNode(vnode.text));
+	      }
+	      for (i = 0; i < cbs.create.length; ++i) cbs.create[i](emptyNode, vnode);
+	      i = vnode.data.hook; // Reuse variable
+	      if (isDef(i)) {
+	        if (i.create) i.create(emptyNode, vnode);
+	        if (i.insert) insertedVnodeQueue.push(vnode);
+	      }
+	    } else {
+	      elm = vnode.elm = document.createTextNode(vnode.text);
+	    }
+	    return vnode.elm;
+	  }
+	
+	  function addVnodes(parentElm, before, vnodes, startIdx, endIdx, insertedVnodeQueue) {
+	    for (; startIdx <= endIdx; ++startIdx) {
+	      parentElm.insertBefore(createElm(vnodes[startIdx], insertedVnodeQueue), before);
+	    }
+	  }
+	
+	  function invokeDestroyHook(vnode) {
+	    var i = vnode.data, j;
+	    if (isDef(i)) {
+	      if (isDef(i = i.hook) && isDef(i = i.destroy)) i(vnode);
+	      for (i = 0; i < cbs.destroy.length; ++i) cbs.destroy[i](vnode);
+	      if (isDef(i = vnode.children)) {
+	        for (j = 0; j < vnode.children.length; ++j) {
+	          invokeDestroyHook(vnode.children[j]);
+	        }
+	      }
+	    }
+	  }
+	
+	  function removeVnodes(parentElm, vnodes, startIdx, endIdx) {
+	    for (; startIdx <= endIdx; ++startIdx) {
+	      var i, listeners, rm, ch = vnodes[startIdx];
+	      if (isDef(ch)) {
+	        if (isDef(ch.sel)) {
+	          invokeDestroyHook(ch);
+	          listeners = cbs.remove.length + 1;
+	          rm = createRmCb(ch.elm, listeners);
+	          for (i = 0; i < cbs.remove.length; ++i) cbs.remove[i](ch, rm);
+	          if (isDef(i = ch.data) && isDef(i = i.hook) && isDef(i = i.remove)) {
+	            i(ch, rm);
+	          } else {
+	            rm();
+	          }
+	        } else { // Text node
+	          parentElm.removeChild(ch.elm);
+	        }
+	      }
+	    }
+	  }
+	
+	  function updateChildren(parentElm, oldCh, newCh, insertedVnodeQueue) {
+	    var oldStartIdx = 0, newStartIdx = 0;
+	    var oldEndIdx = oldCh.length - 1;
+	    var oldStartVnode = oldCh[0];
+	    var oldEndVnode = oldCh[oldEndIdx];
+	    var newEndIdx = newCh.length - 1;
+	    var newStartVnode = newCh[0];
+	    var newEndVnode = newCh[newEndIdx];
+	    var oldKeyToIdx, idxInOld, elmToMove, before;
+	
+	    while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+	      if (isUndef(oldStartVnode)) {
+	        oldStartVnode = oldCh[++oldStartIdx]; // Vnode has been moved left
+	      } else if (isUndef(oldEndVnode)) {
+	        oldEndVnode = oldCh[--oldEndIdx];
+	      } else if (sameVnode(oldStartVnode, newStartVnode)) {
+	        patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue);
+	        oldStartVnode = oldCh[++oldStartIdx];
+	        newStartVnode = newCh[++newStartIdx];
+	      } else if (sameVnode(oldEndVnode, newEndVnode)) {
+	        patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue);
+	        oldEndVnode = oldCh[--oldEndIdx];
+	        newEndVnode = newCh[--newEndIdx];
+	      } else if (sameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
+	        patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
+	        parentElm.insertBefore(oldStartVnode.elm, oldEndVnode.elm.nextSibling);
+	        oldStartVnode = oldCh[++oldStartIdx];
+	        newEndVnode = newCh[--newEndIdx];
+	      } else if (sameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
+	        patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue);
+	        parentElm.insertBefore(oldEndVnode.elm, oldStartVnode.elm);
+	        oldEndVnode = oldCh[--oldEndIdx];
+	        newStartVnode = newCh[++newStartIdx];
+	      } else {
+	        if (isUndef(oldKeyToIdx)) oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
+	        idxInOld = oldKeyToIdx[newStartVnode.key];
+	        if (isUndef(idxInOld)) { // New element
+	          parentElm.insertBefore(createElm(newStartVnode, insertedVnodeQueue), oldStartVnode.elm);
+	          newStartVnode = newCh[++newStartIdx];
+	        } else {
+	          elmToMove = oldCh[idxInOld];
+	          patchVnode(elmToMove, newStartVnode, insertedVnodeQueue);
+	          oldCh[idxInOld] = undefined;
+	          parentElm.insertBefore(elmToMove.elm, oldStartVnode.elm);
+	          newStartVnode = newCh[++newStartIdx];
+	        }
+	      }
+	    }
+	    if (oldStartIdx > oldEndIdx) {
+	      before = isUndef(newCh[newEndIdx+1]) ? null : newCh[newEndIdx+1].elm;
+	      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue);
+	    } else if (newStartIdx > newEndIdx) {
+	      removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
+	    }
+	  }
+	
+	  function patchVnode(oldVnode, vnode, insertedVnodeQueue) {
+	    var i, hook;
+	    if (isDef(i = vnode.data) && isDef(hook = i.hook) && isDef(i = hook.prepatch)) {
+	      i(oldVnode, vnode);
+	    }
+	    if (isDef(i = oldVnode.data) && isDef(i = i.vnode)) oldVnode = i;
+	    if (isDef(i = vnode.data) && isDef(i = i.vnode)) vnode = i;
+	    var elm = vnode.elm = oldVnode.elm, oldCh = oldVnode.children, ch = vnode.children;
+	    if (oldVnode === vnode) return;
+	    if (isDef(vnode.data)) {
+	      for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode);
+	      i = vnode.data.hook;
+	      if (isDef(i) && isDef(i = i.update)) i(oldVnode, vnode);
+	    }
+	    if (isUndef(vnode.text)) {
+	      if (isDef(oldCh) && isDef(ch)) {
+	        if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue);
+	      } else if (isDef(ch)) {
+	        addVnodes(elm, null, ch, 0, ch.length - 1, insertedVnodeQueue);
+	      } else if (isDef(oldCh)) {
+	        removeVnodes(elm, oldCh, 0, oldCh.length - 1);
+	      }
+	    } else if (oldVnode.text !== vnode.text) {
+	      elm.textContent = vnode.text;
+	    }
+	    if (isDef(hook) && isDef(i = hook.postpatch)) {
+	      i(oldVnode, vnode);
+	    }
+	  }
+	
+	  return function(oldVnode, vnode) {
+	    var i;
+	    var insertedVnodeQueue = [];
+	    for (i = 0; i < cbs.pre.length; ++i) cbs.pre[i]();
+	    if (oldVnode instanceof Element) {
+	      if (oldVnode.parentElement !== null) {
+	        createElm(vnode, insertedVnodeQueue);
+	        oldVnode.parentElement.replaceChild(vnode.elm, oldVnode);
+	      } else {
+	        oldVnode = emptyNodeAt(oldVnode);
+	        patchVnode(oldVnode, vnode, insertedVnodeQueue);
+	      }
+	    } else {
+	      patchVnode(oldVnode, vnode, insertedVnodeQueue);
+	    }
+	    for (i = 0; i < insertedVnodeQueue.length; ++i) {
+	      insertedVnodeQueue[i].data.hook.insert(insertedVnodeQueue[i]);
+	    }
+	    for (i = 0; i < cbs.post.length; ++i) cbs.post[i]();
+	    return vnode;
+	  };
+	}
+	
+	module.exports = {init: init};
+
+
+/***/ },
+/* 7 */
+/*!*****************************!*\
+  !*** ./~/snabbdom/vnode.js ***!
+  \*****************************/
+/***/ function(module, exports) {
+
+	module.exports = function(sel, data, children, text, elm) {
+	  var key = data === undefined ? undefined : data.key;
+	  return {sel: sel, data: data, children: children,
+	          text: text, elm: elm, key: key};
+	};
+
+
+/***/ },
+/* 8 */
+/*!**************************!*\
+  !*** ./~/snabbdom/is.js ***!
+  \**************************/
+/***/ function(module, exports) {
+
+	module.exports = {
+	  array: Array.isArray,
+	  primitive: function(s) { return typeof s === 'string' || typeof s === 'number'; },
+	};
+
+
+/***/ },
+/* 9 */
+/*!*************************!*\
+  !*** ./~/snabbdom/h.js ***!
+  \*************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var VNode = __webpack_require__(/*! ./vnode */ 7);
+	var is = __webpack_require__(/*! ./is */ 8);
+	
+	module.exports = function h(sel, b, c) {
+	  var data = {}, children, text, i;
+	  if (arguments.length === 3) {
+	    data = b;
+	    if (is.array(c)) { children = c; }
+	    else if (is.primitive(c)) { text = c; }
+	  } else if (arguments.length === 2) {
+	    if (is.array(b)) { children = b; }
+	    else if (is.primitive(b)) { text = b; }
+	    else { data = b; }
+	  }
+	  if (is.array(children)) {
+	    for (i = 0; i < children.length; ++i) {
+	      if (is.primitive(children[i])) children[i] = VNode(undefined, undefined, undefined, children[i]);
+	    }
+	  }
+	  return VNode(sel, data, children, text, undefined);
+	};
+
+
+/***/ },
+/* 10 */
+/*!********************************!*\
+  !*** ./~/fast.js/array/map.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 11);
+	
+	/**
+	 * # Map
+	 *
+	 * A fast `.map()` implementation.
+	 *
+	 * @param  {Array}    subject     The array (or array-like) to map over.
+	 * @param  {Function} fn          The mapper function.
+	 * @param  {Object}   thisContext The context for the mapper.
+	 * @return {Array}                The array containing the results.
+	 */
+	module.exports = function fastMap (subject, fn, thisContext) {
+	  var length = subject.length,
+	      result = new Array(length),
+	      iterator = thisContext !== undefined ? bindInternal3(fn, thisContext) : fn,
+	      i;
+	  for (i = 0; i < length; i++) {
+	    result[i] = iterator(subject[i], i, subject);
+	  }
+	  return result;
+	};
+
+
+/***/ },
+/* 11 */
+/*!*********************************************!*\
+  !*** ./~/fast.js/function/bindInternal3.js ***!
+  \*********************************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Internal helper to bind a function known to have 3 arguments
+	 * to a given context.
+	 */
+	module.exports = function bindInternal3 (func, thisContext) {
+	  return function (a, b, c) {
+	    return func.call(thisContext, a, b, c);
+	  };
+	};
+
+
+/***/ },
+/* 12 */
+/*!***********************************!*\
+  !*** ./~/fast.js/array/reduce.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var bindInternal4 = __webpack_require__(/*! ../function/bindInternal4 */ 13);
+	
+	/**
+	 * # Reduce
+	 *
+	 * A fast `.reduce()` implementation.
+	 *
+	 * @param  {Array}    subject      The array (or array-like) to reduce.
+	 * @param  {Function} fn           The reducer function.
+	 * @param  {mixed}    initialValue The initial value for the reducer, defaults to subject[0].
+	 * @param  {Object}   thisContext  The context for the reducer.
+	 * @return {mixed}                 The final result.
+	 */
+	module.exports = function fastReduce (subject, fn, initialValue, thisContext) {
+	  var length = subject.length,
+	      iterator = thisContext !== undefined ? bindInternal4(fn, thisContext) : fn,
+	      i, result;
+	
+	  if (initialValue === undefined) {
+	    i = 1;
+	    result = subject[0];
+	  }
+	  else {
+	    i = 0;
+	    result = initialValue;
+	  }
+	
+	  for (; i < length; i++) {
+	    result = iterator(result, subject[i], i, subject);
+	  }
+	
+	  return result;
+	};
+
+
+/***/ },
+/* 13 */
+/*!*********************************************!*\
+  !*** ./~/fast.js/function/bindInternal4.js ***!
+  \*********************************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Internal helper to bind a function known to have 4 arguments
+	 * to a given context.
+	 */
+	module.exports = function bindInternal4 (func, thisContext) {
+	  return function (a, b, c, d) {
+	    return func.call(thisContext, a, b, c, d);
+	  };
+	};
+
+
+/***/ },
+/* 14 */
+/*!***********************************!*\
+  !*** ./~/fast.js/array/filter.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 11);
+	
+	/**
+	 * # Filter
+	 *
+	 * A fast `.filter()` implementation.
+	 *
+	 * @param  {Array}    subject     The array (or array-like) to filter.
+	 * @param  {Function} fn          The filter function.
+	 * @param  {Object}   thisContext The context for the filter.
+	 * @return {Array}                The array containing the results.
+	 */
+	module.exports = function fastFilter (subject, fn, thisContext) {
+	  var length = subject.length,
+	      result = [],
+	      iterator = thisContext !== undefined ? bindInternal3(fn, thisContext) : fn,
+	      i;
+	  for (i = 0; i < length; i++) {
+	    if (iterator(subject[i], i, subject)) {
+	      result.push(subject[i]);
+	    }
+	  }
+	  return result;
+	};
+
+
+/***/ },
+/* 15 */
+/*!*************************************!*\
+  !*** ./~/matches-selector/index.js ***!
+  \*************************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var proto = Element.prototype;
+	var vendor = proto.matches
+	  || proto.matchesSelector
+	  || proto.webkitMatchesSelector
+	  || proto.mozMatchesSelector
+	  || proto.msMatchesSelector
+	  || proto.oMatchesSelector;
+	
+	module.exports = match;
+	
+	/**
+	 * Match `el` to `selector`.
+	 *
+	 * @param {Element} el
+	 * @param {String} selector
+	 * @return {Boolean}
+	 * @api public
+	 */
+	
+	function match(el, selector) {
+	  if (vendor) return vendor.call(el, selector);
+	  var nodes = el.parentNode.querySelectorAll(selector);
+	  for (var i = 0; i < nodes.length; i++) {
+	    if (nodes[i] == el) return true;
+	  }
+	  return false;
+	}
+
+/***/ },
+/* 16 */
+/*!***************************************!*\
+  !*** ./~/cycle-snabbdom/lib/utils.js ***!
+  \***************************************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var isElement = function isElement(obj) {
+	  return typeof HTMLElement === "object" ? obj instanceof HTMLElement || obj instanceof DocumentFragment : obj && typeof obj === "object" && obj !== null && (obj.nodeType === 1 || obj.nodeType === 11) && typeof obj.nodeName === "string";
+	};
+	
+	var getDomElement = function getDomElement(_el) {
+	  var domElement = typeof _el === "string" ? document.querySelector(_el) : _el;
+	
+	  if (typeof domElement === "string" && domElement === null) {
+	    throw new Error("Cannot render into unknown element `" + _el + "`");
+	  } else if (!isElement(domElement)) {
+	    throw new Error("Given container is not a DOM element neither a " + "selector string.");
+	  }
+	  return domElement;
+	};
+	
+	exports.getDomElement = getDomElement;
+
+/***/ },
+/* 17 */
+/*!*******************************************!*\
+  !*** ./~/cycle-snabbdom/lib/fromEvent.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var Rx = __webpack_require__(/*! rx */ 1);
+	
+	var disposableCreate = Rx.Disposable.create;
+	var CompositeDisposable = Rx.CompositeDisposable;
+	var AnonymousObservable = Rx.AnonymousObservable;
+	
+	function createListener(_ref) {
+	  var element = _ref.element;
+	  var eventName = _ref.eventName;
+	  var handler = _ref.handler;
+	  var useCapture = _ref.useCapture;
+	
+	  if (element.addEventListener) {
+	    element.addEventListener(eventName, handler, useCapture);
+	    return disposableCreate(function removeEventListener() {
+	      element.removeEventListener(eventName, handler, useCapture);
+	    });
+	  }
+	  throw new Error("No listener found");
+	}
+	
+	function createEventListener(_ref2) {
+	  var element = _ref2.element;
+	  var eventName = _ref2.eventName;
+	  var handler = _ref2.handler;
+	  var useCapture = _ref2.useCapture;
+	
+	  var disposables = new CompositeDisposable();
+	
+	  if (Array.isArray(element)) {
+	    for (var i = 0, len = element.length; i < len; i++) {
+	      disposables.add(createEventListener({
+	        element: element[i],
+	        eventName: eventName,
+	        handler: handler,
+	        useCapture: useCapture
+	      }));
+	    }
+	  } else if (element) {
+	    disposables.add(createListener({ element: element, eventName: eventName, handler: handler, useCapture: useCapture }));
+	  }
+	  return disposables;
+	}
+	
+	function fromEvent(element, eventName) {
+	  var useCapture = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+	
+	  return new AnonymousObservable(function subscribe(observer) {
+	    return createEventListener({
+	      element: element,
+	      eventName: eventName,
+	      handler: function handler() {
+	        observer.onNext(arguments[0]);
+	      },
+	      useCapture: useCapture
+	    });
+	  }).share();
+	}
+	
+	module.exports = fromEvent;
+
+/***/ },
+/* 18 */
+/*!*******************************************!*\
+  !*** ./~/cycle-snabbdom/lib/parseTree.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _rx = __webpack_require__(/*! rx */ 1);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _map = __webpack_require__(/*! fast.js/array/map */ 10);
+	
+	var _map2 = _interopRequireDefault(_map);
+	
+	var _filter = __webpack_require__(/*! fast.js/array/filter */ 14);
+	
+	var _filter2 = _interopRequireDefault(_filter);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+	
+	var combineVTreeStreams = function combineVTreeStreams(vTree) {
+	  for (var _len = arguments.length, children = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    children[_key - 1] = arguments[_key];
+	  }
+	
+	  return {
+	    sel: vTree.sel,
+	    data: vTree.data,
+	    text: vTree.text,
+	    elm: vTree.elm,
+	    key: vTree.key,
+	    children: children
+	  };
+	};
+	
+	var parseTree = function parseTree(vTree) {
+	  if (!vTree) {
+	    return null;
+	  } else if (vTree.subscribe) {
+	    return vTree.flatMapLatest(parseTree);
+	  } else if ('object' === (typeof vTree === 'undefined' ? 'undefined' : _typeof(vTree))) {
+	    var vtree$ = _rx2.default.Observable.just(vTree);
+	    if (vTree.children && vTree.children.length > 0) {
+	      var _Rx$Observable;
+	
+	      return (_Rx$Observable = _rx2.default.Observable).combineLatest.apply(_Rx$Observable, [vtree$].concat(_toConsumableArray((0, _filter2.default)((0, _map2.default)(vTree.children, parseTree), function (x) {
+	        return x !== null;
+	      })), [combineVTreeStreams]));
+	    }
+	    return vtree$;
+	  } else {
+	    throw new Error('Unhandled tree value');
+	  }
+	};
+	
+	exports.default = parseTree;
+
+/***/ },
+/* 19 */
+/*!*********************************************!*\
+  !*** ./~/hyperscript-helpers/dist/index.js ***!
+  \*********************************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var isValidString = function isValidString(param) {
+	  return typeof param === 'string' && param.length > 0;
+	};
+	
+	var startsWith = function startsWith(string, start) {
+	  return string.indexOf(start) === 0;
+	};
+	
+	var isSelector = function isSelector(param) {
+	  return isValidString(param) && (startsWith(param, '.') || startsWith(param, '#'));
+	};
+	
+	var node = function node(h) {
+	  return function (tagName) {
+	    return function (first) {
+	      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	        rest[_key - 1] = arguments[_key];
+	      }
+	
+	      if (isSelector(first)) {
+	        return h.apply(undefined, [tagName + first].concat(rest));
+	      } else {
+	        return h.apply(undefined, [tagName, first].concat(rest));
+	      }
+	    };
+	  };
+	};
+	
+	var TAG_NAMES = ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hgroup', 'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'map', 'mark', 'menu', 'meta', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'p', 'param', 'pre', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'u', 'ul', 'video'];
+	
+	module.exports = function (h) {
+	  var exported = { TAG_NAMES: TAG_NAMES, isSelector: isSelector };
+	  var appliedNode = node(h);
+	  TAG_NAMES.forEach(function (n) {
+	    exported[n] = appliedNode(n);
+	  });
+	  return exported;
+	};
+
+
+/***/ },
+/* 20 */
+/*!*************************************!*\
+  !*** ./~/snabbdom/modules/class.js ***!
+  \*************************************/
+/***/ function(module, exports) {
+
+	function updateClass(oldVnode, vnode) {
+	  var cur, name, elm = vnode.elm,
+	      oldClass = oldVnode.data.class || {},
+	      klass = vnode.data.class || {};
+	  for (name in klass) {
+	    cur = klass[name];
+	    if (cur !== oldClass[name]) {
+	      elm.classList[cur ? 'add' : 'remove'](name);
+	    }
+	  }
+	}
+	
+	module.exports = {create: updateClass, update: updateClass};
+
+
+/***/ },
+/* 21 */
+/*!*************************************!*\
+  !*** ./~/snabbdom/modules/props.js ***!
+  \*************************************/
+/***/ function(module, exports) {
+
+	function updateProps(oldVnode, vnode) {
+	  var key, cur, old, elm = vnode.elm,
+	      oldProps = oldVnode.data.props || {}, props = vnode.data.props || {};
+	  for (key in props) {
+	    cur = props[key];
+	    old = oldProps[key];
+	    if (old !== cur) {
+	      elm[key] = cur;
+	    }
+	  }
+	}
+	
+	module.exports = {create: updateProps, update: updateProps};
+
+
+/***/ },
+/* 22 */
+/*!******************************************!*\
+  !*** ./~/snabbdom/modules/attributes.js ***!
+  \******************************************/
+/***/ function(module, exports) {
+
+	var booleanAttrs = ["allowfullscreen", "async", "autofocus", "autoplay", "checked", "compact", "controls", "declare", 
+	                "default", "defaultchecked", "defaultmuted", "defaultselected", "defer", "disabled", "draggable", 
+	                "enabled", "formnovalidate", "hidden", "indeterminate", "inert", "ismap", "itemscope", "loop", "multiple", 
+	                "muted", "nohref", "noresize", "noshade", "novalidate", "nowrap", "open", "pauseonexit", "readonly", 
+	                "required", "reversed", "scoped", "seamless", "selected", "sortable", "spellcheck", "translate", 
+	                "truespeed", "typemustmatch", "visible"];
+	    
+	var booleanAttrsDict = {};
+	for(var i=0, len = booleanAttrs.length; i < len; i++) {
+	  booleanAttrsDict[booleanAttrs[i]] = true;
+	}
+	    
+	function updateAttrs(oldVnode, vnode) {
+	  var key, cur, old, elm = vnode.elm,
+	      oldAttrs = oldVnode.data.attrs || {}, attrs = vnode.data.attrs || {};
+	  
+	  // update modified attributes, add new attributes
+	  for (key in attrs) {
+	    cur = attrs[key];
+	    old = oldAttrs[key];
+	    if (old !== cur) {
+	      // TODO: add support to namespaced attributes (setAttributeNS)
+	      if(!cur && booleanAttrsDict[key])
+	        elm.removeAttribute(key);
+	      else
+	        elm.setAttribute(key, cur);
+	    }
+	  }
+	  //remove removed attributes
+	  // use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)
+	  // the other option is to remove all attributes with value == undefined
+	  for (key in oldAttrs) {
+	    if (!(key in attrs)) {
+	      elm.removeAttribute(key);
+	    }
+	  }
+	}
+	
+	module.exports = {create: updateAttrs, update: updateAttrs};
+
+
+/***/ },
+/* 23 */
+/*!*************************************!*\
+  !*** ./~/snabbdom/modules/style.js ***!
+  \*************************************/
+/***/ function(module, exports) {
+
+	var raf = requestAnimationFrame || setTimeout;
+	var nextFrame = function(fn) { raf(function() { raf(fn); }); };
+	
+	function setNextFrame(obj, prop, val) {
+	  nextFrame(function() { obj[prop] = val; });
+	}
+	
+	function updateStyle(oldVnode, vnode) {
+	  var cur, name, elm = vnode.elm,
+	      oldStyle = oldVnode.data.style || {},
+	      style = vnode.data.style || {},
+	      oldHasDel = 'delayed' in oldStyle;
+	  for (name in style) {
+	    cur = style[name];
+	    if (name === 'delayed') {
+	      for (name in style.delayed) {
+	        cur = style.delayed[name];
+	        if (!oldHasDel || cur !== oldStyle.delayed[name]) {
+	          setNextFrame(elm.style, name, cur);
+	        }
+	      }
+	    } else if (name !== 'remove' && cur !== oldStyle[name]) {
+	      elm.style[name] = cur;
+	    }
+	  }
+	}
+	
+	function applyDestroyStyle(vnode) {
+	  var style, name, elm = vnode.elm, s = vnode.data.style;
+	  if (!s || !(style = s.destroy)) return;
+	  for (name in style) {
+	    elm.style[name] = style[name];
+	  }
+	}
+	
+	function applyRemoveStyle(vnode, rm) {
+	  var s = vnode.data.style;
+	  if (!s || !s.remove) {
+	    rm();
+	    return;
+	  }
+	  var name, elm = vnode.elm, idx, i = 0, maxDur = 0,
+	      compStyle, style = s.remove, amount = 0, applied = [];
+	  for (name in style) {
+	    applied.push(name);
+	    elm.style[name] = style[name];
+	  }
+	  compStyle = getComputedStyle(elm);
+	  var props = compStyle['transition-property'].split(', ');
+	  for (; i < props.length; ++i) {
+	    if(applied.indexOf(props[i]) !== -1) amount++;
+	  }
+	  elm.addEventListener('transitionend', function(ev) {
+	    if (ev.target === elm) --amount;
+	    if (amount === 0) rm();
+	  });
+	}
+	
+	module.exports = {create: updateStyle, update: updateStyle, destroy: applyDestroyStyle, remove: applyRemoveStyle};
+
+
+/***/ },
+/* 24 */
 /*!************************************!*\
   !*** ./~/@cycle/http/lib/index.js ***!
   \************************************/
@@ -12603,7 +13820,7 @@
 
 	"use strict";
 	
-	var _require = __webpack_require__(/*! ./http-driver */ 6);
+	var _require = __webpack_require__(/*! ./http-driver */ 25);
 	
 	var makeHTTPDriver = _require.makeHTTPDriver;
 	
@@ -12663,7 +13880,7 @@
 	module.exports = CycleHTTPDriver;
 
 /***/ },
-/* 6 */
+/* 25 */
 /*!******************************************!*\
   !*** ./~/@cycle/http/lib/http-driver.js ***!
   \******************************************/
@@ -12671,8 +13888,8 @@
 
 	"use strict";
 	
-	var Rx = __webpack_require__(/*! rx */ 2);
-	var superagent = __webpack_require__(/*! superagent */ 7);
+	var Rx = __webpack_require__(/*! rx */ 1);
+	var superagent = __webpack_require__(/*! superagent */ 26);
 	
 	function optionsToSuperagent(_ref) {
 	  var url = _ref.url;
@@ -12836,7 +14053,7 @@
 	};
 
 /***/ },
-/* 7 */
+/* 26 */
 /*!************************************!*\
   !*** ./~/superagent/lib/client.js ***!
   \************************************/
@@ -12846,8 +14063,8 @@
 	 * Module dependencies.
 	 */
 	
-	var Emitter = __webpack_require__(/*! emitter */ 8);
-	var reduce = __webpack_require__(/*! reduce */ 9);
+	var Emitter = __webpack_require__(/*! emitter */ 27);
+	var reduce = __webpack_require__(/*! reduce */ 28);
 	
 	/**
 	 * Root reference for iframes.
@@ -14002,7 +15219,7 @@
 
 
 /***/ },
-/* 8 */
+/* 27 */
 /*!**************************************!*\
   !*** ./~/component-emitter/index.js ***!
   \**************************************/
@@ -14175,7 +15392,7 @@
 
 
 /***/ },
-/* 9 */
+/* 28 */
 /*!*************************************!*\
   !*** ./~/reduce-component/index.js ***!
   \*************************************/
@@ -14207,1305 +15424,80 @@
 	};
 
 /***/ },
-/* 10 */
-/*!***************************************!*\
-  !*** ./~/cycle-snabbdom/lib/index.js ***!
-  \***************************************/
+/* 29 */
+/*!************************!*\
+  !*** ./src/content.js ***!
+  \************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
-	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.video = exports.ul = exports.u = exports.tr = exports.title = exports.thead = exports.th = exports.tfoot = exports.textarea = exports.td = exports.tbody = exports.table = exports.sup = exports.sub = exports.style = exports.strong = exports.span = exports.source = exports.small = exports.select = exports.section = exports.script = exports.samp = exports.s = exports.ruby = exports.rt = exports.rp = exports.q = exports.pre = exports.param = exports.p = exports.option = exports.optgroup = exports.ol = exports.object = exports.noscript = exports.nav = exports.meta = exports.menu = exports.mark = exports.map = exports.link = exports.li = exports.legend = exports.label = exports.keygen = exports.kbd = exports.ins = exports.input = exports.img = exports.iframe = exports.i = exports.html = exports.hr = exports.hgroup = exports.header = exports.head = exports.h6 = exports.h5 = exports.h4 = exports.h3 = exports.h2 = exports.h1 = exports.form = exports.footer = exports.figure = exports.figcaption = exports.fieldset = exports.embed = exports.em = exports.dt = exports.dl = exports.div = exports.dir = exports.dfn = exports.del = exports.dd = exports.colgroup = exports.col = exports.code = exports.cite = exports.caption = exports.canvas = exports.button = exports.br = exports.body = exports.blockquote = exports.bdo = exports.bdi = exports.base = exports.b = exports.audio = exports.aside = exports.article = exports.area = exports.address = exports.abbr = exports.a = exports.h = exports.makeDOMDriver = undefined;
 	
-	var _rx = __webpack_require__(/*! rx */ 2);
+	var _checkbox = __webpack_require__(/*! ./examples/checkbox */ 34);
 	
-	var _rx2 = _interopRequireDefault(_rx);
+	var _checkbox2 = _interopRequireDefault(_checkbox);
 	
-	var _snabbdom = __webpack_require__(/*! snabbdom */ 11);
+	var _colorChange = __webpack_require__(/*! ./examples/color-change */ 35);
 	
-	var _snabbdom2 = _interopRequireDefault(_snabbdom);
+	var _colorChange2 = _interopRequireDefault(_colorChange);
 	
-	var _h = __webpack_require__(/*! snabbdom/h */ 14);
+	var _githubSearch = __webpack_require__(/*! ./examples/github-search */ 36);
 	
-	var _h2 = _interopRequireDefault(_h);
-	
-	var _map = __webpack_require__(/*! fast.js/array/map */ 15);
-	
-	var _map2 = _interopRequireDefault(_map);
-	
-	var _reduce = __webpack_require__(/*! fast.js/array/reduce */ 17);
-	
-	var _reduce2 = _interopRequireDefault(_reduce);
-	
-	var _filter = __webpack_require__(/*! fast.js/array/filter */ 19);
-	
-	var _filter2 = _interopRequireDefault(_filter);
-	
-	var _matchesSelector = __webpack_require__(/*! matches-selector */ 20);
-	
-	var _matchesSelector2 = _interopRequireDefault(_matchesSelector);
-	
-	var _utils = __webpack_require__(/*! ./utils */ 21);
-	
-	var _fromEvent = __webpack_require__(/*! ./fromEvent */ 22);
-	
-	var _fromEvent2 = _interopRequireDefault(_fromEvent);
-	
-	var _parseTree = __webpack_require__(/*! ./parseTree */ 23);
-	
-	var _parseTree2 = _interopRequireDefault(_parseTree);
+	var _githubSearch2 = _interopRequireDefault(_githubSearch);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var _require = __webpack_require__(/*! hyperscript-helpers */ 24)(_h2.default);
-	
-	var a = _require.a;
-	var abbr = _require.abbr;
-	var address = _require.address;
-	var area = _require.area;
-	var article = _require.article;
-	var aside = _require.aside;
-	var audio = _require.audio;
-	var b = _require.b;
-	var base = _require.base;
-	var bdi = _require.bdi;
-	var bdo = _require.bdo;
-	var blockquote = _require.blockquote;
-	var body = _require.body;
-	var br = _require.br;
-	var button = _require.button;
-	var canvas = _require.canvas;
-	var caption = _require.caption;
-	var cite = _require.cite;
-	var code = _require.code;
-	var col = _require.col;
-	var colgroup = _require.colgroup;
-	var dd = _require.dd;
-	var del = _require.del;
-	var dfn = _require.dfn;
-	var dir = _require.dir;
-	var div = _require.div;
-	var dl = _require.dl;
-	var dt = _require.dt;
-	var em = _require.em;
-	var embed = _require.embed;
-	var fieldset = _require.fieldset;
-	var figcaption = _require.figcaption;
-	var figure = _require.figure;
-	var footer = _require.footer;
-	var form = _require.form;
-	var h1 = _require.h1;
-	var h2 = _require.h2;
-	var h3 = _require.h3;
-	var h4 = _require.h4;
-	var h5 = _require.h5;
-	var h6 = _require.h6;
-	var head = _require.head;
-	var header = _require.header;
-	var hgroup = _require.hgroup;
-	var hr = _require.hr;
-	var html = _require.html;
-	var i = _require.i;
-	var iframe = _require.iframe;
-	var img = _require.img;
-	var input = _require.input;
-	var ins = _require.ins;
-	var kbd = _require.kbd;
-	var keygen = _require.keygen;
-	var label = _require.label;
-	var legend = _require.legend;
-	var li = _require.li;
-	var link = _require.link;
-	var map = _require.map;
-	var mark = _require.mark;
-	var menu = _require.menu;
-	var meta = _require.meta;
-	var nav = _require.nav;
-	var noscript = _require.noscript;
-	var object = _require.object;
-	var ol = _require.ol;
-	var optgroup = _require.optgroup;
-	var option = _require.option;
-	var p = _require.p;
-	var param = _require.param;
-	var pre = _require.pre;
-	var q = _require.q;
-	var rp = _require.rp;
-	var rt = _require.rt;
-	var ruby = _require.ruby;
-	var s = _require.s;
-	var samp = _require.samp;
-	var script = _require.script;
-	var section = _require.section;
-	var select = _require.select;
-	var small = _require.small;
-	var source = _require.source;
-	var span = _require.span;
-	var strong = _require.strong;
-	var style = _require.style;
-	var sub = _require.sub;
-	var sup = _require.sup;
-	var table = _require.table;
-	var tbody = _require.tbody;
-	var td = _require.td;
-	var textarea = _require.textarea;
-	var tfoot = _require.tfoot;
-	var th = _require.th;
-	var thead = _require.thead;
-	var title = _require.title;
-	var tr = _require.tr;
-	var u = _require.u;
-	var ul = _require.ul;
-	var video = _require.video;
-	
-	var isolateSource = function isolateSource(_source, _scope) {
-	  return _source.select('.cycle-scope-' + _scope);
-	};
-	
-	var isolateSink = function isolateSink(sink, scope) {
-	  return sink.map(function (vtree) {
-	    var c = (vtree.sel + ' cycle-scope-' + scope).trim();
-	    vtree.sel = c;
-	    return vtree;
-	  });
-	};
-	
-	var makeIsStrictlyInRootScope = function makeIsStrictlyInRootScope(rootList, namespace) {
-	  return function (leaf) {
-	    var classIsForeign = function classIsForeign(c) {
-	      var matched = c.match(/cycle-scope-(\S+)/);
-	      return matched && namespace.indexOf('.' + c) === -1;
-	    };
-	
-	    for (var el = leaf.parentElement; el !== null; el = el.parentElement) {
-	      if (rootList.indexOf(el) >= 0) {
-	        return true;
-	      }
-	      var classList = el.className.split(' ');
-	      if (classList.some(classIsForeign)) {
-	        return false;
-	      }
-	    }
-	    return true;
-	  };
-	};
-	
-	var makeEventsSelector = function makeEventsSelector(element$) {
-	  return function (eventName) {
-	    var useCapture = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-	
-	    if (typeof eventName !== 'string') {
-	      throw new Error('DOM drivers events() expects argument to be a ' + 'string representing the event type to listen for.');
-	    }
-	    return element$.flatMapLatest(function (element) {
-	      if (!element) {
-	        return _rx2.default.Observable.empty();
-	      }
-	      return (0, _fromEvent2.default)(element, eventName, useCapture);
-	    }).share();
-	  };
-	};
-	
-	// Use function not 'const = x => {}' for this.namespace below
-	function makeElementSelector(rootElem$) {
-	  return function DOMSelect(selector) {
-	    if (typeof selector !== 'string') {
-	      throw new Error('DOM drivers select() expects first argument to be a ' + 'string as a CSS selector');
-	    }
-	    var namespace = this.namespace;
-	    var scopedSelector = (namespace.join(' ') + ' ' + selector).trim();
-	    var element$ = selector.trim() === ':root' ? rootElem$ : rootElem$.map(function (x) {
-	      var array = Array.isArray(x) ? x : [x];
-	      return (0, _filter2.default)((0, _reduce2.default)((0, _map2.default)(array, function (element) {
-	        if ((0, _matchesSelector2.default)(element, scopedSelector)) {
-	          return [element];
-	        } else {
-	          var nodeList = element.querySelectorAll(scopedSelector);
-	          return Array.prototype.slice.call(nodeList);
-	        }
-	      }), function (prev, curr) {
-	        return prev.concat(curr);
-	      }, []), makeIsStrictlyInRootScope(array, namespace));
-	    });
-	    return {
-	      observable: element$,
-	      namespace: namespace.concat(selector),
-	      select: makeElementSelector(element$),
-	      events: makeEventsSelector(element$),
-	      isolateSource: isolateSource,
-	      isolateSink: isolateSink
-	    };
-	  };
-	}
-	
-	var validateDOMDriverInput = function validateDOMDriverInput(view$) {
-	  if (!view$ || typeof view$.subscribe !== 'function') {
-	    throw new Error('The DOM driver function expects as input an ' + 'Observable of virtual DOM elements');
+	function mapContent(responses, val) {
+	  switch (parseInt(val)) {
+	    case 0:
+	      return (0, _checkbox2.default)(responses);
+	    case 1:
+	      return (0, _colorChange2.default)(responses);
+	    case 2:
+	      return (0, _githubSearch2.default)(responses);
+	    default:
+	      return (0, _checkbox2.default)(responses);
 	  }
-	};
-	
-	var makeDOMDriver = function makeDOMDriver(container) {
-	  var modules = arguments.length <= 1 || arguments[1] === undefined ? [__webpack_require__(/*! snabbdom/modules/class */ 25), __webpack_require__(/*! snabbdom/modules/props */ 26), __webpack_require__(/*! snabbdom/modules/attributes */ 27), __webpack_require__(/*! snabbdom/modules/style */ 28)] : arguments[1];
-	
-	  var patch = _snabbdom2.default.init(modules);
-	  var rootElem = (0, _utils.getDomElement)(container);
-	
-	  var DOMDriver = function DOMDriver(view$) {
-	    validateDOMDriverInput(view$);
-	
-	    var rootElem$ = view$.flatMapLatest(_parseTree2.default).startWith(rootElem).pairwise().map(function (_ref) {
-	      var _ref2 = _slicedToArray(_ref, 2);
-	
-	      var prevView = _ref2[0];
-	      var newView = _ref2[1];
-	
-	      patch(prevView, newView);
-	      return newView.elm;
-	    }).replay(null, 1);
-	
-	    var disposable = rootElem$.connect();
-	    return {
-	      namespace: [],
-	      select: makeElementSelector(rootElem$),
-	      dispose: disposable.dispose.bind(disposable),
-	      isolateSink: isolateSink,
-	      isolateSource: isolateSource
-	    };
-	  };
-	  return DOMDriver;
-	};
-	
-	exports.makeDOMDriver = makeDOMDriver;
-	exports.h = _h2.default;
-	exports.a = a;
-	exports.abbr = abbr;
-	exports.address = address;
-	exports.area = area;
-	exports.article = article;
-	exports.aside = aside;
-	exports.audio = audio;
-	exports.b = b;
-	exports.base = base;
-	exports.bdi = bdi;
-	exports.bdo = bdo;
-	exports.blockquote = blockquote;
-	exports.body = body;
-	exports.br = br;
-	exports.button = button;
-	exports.canvas = canvas;
-	exports.caption = caption;
-	exports.cite = cite;
-	exports.code = code;
-	exports.col = col;
-	exports.colgroup = colgroup;
-	exports.dd = dd;
-	exports.del = del;
-	exports.dfn = dfn;
-	exports.dir = dir;
-	exports.div = div;
-	exports.dl = dl;
-	exports.dt = dt;
-	exports.em = em;
-	exports.embed = embed;
-	exports.fieldset = fieldset;
-	exports.figcaption = figcaption;
-	exports.figure = figure;
-	exports.footer = footer;
-	exports.form = form;
-	exports.h1 = h1;
-	exports.h2 = h2;
-	exports.h3 = h3;
-	exports.h4 = h4;
-	exports.h5 = h5;
-	exports.h6 = h6;
-	exports.head = head;
-	exports.header = header;
-	exports.hgroup = hgroup;
-	exports.hr = hr;
-	exports.html = html;
-	exports.i = i;
-	exports.iframe = iframe;
-	exports.img = img;
-	exports.input = input;
-	exports.ins = ins;
-	exports.kbd = kbd;
-	exports.keygen = keygen;
-	exports.label = label;
-	exports.legend = legend;
-	exports.li = li;
-	exports.link = link;
-	exports.map = map;
-	exports.mark = mark;
-	exports.menu = menu;
-	exports.meta = meta;
-	exports.nav = nav;
-	exports.noscript = noscript;
-	exports.object = object;
-	exports.ol = ol;
-	exports.optgroup = optgroup;
-	exports.option = option;
-	exports.p = p;
-	exports.param = param;
-	exports.pre = pre;
-	exports.q = q;
-	exports.rp = rp;
-	exports.rt = rt;
-	exports.ruby = ruby;
-	exports.s = s;
-	exports.samp = samp;
-	exports.script = script;
-	exports.section = section;
-	exports.select = select;
-	exports.small = small;
-	exports.source = source;
-	exports.span = span;
-	exports.strong = strong;
-	exports.style = style;
-	exports.sub = sub;
-	exports.sup = sup;
-	exports.table = table;
-	exports.tbody = tbody;
-	exports.td = td;
-	exports.textarea = textarea;
-	exports.tfoot = tfoot;
-	exports.th = th;
-	exports.thead = thead;
-	exports.title = title;
-	exports.tr = tr;
-	exports.u = u;
-	exports.ul = ul;
-	exports.video = video;
-
-/***/ },
-/* 11 */
-/*!********************************!*\
-  !*** ./~/snabbdom/snabbdom.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// jshint newcap: false
-	/* global require, module, document, Element */
-	'use strict';
-	
-	var VNode = __webpack_require__(/*! ./vnode */ 12);
-	var is = __webpack_require__(/*! ./is */ 13);
-	
-	function isUndef(s) { return s === undefined; }
-	function isDef(s) { return s !== undefined; }
-	
-	function emptyNodeAt(elm) {
-	  return VNode(elm.tagName, {}, [], undefined, elm);
-	}
-	
-	var emptyNode = VNode('', {}, [], undefined, undefined);
-	
-	function sameVnode(vnode1, vnode2) {
-	  return vnode1.key === vnode2.key && vnode1.sel === vnode2.sel;
-	}
-	
-	function createKeyToOldIdx(children, beginIdx, endIdx) {
-	  var i, map = {}, key;
-	  for (i = beginIdx; i <= endIdx; ++i) {
-	    key = children[i].key;
-	    if (isDef(key)) map[key] = i;
-	  }
-	  return map;
-	}
-	
-	function createRmCb(childElm, listeners) {
-	  return function() {
-	    if (--listeners === 0) childElm.parentElement.removeChild(childElm);
-	  };
-	}
-	
-	var hooks = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
-	
-	function init(modules) {
-	  var i, j, cbs = {};
-	  for (i = 0; i < hooks.length; ++i) {
-	    cbs[hooks[i]] = [];
-	    for (j = 0; j < modules.length; ++j) {
-	      if (modules[j][hooks[i]] !== undefined) cbs[hooks[i]].push(modules[j][hooks[i]]);
-	    }
-	  }
-	
-	  function createElm(vnode, insertedVnodeQueue) {
-	    var i, data = vnode.data;
-	    if (isDef(data)) {
-	      if (isDef(i = data.hook) && isDef(i = i.init)) i(vnode);
-	      if (isDef(i = data.vnode)) vnode = i;
-	    }
-	    var elm, children = vnode.children, sel = vnode.sel;
-	    if (isDef(sel)) {
-	      // Parse selector
-	      var hashIdx = sel.indexOf('#');
-	      var dotIdx = sel.indexOf('.', hashIdx);
-	      var hash = hashIdx > 0 ? hashIdx : sel.length;
-	      var dot = dotIdx > 0 ? dotIdx : sel.length;
-	      var tag = hashIdx !== -1 || dotIdx !== -1 ? sel.slice(0, Math.min(hash, dot)) : sel;
-	      elm = vnode.elm = isDef(data) && isDef(i = data.ns) ? document.createElementNS(i, tag)
-	                                                          : document.createElement(tag);
-	      if (hash < dot) elm.id = sel.slice(hash + 1, dot);
-	      if (dotIdx > 0) elm.className = sel.slice(dot+1).replace(/\./g, ' ');
-	      if (is.array(children)) {
-	        for (i = 0; i < children.length; ++i) {
-	          elm.appendChild(createElm(children[i], insertedVnodeQueue));
-	        }
-	      } else if (is.primitive(vnode.text)) {
-	        elm.appendChild(document.createTextNode(vnode.text));
-	      }
-	      for (i = 0; i < cbs.create.length; ++i) cbs.create[i](emptyNode, vnode);
-	      i = vnode.data.hook; // Reuse variable
-	      if (isDef(i)) {
-	        if (i.create) i.create(emptyNode, vnode);
-	        if (i.insert) insertedVnodeQueue.push(vnode);
-	      }
-	    } else {
-	      elm = vnode.elm = document.createTextNode(vnode.text);
-	    }
-	    return vnode.elm;
-	  }
-	
-	  function addVnodes(parentElm, before, vnodes, startIdx, endIdx, insertedVnodeQueue) {
-	    for (; startIdx <= endIdx; ++startIdx) {
-	      parentElm.insertBefore(createElm(vnodes[startIdx], insertedVnodeQueue), before);
-	    }
-	  }
-	
-	  function invokeDestroyHook(vnode) {
-	    var i = vnode.data, j;
-	    if (isDef(i)) {
-	      if (isDef(i = i.hook) && isDef(i = i.destroy)) i(vnode);
-	      for (i = 0; i < cbs.destroy.length; ++i) cbs.destroy[i](vnode);
-	      if (isDef(i = vnode.children)) {
-	        for (j = 0; j < vnode.children.length; ++j) {
-	          invokeDestroyHook(vnode.children[j]);
-	        }
-	      }
-	    }
-	  }
-	
-	  function removeVnodes(parentElm, vnodes, startIdx, endIdx) {
-	    for (; startIdx <= endIdx; ++startIdx) {
-	      var i, listeners, rm, ch = vnodes[startIdx];
-	      if (isDef(ch)) {
-	        if (isDef(ch.sel)) {
-	          invokeDestroyHook(ch);
-	          listeners = cbs.remove.length + 1;
-	          rm = createRmCb(ch.elm, listeners);
-	          for (i = 0; i < cbs.remove.length; ++i) cbs.remove[i](ch, rm);
-	          if (isDef(i = ch.data) && isDef(i = i.hook) && isDef(i = i.remove)) {
-	            i(ch, rm);
-	          } else {
-	            rm();
-	          }
-	        } else { // Text node
-	          parentElm.removeChild(ch.elm);
-	        }
-	      }
-	    }
-	  }
-	
-	  function updateChildren(parentElm, oldCh, newCh, insertedVnodeQueue) {
-	    var oldStartIdx = 0, newStartIdx = 0;
-	    var oldEndIdx = oldCh.length - 1;
-	    var oldStartVnode = oldCh[0];
-	    var oldEndVnode = oldCh[oldEndIdx];
-	    var newEndIdx = newCh.length - 1;
-	    var newStartVnode = newCh[0];
-	    var newEndVnode = newCh[newEndIdx];
-	    var oldKeyToIdx, idxInOld, elmToMove, before;
-	
-	    while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
-	      if (isUndef(oldStartVnode)) {
-	        oldStartVnode = oldCh[++oldStartIdx]; // Vnode has been moved left
-	      } else if (isUndef(oldEndVnode)) {
-	        oldEndVnode = oldCh[--oldEndIdx];
-	      } else if (sameVnode(oldStartVnode, newStartVnode)) {
-	        patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue);
-	        oldStartVnode = oldCh[++oldStartIdx];
-	        newStartVnode = newCh[++newStartIdx];
-	      } else if (sameVnode(oldEndVnode, newEndVnode)) {
-	        patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue);
-	        oldEndVnode = oldCh[--oldEndIdx];
-	        newEndVnode = newCh[--newEndIdx];
-	      } else if (sameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
-	        patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
-	        parentElm.insertBefore(oldStartVnode.elm, oldEndVnode.elm.nextSibling);
-	        oldStartVnode = oldCh[++oldStartIdx];
-	        newEndVnode = newCh[--newEndIdx];
-	      } else if (sameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
-	        patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue);
-	        parentElm.insertBefore(oldEndVnode.elm, oldStartVnode.elm);
-	        oldEndVnode = oldCh[--oldEndIdx];
-	        newStartVnode = newCh[++newStartIdx];
-	      } else {
-	        if (isUndef(oldKeyToIdx)) oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
-	        idxInOld = oldKeyToIdx[newStartVnode.key];
-	        if (isUndef(idxInOld)) { // New element
-	          parentElm.insertBefore(createElm(newStartVnode, insertedVnodeQueue), oldStartVnode.elm);
-	          newStartVnode = newCh[++newStartIdx];
-	        } else {
-	          elmToMove = oldCh[idxInOld];
-	          patchVnode(elmToMove, newStartVnode, insertedVnodeQueue);
-	          oldCh[idxInOld] = undefined;
-	          parentElm.insertBefore(elmToMove.elm, oldStartVnode.elm);
-	          newStartVnode = newCh[++newStartIdx];
-	        }
-	      }
-	    }
-	    if (oldStartIdx > oldEndIdx) {
-	      before = isUndef(newCh[newEndIdx+1]) ? null : newCh[newEndIdx+1].elm;
-	      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue);
-	    } else if (newStartIdx > newEndIdx) {
-	      removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
-	    }
-	  }
-	
-	  function patchVnode(oldVnode, vnode, insertedVnodeQueue) {
-	    var i, hook;
-	    if (isDef(i = vnode.data) && isDef(hook = i.hook) && isDef(i = hook.prepatch)) {
-	      i(oldVnode, vnode);
-	    }
-	    if (isDef(i = oldVnode.data) && isDef(i = i.vnode)) oldVnode = i;
-	    if (isDef(i = vnode.data) && isDef(i = i.vnode)) vnode = i;
-	    var elm = vnode.elm = oldVnode.elm, oldCh = oldVnode.children, ch = vnode.children;
-	    if (oldVnode === vnode) return;
-	    if (isDef(vnode.data)) {
-	      for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode);
-	      i = vnode.data.hook;
-	      if (isDef(i) && isDef(i = i.update)) i(oldVnode, vnode);
-	    }
-	    if (isUndef(vnode.text)) {
-	      if (isDef(oldCh) && isDef(ch)) {
-	        if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue);
-	      } else if (isDef(ch)) {
-	        addVnodes(elm, null, ch, 0, ch.length - 1, insertedVnodeQueue);
-	      } else if (isDef(oldCh)) {
-	        removeVnodes(elm, oldCh, 0, oldCh.length - 1);
-	      }
-	    } else if (oldVnode.text !== vnode.text) {
-	      elm.textContent = vnode.text;
-	    }
-	    if (isDef(hook) && isDef(i = hook.postpatch)) {
-	      i(oldVnode, vnode);
-	    }
-	  }
-	
-	  return function(oldVnode, vnode) {
-	    var i;
-	    var insertedVnodeQueue = [];
-	    for (i = 0; i < cbs.pre.length; ++i) cbs.pre[i]();
-	    if (oldVnode instanceof Element) {
-	      if (oldVnode.parentElement !== null) {
-	        createElm(vnode, insertedVnodeQueue);
-	        oldVnode.parentElement.replaceChild(vnode.elm, oldVnode);
-	      } else {
-	        oldVnode = emptyNodeAt(oldVnode);
-	        patchVnode(oldVnode, vnode, insertedVnodeQueue);
-	      }
-	    } else {
-	      patchVnode(oldVnode, vnode, insertedVnodeQueue);
-	    }
-	    for (i = 0; i < insertedVnodeQueue.length; ++i) {
-	      insertedVnodeQueue[i].data.hook.insert(insertedVnodeQueue[i]);
-	    }
-	    for (i = 0; i < cbs.post.length; ++i) cbs.post[i]();
-	    return vnode;
-	  };
-	}
-	
-	module.exports = {init: init};
-
-
-/***/ },
-/* 12 */
-/*!*****************************!*\
-  !*** ./~/snabbdom/vnode.js ***!
-  \*****************************/
-/***/ function(module, exports) {
-
-	module.exports = function(sel, data, children, text, elm) {
-	  var key = data === undefined ? undefined : data.key;
-	  return {sel: sel, data: data, children: children,
-	          text: text, elm: elm, key: key};
-	};
-
-
-/***/ },
-/* 13 */
-/*!**************************!*\
-  !*** ./~/snabbdom/is.js ***!
-  \**************************/
-/***/ function(module, exports) {
-
-	module.exports = {
-	  array: Array.isArray,
-	  primitive: function(s) { return typeof s === 'string' || typeof s === 'number'; },
-	};
-
-
-/***/ },
-/* 14 */
-/*!*************************!*\
-  !*** ./~/snabbdom/h.js ***!
-  \*************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var VNode = __webpack_require__(/*! ./vnode */ 12);
-	var is = __webpack_require__(/*! ./is */ 13);
-	
-	module.exports = function h(sel, b, c) {
-	  var data = {}, children, text, i;
-	  if (arguments.length === 3) {
-	    data = b;
-	    if (is.array(c)) { children = c; }
-	    else if (is.primitive(c)) { text = c; }
-	  } else if (arguments.length === 2) {
-	    if (is.array(b)) { children = b; }
-	    else if (is.primitive(b)) { text = b; }
-	    else { data = b; }
-	  }
-	  if (is.array(children)) {
-	    for (i = 0; i < children.length; ++i) {
-	      if (is.primitive(children[i])) children[i] = VNode(undefined, undefined, undefined, children[i]);
-	    }
-	  }
-	  return VNode(sel, data, children, text, undefined);
-	};
-
-
-/***/ },
-/* 15 */
-/*!********************************!*\
-  !*** ./~/fast.js/array/map.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 16);
-	
-	/**
-	 * # Map
-	 *
-	 * A fast `.map()` implementation.
-	 *
-	 * @param  {Array}    subject     The array (or array-like) to map over.
-	 * @param  {Function} fn          The mapper function.
-	 * @param  {Object}   thisContext The context for the mapper.
-	 * @return {Array}                The array containing the results.
-	 */
-	module.exports = function fastMap (subject, fn, thisContext) {
-	  var length = subject.length,
-	      result = new Array(length),
-	      iterator = thisContext !== undefined ? bindInternal3(fn, thisContext) : fn,
-	      i;
-	  for (i = 0; i < length; i++) {
-	    result[i] = iterator(subject[i], i, subject);
-	  }
-	  return result;
-	};
-
-
-/***/ },
-/* 16 */
-/*!*********************************************!*\
-  !*** ./~/fast.js/function/bindInternal3.js ***!
-  \*********************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Internal helper to bind a function known to have 3 arguments
-	 * to a given context.
-	 */
-	module.exports = function bindInternal3 (func, thisContext) {
-	  return function (a, b, c) {
-	    return func.call(thisContext, a, b, c);
-	  };
-	};
-
-
-/***/ },
-/* 17 */
-/*!***********************************!*\
-  !*** ./~/fast.js/array/reduce.js ***!
-  \***********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var bindInternal4 = __webpack_require__(/*! ../function/bindInternal4 */ 18);
-	
-	/**
-	 * # Reduce
-	 *
-	 * A fast `.reduce()` implementation.
-	 *
-	 * @param  {Array}    subject      The array (or array-like) to reduce.
-	 * @param  {Function} fn           The reducer function.
-	 * @param  {mixed}    initialValue The initial value for the reducer, defaults to subject[0].
-	 * @param  {Object}   thisContext  The context for the reducer.
-	 * @return {mixed}                 The final result.
-	 */
-	module.exports = function fastReduce (subject, fn, initialValue, thisContext) {
-	  var length = subject.length,
-	      iterator = thisContext !== undefined ? bindInternal4(fn, thisContext) : fn,
-	      i, result;
-	
-	  if (initialValue === undefined) {
-	    i = 1;
-	    result = subject[0];
-	  }
-	  else {
-	    i = 0;
-	    result = initialValue;
-	  }
-	
-	  for (; i < length; i++) {
-	    result = iterator(result, subject[i], i, subject);
-	  }
-	
-	  return result;
-	};
-
-
-/***/ },
-/* 18 */
-/*!*********************************************!*\
-  !*** ./~/fast.js/function/bindInternal4.js ***!
-  \*********************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Internal helper to bind a function known to have 4 arguments
-	 * to a given context.
-	 */
-	module.exports = function bindInternal4 (func, thisContext) {
-	  return function (a, b, c, d) {
-	    return func.call(thisContext, a, b, c, d);
-	  };
-	};
-
-
-/***/ },
-/* 19 */
-/*!***********************************!*\
-  !*** ./~/fast.js/array/filter.js ***!
-  \***********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 16);
-	
-	/**
-	 * # Filter
-	 *
-	 * A fast `.filter()` implementation.
-	 *
-	 * @param  {Array}    subject     The array (or array-like) to filter.
-	 * @param  {Function} fn          The filter function.
-	 * @param  {Object}   thisContext The context for the filter.
-	 * @return {Array}                The array containing the results.
-	 */
-	module.exports = function fastFilter (subject, fn, thisContext) {
-	  var length = subject.length,
-	      result = [],
-	      iterator = thisContext !== undefined ? bindInternal3(fn, thisContext) : fn,
-	      i;
-	  for (i = 0; i < length; i++) {
-	    if (iterator(subject[i], i, subject)) {
-	      result.push(subject[i]);
-	    }
-	  }
-	  return result;
-	};
-
-
-/***/ },
-/* 20 */
-/*!*************************************!*\
-  !*** ./~/matches-selector/index.js ***!
-  \*************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	var proto = Element.prototype;
-	var vendor = proto.matches
-	  || proto.matchesSelector
-	  || proto.webkitMatchesSelector
-	  || proto.mozMatchesSelector
-	  || proto.msMatchesSelector
-	  || proto.oMatchesSelector;
-	
-	module.exports = match;
-	
-	/**
-	 * Match `el` to `selector`.
-	 *
-	 * @param {Element} el
-	 * @param {String} selector
-	 * @return {Boolean}
-	 * @api public
-	 */
-	
-	function match(el, selector) {
-	  if (vendor) return vendor.call(el, selector);
-	  var nodes = el.parentNode.querySelectorAll(selector);
-	  for (var i = 0; i < nodes.length; i++) {
-	    if (nodes[i] == el) return true;
-	  }
-	  return false;
-	}
-
-/***/ },
-/* 21 */
-/*!***************************************!*\
-  !*** ./~/cycle-snabbdom/lib/utils.js ***!
-  \***************************************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var isElement = function isElement(obj) {
-	  return typeof HTMLElement === "object" ? obj instanceof HTMLElement || obj instanceof DocumentFragment : obj && typeof obj === "object" && obj !== null && (obj.nodeType === 1 || obj.nodeType === 11) && typeof obj.nodeName === "string";
-	};
-	
-	var getDomElement = function getDomElement(_el) {
-	  var domElement = typeof _el === "string" ? document.querySelector(_el) : _el;
-	
-	  if (typeof domElement === "string" && domElement === null) {
-	    throw new Error("Cannot render into unknown element `" + _el + "`");
-	  } else if (!isElement(domElement)) {
-	    throw new Error("Given container is not a DOM element neither a " + "selector string.");
-	  }
-	  return domElement;
-	};
-	
-	exports.getDomElement = getDomElement;
-
-/***/ },
-/* 22 */
-/*!*******************************************!*\
-  !*** ./~/cycle-snabbdom/lib/fromEvent.js ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	var Rx = __webpack_require__(/*! rx */ 2);
-	
-	var disposableCreate = Rx.Disposable.create;
-	var CompositeDisposable = Rx.CompositeDisposable;
-	var AnonymousObservable = Rx.AnonymousObservable;
-	
-	function createListener(_ref) {
-	  var element = _ref.element;
-	  var eventName = _ref.eventName;
-	  var handler = _ref.handler;
-	  var useCapture = _ref.useCapture;
-	
-	  if (element.addEventListener) {
-	    element.addEventListener(eventName, handler, useCapture);
-	    return disposableCreate(function removeEventListener() {
-	      element.removeEventListener(eventName, handler, useCapture);
-	    });
-	  }
-	  throw new Error("No listener found");
-	}
-	
-	function createEventListener(_ref2) {
-	  var element = _ref2.element;
-	  var eventName = _ref2.eventName;
-	  var handler = _ref2.handler;
-	  var useCapture = _ref2.useCapture;
-	
-	  var disposables = new CompositeDisposable();
-	
-	  if (Array.isArray(element)) {
-	    for (var i = 0, len = element.length; i < len; i++) {
-	      disposables.add(createEventListener({
-	        element: element[i],
-	        eventName: eventName,
-	        handler: handler,
-	        useCapture: useCapture
-	      }));
-	    }
-	  } else if (element) {
-	    disposables.add(createListener({ element: element, eventName: eventName, handler: handler, useCapture: useCapture }));
-	  }
-	  return disposables;
-	}
-	
-	function fromEvent(element, eventName) {
-	  var useCapture = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-	
-	  return new AnonymousObservable(function subscribe(observer) {
-	    return createEventListener({
-	      element: element,
-	      eventName: eventName,
-	      handler: function handler() {
-	        observer.onNext(arguments[0]);
-	      },
-	      useCapture: useCapture
-	    });
-	  }).share();
-	}
-	
-	module.exports = fromEvent;
-
-/***/ },
-/* 23 */
-/*!*******************************************!*\
-  !*** ./~/cycle-snabbdom/lib/parseTree.js ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _rx = __webpack_require__(/*! rx */ 2);
-	
-	var _rx2 = _interopRequireDefault(_rx);
-	
-	var _map = __webpack_require__(/*! fast.js/array/map */ 15);
-	
-	var _map2 = _interopRequireDefault(_map);
-	
-	var _filter = __webpack_require__(/*! fast.js/array/filter */ 19);
-	
-	var _filter2 = _interopRequireDefault(_filter);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-	
-	var combineVTreeStreams = function combineVTreeStreams(vTree) {
-	  for (var _len = arguments.length, children = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	    children[_key - 1] = arguments[_key];
-	  }
+	} //import Rx from 'rx'
+	
+	function content(responses, toggle$) {
+	  //eslint-disable-line
+	  var state$ = toggle$.map(function (val) {
+	    console.log('I\'m inside the content state mapping!'); //eslint-disable-line
+	    return mapContent(responses, val);
+	  }).do(function (x) {
+	    var hasDOM = x.DOM ? true : false;
+	    var hasHTTP = x.HTTP ? true : false;
+	    console.log('Content state emitted - DOM: ' + hasDOM + ', HTTP: ' + hasHTTP);
+	  }) //eslint-disable-line
+	  .share();
 	
 	  return {
-	    sel: vTree.sel,
-	    data: vTree.data,
-	    text: vTree.text,
-	    elm: vTree.elm,
-	    key: vTree.key,
-	    children: children
-	  };
-	};
+	    DOM: state$.pluck('DOM').do(function () {
+	      console.log('Content DOM plucked');
+	    }), //eslint-disable-line
+	    HTTP: state$.pluck('HTTP').do(function () {
+	      console.log('Content HTTP plucked');
+	    }) //eslint-disable-line
+	    .filter(function (x) {
+	      return x;
+	    }).flatMapLatest(function (x) {
+	      return x;
+	    }).do(function () {
+	      console.log('Content HTTP filtered');
+	    }) };
+	}
 	
-	var parseTree = function parseTree(vTree) {
-	  if (!vTree) {
-	    return null;
-	  } else if (vTree.subscribe) {
-	    return vTree.flatMapLatest(parseTree);
-	  } else if ('object' === (typeof vTree === 'undefined' ? 'undefined' : _typeof(vTree))) {
-	    var vtree$ = _rx2.default.Observable.just(vTree);
-	    if (vTree.children && vTree.children.length > 0) {
-	      var _Rx$Observable;
-	
-	      return (_Rx$Observable = _rx2.default.Observable).combineLatest.apply(_Rx$Observable, [vtree$].concat(_toConsumableArray((0, _filter2.default)((0, _map2.default)(vTree.children, parseTree), function (x) {
-	        return x !== null;
-	      })), [combineVTreeStreams]));
-	    }
-	    return vtree$;
-	  } else {
-	    throw new Error('Unhandled tree value');
-	  }
-	};
-	
-	exports.default = parseTree;
+	//eslint-disable-line
+	exports.default = content;
 
 /***/ },
-/* 24 */
-/*!*********************************************!*\
-  !*** ./~/hyperscript-helpers/dist/index.js ***!
-  \*********************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	var isValidString = function isValidString(param) {
-	  return typeof param === 'string' && param.length > 0;
-	};
-	
-	var startsWith = function startsWith(string, start) {
-	  return string.indexOf(start) === 0;
-	};
-	
-	var isSelector = function isSelector(param) {
-	  return isValidString(param) && (startsWith(param, '.') || startsWith(param, '#'));
-	};
-	
-	var node = function node(h) {
-	  return function (tagName) {
-	    return function (first) {
-	      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	        rest[_key - 1] = arguments[_key];
-	      }
-	
-	      if (isSelector(first)) {
-	        return h.apply(undefined, [tagName + first].concat(rest));
-	      } else {
-	        return h.apply(undefined, [tagName, first].concat(rest));
-	      }
-	    };
-	  };
-	};
-	
-	var TAG_NAMES = ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hgroup', 'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'map', 'mark', 'menu', 'meta', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'p', 'param', 'pre', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'u', 'ul', 'video'];
-	
-	module.exports = function (h) {
-	  var exported = { TAG_NAMES: TAG_NAMES, isSelector: isSelector };
-	  var appliedNode = node(h);
-	  TAG_NAMES.forEach(function (n) {
-	    exported[n] = appliedNode(n);
-	  });
-	  return exported;
-	};
-
-
-/***/ },
-/* 25 */
-/*!*************************************!*\
-  !*** ./~/snabbdom/modules/class.js ***!
-  \*************************************/
-/***/ function(module, exports) {
-
-	function updateClass(oldVnode, vnode) {
-	  var cur, name, elm = vnode.elm,
-	      oldClass = oldVnode.data.class || {},
-	      klass = vnode.data.class || {};
-	  for (name in klass) {
-	    cur = klass[name];
-	    if (cur !== oldClass[name]) {
-	      elm.classList[cur ? 'add' : 'remove'](name);
-	    }
-	  }
-	}
-	
-	module.exports = {create: updateClass, update: updateClass};
-
-
-/***/ },
-/* 26 */
-/*!*************************************!*\
-  !*** ./~/snabbdom/modules/props.js ***!
-  \*************************************/
-/***/ function(module, exports) {
-
-	function updateProps(oldVnode, vnode) {
-	  var key, cur, old, elm = vnode.elm,
-	      oldProps = oldVnode.data.props || {}, props = vnode.data.props || {};
-	  for (key in props) {
-	    cur = props[key];
-	    old = oldProps[key];
-	    if (old !== cur) {
-	      elm[key] = cur;
-	    }
-	  }
-	}
-	
-	module.exports = {create: updateProps, update: updateProps};
-
-
-/***/ },
-/* 27 */
-/*!******************************************!*\
-  !*** ./~/snabbdom/modules/attributes.js ***!
-  \******************************************/
-/***/ function(module, exports) {
-
-	var booleanAttrs = ["allowfullscreen", "async", "autofocus", "autoplay", "checked", "compact", "controls", "declare", 
-	                "default", "defaultchecked", "defaultmuted", "defaultselected", "defer", "disabled", "draggable", 
-	                "enabled", "formnovalidate", "hidden", "indeterminate", "inert", "ismap", "itemscope", "loop", "multiple", 
-	                "muted", "nohref", "noresize", "noshade", "novalidate", "nowrap", "open", "pauseonexit", "readonly", 
-	                "required", "reversed", "scoped", "seamless", "selected", "sortable", "spellcheck", "translate", 
-	                "truespeed", "typemustmatch", "visible"];
-	    
-	var booleanAttrsDict = {};
-	for(var i=0, len = booleanAttrs.length; i < len; i++) {
-	  booleanAttrsDict[booleanAttrs[i]] = true;
-	}
-	    
-	function updateAttrs(oldVnode, vnode) {
-	  var key, cur, old, elm = vnode.elm,
-	      oldAttrs = oldVnode.data.attrs || {}, attrs = vnode.data.attrs || {};
-	  
-	  // update modified attributes, add new attributes
-	  for (key in attrs) {
-	    cur = attrs[key];
-	    old = oldAttrs[key];
-	    if (old !== cur) {
-	      // TODO: add support to namespaced attributes (setAttributeNS)
-	      if(!cur && booleanAttrsDict[key])
-	        elm.removeAttribute(key);
-	      else
-	        elm.setAttribute(key, cur);
-	    }
-	  }
-	  //remove removed attributes
-	  // use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)
-	  // the other option is to remove all attributes with value == undefined
-	  for (key in oldAttrs) {
-	    if (!(key in attrs)) {
-	      elm.removeAttribute(key);
-	    }
-	  }
-	}
-	
-	module.exports = {create: updateAttrs, update: updateAttrs};
-
-
-/***/ },
-/* 28 */
-/*!*************************************!*\
-  !*** ./~/snabbdom/modules/style.js ***!
-  \*************************************/
-/***/ function(module, exports) {
-
-	var raf = requestAnimationFrame || setTimeout;
-	var nextFrame = function(fn) { raf(function() { raf(fn); }); };
-	
-	function setNextFrame(obj, prop, val) {
-	  nextFrame(function() { obj[prop] = val; });
-	}
-	
-	function updateStyle(oldVnode, vnode) {
-	  var cur, name, elm = vnode.elm,
-	      oldStyle = oldVnode.data.style || {},
-	      style = vnode.data.style || {},
-	      oldHasDel = 'delayed' in oldStyle;
-	  for (name in style) {
-	    cur = style[name];
-	    if (name === 'delayed') {
-	      for (name in style.delayed) {
-	        cur = style.delayed[name];
-	        if (!oldHasDel || cur !== oldStyle.delayed[name]) {
-	          setNextFrame(elm.style, name, cur);
-	        }
-	      }
-	    } else if (name !== 'remove' && cur !== oldStyle[name]) {
-	      elm.style[name] = cur;
-	    }
-	  }
-	}
-	
-	function applyDestroyStyle(vnode) {
-	  var style, name, elm = vnode.elm, s = vnode.data.style;
-	  if (!s || !(style = s.destroy)) return;
-	  for (name in style) {
-	    elm.style[name] = style[name];
-	  }
-	}
-	
-	function applyRemoveStyle(vnode, rm) {
-	  var s = vnode.data.style;
-	  if (!s || !s.remove) {
-	    rm();
-	    return;
-	  }
-	  var name, elm = vnode.elm, idx, i = 0, maxDur = 0,
-	      compStyle, style = s.remove, amount = 0, applied = [];
-	  for (name in style) {
-	    applied.push(name);
-	    elm.style[name] = style[name];
-	  }
-	  compStyle = getComputedStyle(elm);
-	  var props = compStyle['transition-property'].split(', ');
-	  for (; i < props.length; ++i) {
-	    if(applied.indexOf(props[i]) !== -1) amount++;
-	  }
-	  elm.addEventListener('transitionend', function(ev) {
-	    if (ev.target === elm) --amount;
-	    if (amount === 0) rm();
-	  });
-	}
-	
-	module.exports = {create: updateStyle, update: updateStyle, destroy: applyDestroyStyle, remove: applyRemoveStyle};
-
-
-/***/ },
-/* 29 */
-/*!*****************************!*\
-  !*** ./src/color-change.js ***!
-  \*****************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 10);
-	
-	var _rx = __webpack_require__(/*! rx */ 2);
-	
-	var _rx2 = _interopRequireDefault(_rx);
-	
-	var _globalStyles = __webpack_require__(/*! ./global-styles */ 30);
-	
-	var _globalStyles2 = _interopRequireDefault(_globalStyles);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var colors = [{ bg: 'White', font: 'Black' }, { bg: 'Gray', font: 'White' }, { bg: 'Green', font: 'Yellow' }, { bg: 'Red', font: 'Black' }, { bg: 'Black', font: 'White' }];
-	
-	var increment = 1;
-	
-	function nextColorIndex(curr, inc) {
-	  var newColor = curr + inc;
-	  if (newColor < 0) {
-	    return colors.length - 1;
-	  }
-	  if (newColor > colors.length - 1) {
-	    return 0;
-	  }
-	  return newColor;
-	}
-	
-	function home(_ref) {
-	  var DOM = _ref.DOM;
-	
-	  var action$ = _rx2.default.Observable.merge(DOM.select('button.colorBtn.next').events('click').map(increment), DOM.select('button.colorBtn.prev').events('click').map(-increment));
-	
-	  var color$ = action$.startWith(0).scan(nextColorIndex);
-	
-	  var vTree$ = color$.map(function (color) {
-	    var nextBg = nextColorIndex(color, increment);
-	    var prevBg = nextColorIndex(color, -increment);
-	
-	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'colorpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page', {}, [(0, _cycleSnabbdom.h)('div.color-change-container.flexcenter', { style: { backgroundColor: colors[color].bg } }, [(0, _cycleSnabbdom.h)('h3', { style: { color: colors[color].font } }, 'Magic Color Changer'), (0, _cycleSnabbdom.h)('em', { style: { color: colors[color].font } }, 'Cycle (get it?) through 5 colors.'), (0, _cycleSnabbdom.h)('button.colorBtn.next', {}, 'Go to ' + colors[nextBg].bg), (0, _cycleSnabbdom.h)('button.colorBtn.prev', {}, 'Back to ' + colors[prevBg].bg)])])]);
-	  });
-	
-	  return { DOM: vTree$ };
-	}
-	
-	exports.default = home;
-
-/***/ },
-/* 30 */
+/* 30 */,
+/* 31 */,
+/* 32 */
 /*!******************************!*\
   !*** ./src/global-styles.js ***!
   \******************************/
@@ -15533,10 +15525,11 @@
 	exports.default = fadeInOutStyle;
 
 /***/ },
-/* 31 */
-/*!******************************!*\
-  !*** ./src/github-search.js ***!
-  \******************************/
+/* 33 */,
+/* 34 */
+/*!**********************************!*\
+  !*** ./src/examples/checkbox.js ***!
+  \**********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15545,13 +15538,111 @@
 	  value: true
 	});
 	
-	var _rx = __webpack_require__(/*! rx */ 2);
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	
+	function checkbox(_ref) {
+	  var DOM = _ref.DOM;
+	
+	  var requests = {
+	    DOM: DOM.select('input').events('change').map(function (ev) {
+	      return ev.target.checked;
+	    }).startWith(false).do(function (x) {
+	      console.log('Checkbox value changed to ' + x);
+	    }) //eslint-disable-line
+	    .map(function (toggled) {
+	      return (0, _cycleSnabbdom.h)('div', [(0, _cycleSnabbdom.h)('input#box1', { props: { type: 'checkbox' } }), 'Toggle me', (0, _cycleSnabbdom.h)('p', toggled ? 'On' : 'Off')]);
+	    })
+	  };
+	  return requests;
+	}
+	
+	exports.default = checkbox;
+
+/***/ },
+/* 35 */
+/*!**************************************!*\
+  !*** ./src/examples/color-change.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	
+	var _rx = __webpack_require__(/*! rx */ 1);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 10);
+	var _globalStyles = __webpack_require__(/*! ../global-styles */ 32);
 	
-	var _globalStyles = __webpack_require__(/*! ./global-styles */ 30);
+	var _globalStyles2 = _interopRequireDefault(_globalStyles);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var colors = [{ bg: 'White', font: 'Black' }, { bg: 'Gray', font: 'White' }, { bg: 'Green', font: 'Yellow' }, { bg: 'Red', font: 'Black' }, { bg: 'Black', font: 'White' }];
+	
+	var increment = 1;
+	
+	function nextColorIndex(curr, inc) {
+	  var newColor = curr + inc;
+	  if (newColor < 0) {
+	    return colors.length - 1;
+	  }
+	  if (newColor > colors.length - 1) {
+	    return 0;
+	  }
+	  return newColor;
+	}
+	
+	function home(_ref) {
+	  var DOM = _ref.DOM;
+	
+	  var action$ = _rx2.default.Observable.merge(DOM.select('button.colorBtn.next').events('click').map(increment), DOM.select('button.colorBtn.prev').events('click').map(-increment)).do(function (x) {
+	    return console.log('Color change action emitted: ' + x);
+	  }); //eslint-disable-line
+	
+	  var color$ = action$.startWith(0).scan(nextColorIndex).do(function (x) {
+	    return console.log('Colors index emitted: ' + x);
+	  }); //eslint-disable-line
+	
+	  var vTree$ = color$.map(function (color) {
+	    var nextBg = nextColorIndex(color, increment);
+	    var prevBg = nextColorIndex(color, -increment);
+	
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'colorpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page', {}, [(0, _cycleSnabbdom.h)('div.color-change-container.flexcenter', { style: { backgroundColor: colors[color].bg } }, [(0, _cycleSnabbdom.h)('h3', { style: { color: colors[color].font } }, 'Magic Color Changer'), (0, _cycleSnabbdom.h)('em', { style: { color: colors[color].font } }, 'Cycle (get it?) through 5 colors.'), (0, _cycleSnabbdom.h)('button.colorBtn.next', {}, 'Go to ' + colors[nextBg].bg), (0, _cycleSnabbdom.h)('button.colorBtn.prev', {}, 'Back to ' + colors[prevBg].bg)])])]);
+	  }).do(function () {
+	    return console.log('Colors DOM emitted');
+	  }); //eslint-disable-line
+	
+	  return { DOM: vTree$ };
+	}
+	
+	exports.default = home;
+
+/***/ },
+/* 36 */
+/*!***************************************!*\
+  !*** ./src/examples/github-search.js ***!
+  \***************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _rx = __webpack_require__(/*! rx */ 1);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	
+	var _globalStyles = __webpack_require__(/*! ../global-styles */ 32);
 	
 	var _globalStyles2 = _interopRequireDefault(_globalStyles);
 	
@@ -15572,7 +15663,7 @@
 	  var _ref$owner = _ref.owner;
 	  var owner = _ref$owner === undefined ? {
 	    html_url: 'https://github.com/',
-	    avatar_url: 'http://fullmurray.com/50/50',
+	    avatar_url: '',
 	    login: '?'
 	  } : _ref$owner;
 	
@@ -15595,41 +15686,54 @@
 	
 	  // Requests for Github repositories happen when the input field changes,
 	  // debounced by 500ms, ignoring empty input field.
-	  var searchRequest$ = DOM.select('.field').events('input').debounce(500).map(function (ev) {
+	  var searchRequest$ = DOM.select('.field').events('input').do(function () {
+	    console.log('GH input changed');
+	  }) //eslint-disable-line
+	  .debounce(500).map(function (ev) {
 	    return ev.target.value.trim();
 	  }) //added trim to reduce useless searches
 	  .filter(function (query) {
 	    return query.length > 0;
 	  }).map(function (q) {
 	    return GITHUB_SEARCH_API + encodeURI(q);
-	  }).distinctUntilChanged();
+	  }).do(function (x) {
+	    return console.log('GH search request emitted: ' + x);
+	  }) //eslint-disable-line
+	  .share(); //needed because multiple observables will subscribe
 	
 	  // Convert the stream of HTTP responses to virtual DOM elements.
 	  var searchResponse$ = HTTP.filter(function (res$) {
-	    return res$.request.url.indexOf(GITHUB_SEARCH_API) === 0;
+	    return res$ && res$.request.url.indexOf(GITHUB_SEARCH_API) === 0;
 	  }).flatMapLatest(function (x) {
 	    return x;
 	  }) //Needed because HTTP gives an Observable when you map it
 	  .map(function (res) {
 	    return res.body.items;
-	  }).map(function (items) {
-	    return items.map(resultView);
-	  }).startWith([]);
+	  }).startWith([]).do(function (x) {
+	    return console.log('GH search response emitted: ' + x.length + ' items');
+	  }) //eslint-disable-line
+	  .share(); //needed because multiple observables will subscribe
 	
 	  //loading indication.  true if request is newer than response
-	  var loading$ = searchRequest$.map(true).merge(searchResponse$.map(false));
+	  var loading$ = searchRequest$.map(true).merge(searchResponse$.map(false)).startWith(false).do(function (x) {
+	    return console.log('GH loading status emitted: ' + x);
+	  }); //eslint-disable-line
 	
 	  //Combined state observable which triggers view updates
 	  var state$ = _rx2.default.Observable.combineLatest(searchResponse$, loading$, function (res, loading) {
 	    return { results: res, loading: loading };
-	  });
+	  }).do(function () {
+	    return console.log('GH state emitted');
+	  }); //eslint-disable-line
 	
 	  //TODO: Prevent this from having initial state when re-entering page.
 	  var vtree$ = state$.map(function (_ref3) {
 	    var results = _ref3.results;
 	    var loading = _ref3.loading;
-	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'ghpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page.github-search-container', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.concat(loading ? loadingSpinner() : ''))])]);
-	  });
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'ghpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page.github-search-container', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.map(resultView).concat(loading ? loadingSpinner() : null))])]);
+	  }).do(function () {
+	    return console.log('GH DOM emitted');
+	  }); //eslint-disable-line
 	
 	  return {
 	    DOM: vtree$,
