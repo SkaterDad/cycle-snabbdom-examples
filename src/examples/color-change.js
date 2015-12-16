@@ -1,6 +1,6 @@
 import {h} from 'cycle-snabbdom'
 import Rx from 'rx'
-import fadeInOutStyle from '../global-styles'
+import {fadeInOutStyle} from '../global/styles'
 
 const colors = [
   {bg: 'White', font: 'Black'},
@@ -28,10 +28,10 @@ function home({DOM}) {
     DOM.select('button.colorBtn.next').events('click').map(increment),
     DOM.select('button.colorBtn.prev').events('click').map(-increment)
   )
-    .do((x) => console.log(`Color change action emitted: ${x}`)) //eslint-disable-line
+    .do((x) => console.log(`Color change action emitted: ${x}`))
 
   let color$ = action$.startWith(0).scan(nextColorIndex)
-    .do((x) => console.log(`Colors index emitted: ${x}`)) //eslint-disable-line
+    .do((x) => console.log(`Colors index emitted: ${x}`))
 
   let vTree$ = color$
       .map((color) => {
@@ -49,7 +49,7 @@ function home({DOM}) {
           ])
         ])
       })
-    .do(() => console.log(`Colors DOM emitted`)) //eslint-disable-line
+    .do(() => console.log(`Colors DOM emitted`))
 
   return {DOM: vTree$}
 }

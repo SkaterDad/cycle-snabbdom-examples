@@ -10,6 +10,8 @@ const header = h('header', {}, [
     h('option', {attrs: {value: 0, selected: true}}, 'Checkbox'),
     h('option', {attrs: {value: 1}}, 'Color Changer'),
     h('option', {attrs: {value: 2}}, 'Github Search'),
+    h('option', {attrs: {value: 3}}, 'Hero Transition (Simple)'),
+    h('option', {attrs: {value: 4}}, 'Hero Transition (Complex)'),
   ]),
 ])
 
@@ -20,9 +22,8 @@ function main(responses) {
   let toggle$ = responses.DOM.select('.switcher').events('change')
     .map(ev => ev.target.value)
     .startWith(0)
-    .do((x) => {console.log(`Example Selector = ${x}`)}) //eslint-disable-line
+    .do((x) => {console.log(`Example Selector = ${x}`)})
 
-  //const theHeader = header(responses)
   const theContent = content(responses, toggle$)
 
   const view$ = Rx.Observable.just(view(header, theContent.DOM))
@@ -31,6 +32,13 @@ function main(responses) {
 }
 
 Cycle.run(main, {
-  DOM: makeDOMDriver('#app-container'),
+  DOM: makeDOMDriver('#app-container', [
+    require(`snabbdom/modules/class`),
+    //require(`snabbdom/modules/hero`),
+    require(`./hero`),
+    require(`snabbdom/modules/style`),
+    require(`snabbdom/modules/props`),
+    require(`snabbdom/modules/attributes`),
+  ]),
   HTTP: makeHTTPDriver(),
 })

@@ -5,11 +5,11 @@ function checkbox({DOM}) {
     DOM: DOM.select('input').events('change')
       .map(ev => ev.target.checked)
       .startWith(false)
-      .do((x) => { console.log(`Checkbox value changed to ${x}`)}) //eslint-disable-line
+      .do((x) => {console.log(`Checkbox value changed to ${x}`)})
       .map(toggled =>
         h('div', [
           h('input#box1', {props: {type: 'checkbox'}}), 'Toggle me',
-          h('p', toggled ? 'On' : 'Off')
+          h('p', toggled ? 'On' : 'Off'),
         ])
       )
   }

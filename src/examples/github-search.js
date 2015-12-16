@@ -1,18 +1,7 @@
 import Rx from 'rx'
 import {h} from 'cycle-snabbdom'
-import fadeInOutStyle from '../global-styles'
-
-function loadingSpinner() {
-  return h('div.spinner-container', {style: fadeInOutStyle}, [
-    h('div.spinner', [
-      h('div.rect1'),
-      h('div.rect2'),
-      h('div.rect3'),
-      h('div.rect4'),
-      h('div.rect5'),
-    ])
-  ])
-}
+import {fadeInOutStyle} from '../global/styles'
+import loadingSpinner from '../global/loading'
 
 function resultView({
   id,
@@ -50,12 +39,12 @@ function githubSearch({DOM, HTTP}) {
   // Requests for Github repositories happen when the input field changes,
   // debounced by 500ms, ignoring empty input field.
   const searchRequest$ = DOM.select('.field').events('input')
-    .do(() => {console.log(`GH input changed`)}) //eslint-disable-line
+    .do(() => {console.log(`GH input changed`)})
     .debounce(500)
     .map(ev => ev.target.value.trim()) //added trim to reduce useless searches
     .filter(query => query.length > 0)
     .map(q => GITHUB_SEARCH_API + encodeURI(q))
-    .do((x) => console.log(`GH search request emitted: ${x}`)) //eslint-disable-line
+    .do((x) => console.log(`GH search request emitted: ${x}`))
     .share() //needed because multiple observables will subscribe
 
   // Convert the stream of HTTP responses to virtual DOM elements.
@@ -64,20 +53,20 @@ function githubSearch({DOM, HTTP}) {
     .flatMapLatest(x => x) //Needed because HTTP gives an Observable when you map it
     .map(res => res.body.items)
     .startWith([])
-    .do((x) => console.log(`GH search response emitted: ${x.length} items`)) //eslint-disable-line
+    .do((x) => console.log(`GH search response emitted: ${x.length} items`))
     .share() //needed because multiple observables will subscribe
 
   //loading indication.  true if request is newer than response
   const loading$ = searchRequest$.map(true).merge(searchResponse$.map(false))
     .startWith(false)
-    .do((x) => console.log(`GH loading status emitted: ${x}`)) //eslint-disable-line
+    .do((x) => console.log(`GH loading status emitted: ${x}`))
 
   //Combined state observable which triggers view updates
   const state$ = Rx.Observable.combineLatest(searchResponse$, loading$,
     (res, loading) => {
       return {results: res, loading: loading}
     })
-    .do(() => console.log(`GH state emitted`)) //eslint-disable-line
+    .do(() => console.log(`GH state emitted`))
 
   //TODO: Prevent this from having initial state when re-entering page.
   const vtree$ = state$
@@ -91,7 +80,7 @@ function githubSearch({DOM, HTTP}) {
         ])
       ])
     )
-    .do(() => console.log(`GH DOM emitted`)) //eslint-disable-line
+    .do(() => console.log(`GH DOM emitted`))
 
   return {
     DOM: vtree$,

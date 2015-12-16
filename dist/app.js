@@ -67,7 +67,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var header = (0, _cycleSnabbdom.h)('header', {}, [(0, _cycleSnabbdom.h)('span', { style: { marginRight: '1rem' } }, 'Example Chooser:'), (0, _cycleSnabbdom.h)('select.switcher', {}, [(0, _cycleSnabbdom.h)('option', { attrs: { value: 0, selected: true } }, 'Checkbox'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 1 } }, 'Color Changer'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 2 } }, 'Github Search')])]);
+	var header = (0, _cycleSnabbdom.h)('header', {}, [(0, _cycleSnabbdom.h)('span', { style: { marginRight: '1rem' } }, 'Example Chooser:'), (0, _cycleSnabbdom.h)('select.switcher', {}, [(0, _cycleSnabbdom.h)('option', { attrs: { value: 0, selected: true } }, 'Checkbox'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 1 } }, 'Color Changer'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 2 } }, 'Github Search'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 3 } }, 'Hero Transition (Simple)'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 4 } }, 'Hero Transition (Complex)')])]);
 	
 	var view = function view(hdr, cont) {
 	  return (0, _cycleSnabbdom.h)('div.app-wrapper', {}, [hdr, (0, _cycleSnabbdom.h)('main.content-holder', {}, [cont])]);
@@ -78,9 +78,8 @@
 	    return ev.target.value;
 	  }).startWith(0).do(function (x) {
 	    console.log('Example Selector = ' + x);
-	  }); //eslint-disable-line
+	  });
 	
-	  //const theHeader = header(responses)
 	  var theContent = (0, _content2.default)(responses, toggle$);
 	
 	  var view$ = _rx2.default.Observable.just(view(header, theContent.DOM));
@@ -89,7 +88,9 @@
 	}
 	
 	_core2.default.run(main, {
-	  DOM: (0, _cycleSnabbdom.makeDOMDriver)('#app-container'),
+	  DOM: (0, _cycleSnabbdom.makeDOMDriver)('#app-container', [__webpack_require__(/*! snabbdom/modules/class */ 20),
+	  //require(`snabbdom/modules/hero`),
+	  __webpack_require__(/*! ./hero */ 40), __webpack_require__(/*! snabbdom/modules/style */ 23), __webpack_require__(/*! snabbdom/modules/props */ 21), __webpack_require__(/*! snabbdom/modules/attributes */ 22)]),
 	  HTTP: (0, _http.makeHTTPDriver)()
 	});
 
@@ -15436,6 +15437,14 @@
 	
 	var _githubSearch2 = _interopRequireDefault(_githubSearch);
 	
+	var _heroTransition = __webpack_require__(/*! ./examples/hero-transition */ 35);
+	
+	var _heroTransition2 = _interopRequireDefault(_heroTransition);
+	
+	var _heroSimple = __webpack_require__(/*! ./examples/hero-simple */ 39);
+	
+	var _heroSimple2 = _interopRequireDefault(_heroSimple);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function mapContent(responses, val) {
@@ -15446,40 +15455,41 @@
 	      return (0, _colorChange2.default)(responses);
 	    case 2:
 	      return (0, _githubSearch2.default)(responses);
+	    case 3:
+	      return (0, _heroSimple2.default)(responses);
+	    case 4:
+	      return (0, _heroTransition2.default)(responses);
 	    default:
 	      return (0, _checkbox2.default)(responses);
 	  }
 	} //import Rx from 'rx'
 	
 	function content(responses, toggle$) {
-	  //eslint-disable-line
 	  var state$ = toggle$.map(function (val) {
-	    console.log('I\'m inside the content state mapping!'); //eslint-disable-line
+	    console.log('I\'m inside the content state mapping!');
 	    return mapContent(responses, val);
 	  }).do(function (x) {
 	    var hasDOM = x.DOM ? true : false;
 	    var hasHTTP = x.HTTP ? true : false;
 	    console.log('Content state emitted - DOM: ' + hasDOM + ', HTTP: ' + hasHTTP);
-	  }) //eslint-disable-line
-	  .share();
+	  }).share();
 	
 	  return {
 	    DOM: state$.pluck('DOM').do(function () {
 	      console.log('Content DOM plucked');
-	    }), //eslint-disable-line
+	    }),
 	    HTTP: state$.pluck('HTTP').do(function () {
 	      console.log('Content HTTP plucked');
-	    }) //eslint-disable-line
-	    .filter(function (x) {
+	    }).filter(function (x) {
 	      return x;
 	    }).flatMapLatest(function (x) {
 	      return x;
 	    }).do(function () {
 	      console.log('Content HTTP filtered');
-	    }) };
+	    })
+	  };
 	}
 	
-	//eslint-disable-line
 	exports.default = content;
 
 /***/ },
@@ -15505,8 +15515,7 @@
 	      return ev.target.checked;
 	    }).startWith(false).do(function (x) {
 	      console.log('Checkbox value changed to ' + x);
-	    }) //eslint-disable-line
-	    .map(function (toggled) {
+	    }).map(function (toggled) {
 	      return (0, _cycleSnabbdom.h)('div', [(0, _cycleSnabbdom.h)('input#box1', { props: { type: 'checkbox' } }), 'Toggle me', (0, _cycleSnabbdom.h)('p', toggled ? 'On' : 'Off')]);
 	    })
 	  };
@@ -15534,9 +15543,7 @@
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _globalStyles = __webpack_require__(/*! ../global-styles */ 32);
-	
-	var _globalStyles2 = _interopRequireDefault(_globalStyles);
+	var _styles = __webpack_require__(/*! ../global/styles */ 32);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -15560,20 +15567,20 @@
 	
 	  var action$ = _rx2.default.Observable.merge(DOM.select('button.colorBtn.next').events('click').map(increment), DOM.select('button.colorBtn.prev').events('click').map(-increment)).do(function (x) {
 	    return console.log('Color change action emitted: ' + x);
-	  }); //eslint-disable-line
+	  });
 	
 	  var color$ = action$.startWith(0).scan(nextColorIndex).do(function (x) {
 	    return console.log('Colors index emitted: ' + x);
-	  }); //eslint-disable-line
+	  });
 	
 	  var vTree$ = color$.map(function (color) {
 	    var nextBg = nextColorIndex(color, increment);
 	    var prevBg = nextColorIndex(color, -increment);
 	
-	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'colorpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page', {}, [(0, _cycleSnabbdom.h)('div.color-change-container.flexcenter', { style: { backgroundColor: colors[color].bg } }, [(0, _cycleSnabbdom.h)('h3', { style: { color: colors[color].font } }, 'Magic Color Changer'), (0, _cycleSnabbdom.h)('em', { style: { color: colors[color].font } }, 'Cycle (get it?) through 5 colors.'), (0, _cycleSnabbdom.h)('button.colorBtn.next', {}, 'Go to ' + colors[nextBg].bg), (0, _cycleSnabbdom.h)('button.colorBtn.prev', {}, 'Back to ' + colors[prevBg].bg)])])]);
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'colorpage', style: _styles.fadeInOutStyle }, [(0, _cycleSnabbdom.h)('div.page', {}, [(0, _cycleSnabbdom.h)('div.color-change-container.flexcenter', { style: { backgroundColor: colors[color].bg } }, [(0, _cycleSnabbdom.h)('h3', { style: { color: colors[color].font } }, 'Magic Color Changer'), (0, _cycleSnabbdom.h)('em', { style: { color: colors[color].font } }, 'Cycle (get it?) through 5 colors.'), (0, _cycleSnabbdom.h)('button.colorBtn.next', {}, 'Go to ' + colors[nextBg].bg), (0, _cycleSnabbdom.h)('button.colorBtn.prev', {}, 'Back to ' + colors[prevBg].bg)])])]);
 	  }).do(function () {
 	    return console.log('Colors DOM emitted');
-	  }); //eslint-disable-line
+	  });
 	
 	  return { DOM: vTree$ };
 	}
@@ -15583,7 +15590,7 @@
 /***/ },
 /* 32 */
 /*!******************************!*\
-  !*** ./src/global-styles.js ***!
+  !*** ./src/global/styles.js ***!
   \******************************/
 /***/ function(module, exports) {
 
@@ -15592,7 +15599,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var fadeInOutStyle = {
+	var fadeInOutStyle = exports.fadeInOutStyle = {
 	  opacity: 0,
 	  transition: 'opacity 0.5s ease-in-out',
 	  delayed: {
@@ -15606,7 +15613,30 @@
 	  }
 	};
 	
-	exports.default = fadeInOutStyle;
+	var fadeOutStyle = exports.fadeOutStyle = {
+	  opacity: 1,
+	  transition: 'opacity 0.5s ease-in-out',
+	  remove: {
+	    opacity: 0
+	  },
+	  destroy: {
+	    opacity: 0
+	  }
+	};
+	
+	var fadeInStyle = exports.fadeInStyle = {
+	  opacity: 0,
+	  transition: 'opacity 0.5s ease-in-out',
+	  delayed: {
+	    opacity: 1
+	  }
+	};
+	
+	var exitAbsolutely = exports.exitAbsolutely = {
+	  opacity: '0',
+	  delayed: { opacity: '1' },
+	  remove: { opacity: '0', position: 'absolute' }
+	};
 
 /***/ },
 /* 33 */
@@ -15627,15 +15657,13 @@
 	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
 	
-	var _globalStyles = __webpack_require__(/*! ../global-styles */ 32);
+	var _styles = __webpack_require__(/*! ../global/styles */ 32);
 	
-	var _globalStyles2 = _interopRequireDefault(_globalStyles);
+	var _loading = __webpack_require__(/*! ../global/loading */ 34);
+	
+	var _loading2 = _interopRequireDefault(_loading);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function loadingSpinner() {
-	  return (0, _cycleSnabbdom.h)('div.spinner-container', { style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.spinner', [(0, _cycleSnabbdom.h)('div.rect1'), (0, _cycleSnabbdom.h)('div.rect2'), (0, _cycleSnabbdom.h)('div.rect3'), (0, _cycleSnabbdom.h)('div.rect4'), (0, _cycleSnabbdom.h)('div.rect5')])]);
-	}
 	
 	function resultView(_ref) {
 	  var id = _ref.id;
@@ -15673,8 +15701,7 @@
 	  // debounced by 500ms, ignoring empty input field.
 	  var searchRequest$ = DOM.select('.field').events('input').do(function () {
 	    console.log('GH input changed');
-	  }) //eslint-disable-line
-	  .debounce(500).map(function (ev) {
+	  }).debounce(500).map(function (ev) {
 	    return ev.target.value.trim();
 	  }) //added trim to reduce useless searches
 	  .filter(function (query) {
@@ -15683,8 +15710,7 @@
 	    return GITHUB_SEARCH_API + encodeURI(q);
 	  }).do(function (x) {
 	    return console.log('GH search request emitted: ' + x);
-	  }) //eslint-disable-line
-	  .share(); //needed because multiple observables will subscribe
+	  }).share(); //needed because multiple observables will subscribe
 	
 	  // Convert the stream of HTTP responses to virtual DOM elements.
 	  var searchResponse$ = HTTP.filter(function (res$) {
@@ -15696,29 +15722,28 @@
 	    return res.body.items;
 	  }).startWith([]).do(function (x) {
 	    return console.log('GH search response emitted: ' + x.length + ' items');
-	  }) //eslint-disable-line
-	  .share(); //needed because multiple observables will subscribe
+	  }).share(); //needed because multiple observables will subscribe
 	
 	  //loading indication.  true if request is newer than response
 	  var loading$ = searchRequest$.map(true).merge(searchResponse$.map(false)).startWith(false).do(function (x) {
 	    return console.log('GH loading status emitted: ' + x);
-	  }); //eslint-disable-line
+	  });
 	
 	  //Combined state observable which triggers view updates
 	  var state$ = _rx2.default.Observable.combineLatest(searchResponse$, loading$, function (res, loading) {
 	    return { results: res, loading: loading };
 	  }).do(function () {
 	    return console.log('GH state emitted');
-	  }); //eslint-disable-line
+	  });
 	
 	  //TODO: Prevent this from having initial state when re-entering page.
 	  var vtree$ = state$.map(function (_ref3) {
 	    var results = _ref3.results;
 	    var loading = _ref3.loading;
-	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'ghpage', style: _globalStyles2.default }, [(0, _cycleSnabbdom.h)('div.page.github-search-container', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.map(resultView).concat(loading ? loadingSpinner() : null))])]);
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'ghpage', style: _styles.fadeInOutStyle }, [(0, _cycleSnabbdom.h)('div.page.github-search-container', {}, [(0, _cycleSnabbdom.h)('label.label', {}, 'Search:'), (0, _cycleSnabbdom.h)('input.field', { props: { type: 'text' } }), (0, _cycleSnabbdom.h)('hr'), (0, _cycleSnabbdom.h)('section.search-results', {}, results.map(resultView).concat(loading ? (0, _loading2.default)() : null))])]);
 	  }).do(function () {
 	    return console.log('GH DOM emitted');
-	  }); //eslint-disable-line
+	  });
 	
 	  return {
 	    DOM: vtree$,
@@ -15727,6 +15752,505 @@
 	}
 	
 	exports.default = githubSearch;
+
+/***/ },
+/* 34 */
+/*!*******************************!*\
+  !*** ./src/global/loading.js ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	
+	var _styles = __webpack_require__(/*! ./styles */ 32);
+	
+	var _styles2 = _interopRequireDefault(_styles);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function loadingSpinner() {
+	  return (0, _cycleSnabbdom.h)('div.spinner-container', { style: _styles2.default }, [(0, _cycleSnabbdom.h)('div.spinner', [(0, _cycleSnabbdom.h)('div.rect1'), (0, _cycleSnabbdom.h)('div.rect2'), (0, _cycleSnabbdom.h)('div.rect3'), (0, _cycleSnabbdom.h)('div.rect4'), (0, _cycleSnabbdom.h)('div.rect5')])]);
+	}
+	
+	exports.default = loadingSpinner;
+
+/***/ },
+/* 35 */
+/*!*****************************************!*\
+  !*** ./src/examples/hero-transition.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _heroList = __webpack_require__(/*! ./hero-list */ 36);
+	
+	var _heroList2 = _interopRequireDefault(_heroList);
+	
+	var _heroDetail = __webpack_require__(/*! ./hero-detail */ 38);
+	
+	var _heroDetail2 = _interopRequireDefault(_heroDetail);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	//import Rx from 'rx'
+	
+	function mapContent(responses, action) {
+	  switch (action.view) {
+	    case 'list':
+	      console.log('Hero: Show the list view!');
+	      return (0, _heroList2.default)(responses);
+	    case 'details':
+	      console.log('Hero: Show the details view!');
+	      return (0, _heroDetail2.default)(responses, action.url);
+	    default:
+	      console.log('Hero: Show the list view! (default)');
+	      return (0, _heroList2.default)(responses);
+	  }
+	}
+	
+	function heroTransition(responses) {
+	  //User intents
+	  var listItemClick$ = responses.DOM.select('.hero-item').events('click').filter(function (ev) {
+	    return ev.target.detailUrl;
+	  }).map(function (ev) {
+	    return {
+	      view: 'details',
+	      url: ev.target.detailUrl
+	    };
+	  });
+	
+	  var detailCloseClick$ = responses.DOM.select('.detail-close').events('click').map(function () {
+	    return {
+	      view: 'list'
+	    };
+	  });
+	
+	  var action$ = listItemClick$.merge(detailCloseClick$).startWith({ view: 'list' });
+	
+	  var state$ = action$.map(function (action) {
+	    return mapContent(responses, action);
+	  }).shareReplay(1); //<- Magic
+	
+	  var heroContent = {
+	    DOM: state$.filter(function (x) {
+	      return x.DOM;
+	    }).map(function (x) {
+	      return x.DOM;
+	    }).do(function () {
+	      console.log('Hero: Content DOM mapped');
+	    }),
+	    HTTP: state$.filter(function (x) {
+	      return x.HTTP;
+	    }).map(function (x) {
+	      return x.HTTP;
+	    }).do(function () {
+	      console.log('Hero: Content HTTP mapped');
+	    }).filter(function (x) {
+	      return x;
+	    }).flatMapLatest(function (x) {
+	      return x;
+	    }).do(function () {
+	      console.log('Hero: Content HTTP filtered');
+	    })
+	  };
+	
+	  return heroContent;
+	}
+	
+	exports.default = heroTransition;
+
+/***/ },
+/* 36 */
+/*!***********************************!*\
+  !*** ./src/examples/hero-list.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _rx = __webpack_require__(/*! rx */ 1);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	
+	var _utils = __webpack_require__(/*! ../global/utils */ 37);
+	
+	var _loading = __webpack_require__(/*! ../global/loading */ 34);
+	
+	var _loading2 = _interopRequireDefault(_loading);
+	
+	var _styles = __webpack_require__(/*! ../global/styles */ 32);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function resultView(_ref) {
+	  var id = _ref.id;
+	  var _ref$url = _ref.url;
+	  var url = _ref$url === undefined ? 'https://api.github.com/' : _ref$url;
+	  var _ref$full_name = _ref.full_name;
+	  var full_name = _ref$full_name === undefined ? 'Unknown Repo Name' : _ref$full_name;
+	  var _ref$description = _ref.description;
+	  var description = _ref$description === undefined ? 'No description given.' : _ref$description;
+	  var _ref$owner = _ref.owner;
+	  var owner = _ref$owner === undefined ? {
+	    html_url: 'https://github.com/',
+	    avatar_url: '',
+	    login: '?'
+	  } : _ref$owner;
+	
+	  var html = (0, _cycleSnabbdom.h)('article.hero.hero-item', {
+	    key: id,
+	    props: {
+	      detailUrl: url
+	    }
+	  }, //hero: {id: `repo${id}`},
+	  [(0, _cycleSnabbdom.h)('img.hero', { props: { src: owner.avatar_url }, hero: { id: 'repo' + id } }), (0, _cycleSnabbdom.h)('h1.hero.repo', {}, full_name), (0, _cycleSnabbdom.h)('div.small', {}, description), (0, _cycleSnabbdom.h)('div.small', {}, 'by ' + owner.login)]);
+	  return html;
+	}
+	
+	function heroList(_ref2) {
+	  var HTTP = _ref2.HTTP;
+	
+	  var GET_REQUEST_URL = 'https://api.github.com/users/cyclejs/repos';
+	
+	  //Send HTTP request to get data for the page
+	  //.shareReplay(1) is needed because this observable
+	  //immediately emmits its value before anything can
+	  //subscribe to it.
+	  var dataRequest$ = _rx2.default.Observable.just(GET_REQUEST_URL).do(function () {
+	    return console.log('Hero list: Search request subscribed');
+	  }).shareReplay(1);
+	
+	  // Convert the stream of HTTP responses to virtual DOM elements.
+	  var dataResponse$ = HTTP.filter(function (res$) {
+	    return (0, _utils.checkRequestUrl)(res$, GET_REQUEST_URL);
+	  }).flatMapLatest(function (x) {
+	    return x;
+	  }) //Needed because HTTP gives an Observable when you map it
+	  .map(function (res) {
+	    return res.body;
+	  }).startWith([]).do(function (x) {
+	    return console.log('Hero list: HTTP response emitted: ' + x.length + ' items');
+	  }).share();
+	
+	  //loading indication.  true if request is newer than response
+	  var loading$ = dataRequest$.map(true).merge(dataResponse$.map(false)).do(function (x) {
+	    return console.log('Hero List: loading status emitted: ' + x);
+	  });
+	
+	  //Combined state observable which triggers view updates
+	  var state$ = _rx2.default.Observable.combineLatest(dataResponse$, loading$, function (res, loading) {
+	    return { results: res, loading: loading };
+	  }).do(function () {
+	    return console.log('Hero List: state emitted');
+	  });
+	
+	  //Map state into DOM elements
+	  var vtree$ = state$.map(function (_ref3) {
+	    var results = _ref3.results;
+	    var loading = _ref3.loading;
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'herolistpage', style: _styles.fadeInStyle }, [(0, _cycleSnabbdom.h)('div', { style: { height: '100%', overflow: 'auto' } }, [(0, _cycleSnabbdom.h)('h1', {}, 'Repo List'), (0, _cycleSnabbdom.h)('section.flex', {}, results.map(resultView).concat(loading ? (0, _loading2.default)() : null))])]);
+	  }).do(function () {
+	    return console.log('Hero list: DOM emitted');
+	  });
+	
+	  return {
+	    DOM: vtree$,
+	    HTTP: dataRequest$
+	  };
+	}
+	
+	exports.default = heroList;
+
+/***/ },
+/* 37 */
+/*!*****************************!*\
+  !*** ./src/global/utils.js ***!
+  \*****************************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.checkRequestUrl = checkRequestUrl;
+	function checkRequestUrl(res$, url) {
+	  try {
+	    return res$.request.url.indexOf(url) === 0;
+	  } catch (e) {
+	    return false;
+	  }
+	}
+
+/***/ },
+/* 38 */
+/*!*************************************!*\
+  !*** ./src/examples/hero-detail.js ***!
+  \*************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _rx = __webpack_require__(/*! rx */ 1);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	
+	var _utils = __webpack_require__(/*! ../global/utils */ 37);
+	
+	var _styles = __webpack_require__(/*! ../global/styles */ 32);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	//import loadingSpinner from '../global/loading'
+	
+	function detailView(_ref) {
+	  var id = _ref.id;
+	  var _ref$full_name = _ref.full_name;
+	  var full_name = _ref$full_name === undefined ? 'Unknown Repo Name' : _ref$full_name;
+	  var _ref$description = _ref.description;
+	  var description = _ref$description === undefined ? 'No description given.' : _ref$description;
+	  var _ref$stargazers_count = _ref.stargazers_count;
+	  var stargazers_count = _ref$stargazers_count === undefined ? '?' : _ref$stargazers_count;
+	  var _ref$language = _ref.language;
+	  var language = _ref$language === undefined ? '?' : _ref$language;
+	  var _ref$owner = _ref.owner;
+	  var owner = _ref$owner === undefined ? {
+	    avatar_url: '',
+	    login: '?'
+	  } : _ref$owner;
+	
+	  var html = (0, _cycleSnabbdom.h)('div.hero-detail.hero', {}, [(0, _cycleSnabbdom.h)('img.hero-details-avatar.hero', { props: { src: owner.avatar_url }, hero: { id: 'repo' + id } }), (0, _cycleSnabbdom.h)('h3', {}, owner.login), (0, _cycleSnabbdom.h)('h1', {}, full_name), (0, _cycleSnabbdom.h)('span', {}, 'Stars: ' + stargazers_count + '  -  Language: ' + language), (0, _cycleSnabbdom.h)('p', {}, description), (0, _cycleSnabbdom.h)('button.detail-close', {}, 'Back to List')]);
+	  return html;
+	}
+	
+	function heroDetail(_ref2) {
+	  var HTTP = _ref2.HTTP;
+	  var repoUrl = arguments.length <= 1 || arguments[1] === undefined ? 'https://api.github.com/repos/paldepind/snabbdom' : arguments[1];
+	
+	  var GET_REQUEST_URL = repoUrl;
+	
+	  //Send HTTP request to get data for the page
+	  var searchRequest$ = _rx2.default.Observable.just(GET_REQUEST_URL).do(function (x) {
+	    return console.log('Hero Detail: Sent GET request to: ' + x);
+	  });
+	
+	  // Convert the stream of HTTP responses to virtual DOM elements.
+	  var searchResponse$ = HTTP.filter(function (res$) {
+	    return (0, _utils.checkRequestUrl)(res$, GET_REQUEST_URL);
+	  }).flatMapLatest(function (x) {
+	    return x;
+	  }) //Needed because HTTP gives an Observable when you map it
+	  .map(function (res) {
+	    return res.body;
+	  }).do(function () {
+	    return console.log('Hero Detail: HTTP response emitted');
+	  });
+	
+	  //Map current state to DOM elements
+	  var vtree$ = searchResponse$.filter(function (results) {
+	    return results;
+	  }) //ignore any null or undefined responses
+	  .map(function (results) {
+	    return (0, _cycleSnabbdom.h)('div.page-wrapper', { key: 'herodetailpage', style: _styles.fadeInOutStyle }, [(0, _cycleSnabbdom.h)('h1', {}, 'Repo Details'), (0, _cycleSnabbdom.h)('div.page.hero-detail-container', {}, [detailView(results)])]);
+	  }).do(function () {
+	    return console.log('Hero Detail: DOM emitted');
+	  });
+	
+	  return {
+	    DOM: vtree$,
+	    HTTP: searchRequest$
+	  };
+	}
+	
+	exports.default = heroDetail;
+
+/***/ },
+/* 39 */
+/*!*************************************!*\
+  !*** ./src/examples/hero-simple.js ***!
+  \*************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	
+	var _styles = __webpack_require__(/*! ../global/styles */ 32);
+	
+	var HERO_ID = 'test-hero-simple';
+	var HERO_TEXT = 'HERO';
+	
+	var falseView = (0, _cycleSnabbdom.h)('div.falsebox.hero', {
+	  style: {
+	    position: 'absolute',
+	    width: '100px', height: '100px',
+	    backgroundColor: 'rgb(255,107,64)',
+	    margin: '1rem', padding: '1rem',
+	    borderRadius: '3px',
+	    boxShadow: '1px 1px 2px 0px black',
+	    opacity: '0',
+	    delayed: { opacity: '1' },
+	    remove: { opacity: '0' } //, position: 'absolute', top: '0', left: '0'}
+	  }
+	}, [(0, _cycleSnabbdom.h)('span.falsetext.hero', { hero: { id: HERO_ID } }, HERO_TEXT)]);
+	
+	var trueView = (0, _cycleSnabbdom.h)('div.truebox.hero', {
+	  style: {
+	    position: 'absolute',
+	    width: '300px', height: '200px',
+	    backgroundColor: 'rgb(123,73,17)',
+	    margin: '5rem', padding: '1rem',
+	    borderRadius: '3px',
+	    boxShadow: '1px 1px 2px 0px black',
+	    opacity: '0',
+	    delayed: { opacity: '1' },
+	    remove: { opacity: '0' } //, position: 'absolute', top: '0', left: '0'}
+	  }
+	}, [(0, _cycleSnabbdom.h)('span.truetext.hero', { hero: { id: HERO_ID } }, HERO_TEXT)]);
+	
+	var view = function view(toggled) {
+	  return (0, _cycleSnabbdom.h)('div.page', { key: 'heroSimplePage', style: _styles.fadeInOutStyle }, [(0, _cycleSnabbdom.h)('input#box1', { props: { type: 'checkbox' } }), 'Toggle me', (0, _cycleSnabbdom.h)('div#box-wrapper', { style: { position: 'relative' } }, [toggled ? trueView : falseView])]);
+	};
+	
+	function heroSimple(_ref) {
+	  var DOM = _ref.DOM;
+	
+	  var vTree$ = DOM.select('input').events('change').map(function (ev) {
+	    return ev.target.checked;
+	  }).startWith(false).do(function (x) {
+	    console.log('Checkbox value changed to ' + x);
+	  }).map(view);
+	
+	  return { DOM: vTree$ };
+	}
+	
+	exports.default = heroSimple;
+
+/***/ },
+/* 40 */
+/*!*********************!*\
+  !*** ./src/hero.js ***!
+  \*********************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/*eslint-disable */
+	
+	/* global requestAnimationFrame */
+	var raf = requestAnimationFrame || setTimeout;
+	var nextFrame = function nextFrame(fn) {
+	  raf(function () {
+	    raf(fn);
+	  });
+	};
+	
+	function setNextFrame(obj, prop, val) {
+	  nextFrame(function () {
+	    obj[prop] = val;
+	  });
+	}
+	
+	var removed, created;
+	
+	function pre(oldVnode, vnode) {
+	  removed = {};
+	  created = [];
+	}
+	
+	function create(oldVnode, vnode) {
+	  var hero = vnode.data.hero;
+	  if (hero && hero.id) {
+	    created.push(hero.id);
+	    created.push(vnode);
+	  }
+	}
+	
+	function destroy(vnode) {
+	  var hero = vnode.data.hero;
+	  if (hero && hero.id) {
+	    vnode.lastRect = vnode.elm.getBoundingClientRect(); //NEW - save the bounding rectangle to a new property on the vnode
+	    removed[hero.id] = vnode;
+	  }
+	}
+	
+	function post() {
+	  var i, id, newElm, oldVnode, oldElm, hRatio, wRatio, oldRect, newRect, dx, dy, origTransform, origTransition, newStyle, oldStyle;
+	  for (i = 0; i < created.length; i += 2) {
+	    id = created[i];
+	    newElm = created[i + 1].elm;
+	    oldVnode = removed[id];
+	    if (oldVnode) {
+	      newStyle = newElm.style;
+	      oldElm = oldVnode.elm;
+	      oldStyle = oldElm.style;
+	      newRect = newElm.getBoundingClientRect();
+	      oldRect = oldVnode.lastRect; // oldElm.getBoundingClientRect(); //NEW - USE PREVIOUSLY SAVED BOUNDING RECTANGLE
+	      dx = oldRect.left - newRect.left;
+	      dy = oldRect.top - newRect.top;
+	      wRatio = newRect.width / Math.max(oldRect.width, 1);
+	      hRatio = newRect.height / Math.max(oldRect.height, 1);
+	      // Animate new element
+	      origTransform = newStyle.transform;
+	      origTransition = newStyle.transition;
+	      newStyle.transition = origTransition + 'transform 0s';
+	      newStyle.transformOrigin = '0 0';
+	      newStyle.opacity = '0';
+	      newStyle.transform = origTransform + 'translate(' + dx + 'px, ' + dy + 'px) ' + 'scale(' + 1 / wRatio + ', ' + 1 / hRatio + ')';
+	      setNextFrame(newStyle, 'transition', origTransition);
+	      setNextFrame(newStyle, 'transform', origTransform);
+	      setNextFrame(newStyle, 'opacity', '1');
+	      // Animate old element
+	      oldStyle.position = 'absolute';
+	      oldStyle.top = newRect.top + 'px';
+	      oldStyle.left = newRect.left + 'px';
+	      oldStyle.width = oldRect.width + 'px'; //NEW - Needed for elements who were sized relative to their parents
+	      oldStyle.height = oldRect.height + 'px'; //NEW - Needed for elements who were sized relative to their parents
+	      oldStyle.margin = 0; //NEW
+	      oldStyle.transformOrigin = '0 0';
+	      oldStyle.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+	      oldStyle.opacity = '1';
+	      document.body.appendChild(oldElm);
+	      setNextFrame(oldStyle, 'transform', 'scale(' + wRatio + ', ' + hRatio + ')');
+	      setNextFrame(oldStyle, 'opacity', '0');
+	      oldElm.addEventListener('transitionend', function (ev) {
+	        if (ev.propertyName === 'transform') document.body.removeChild(ev.target);
+	      });
+	    }
+	  }
+	  removed = created = undefined;
+	}
+	
+	module.exports = { pre: pre, create: create, destroy: destroy, post: post };
+	
+	/*eslint-enable */
 
 /***/ }
 /******/ ]);

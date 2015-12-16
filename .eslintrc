@@ -1,5 +1,6 @@
 {
   "extends": "eslint-config-cycle",
+  "env": {browser: true, node: true},
   "rules":  { "quotes": [2, "single"],
               "comma-dangle": [1, "always-multiline"],
             }
