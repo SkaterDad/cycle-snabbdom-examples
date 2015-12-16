@@ -88,9 +88,7 @@
 	}
 	
 	_core2.default.run(main, {
-	  DOM: (0, _cycleSnabbdom.makeDOMDriver)('#app-container', [__webpack_require__(/*! snabbdom/modules/class */ 20),
-	  //require(`snabbdom/modules/hero`),
-	  __webpack_require__(/*! ./hero */ 40), __webpack_require__(/*! snabbdom/modules/style */ 23), __webpack_require__(/*! snabbdom/modules/props */ 21), __webpack_require__(/*! snabbdom/modules/attributes */ 22)]),
+	  DOM: (0, _cycleSnabbdom.makeDOMDriver)('#app-container', [__webpack_require__(/*! snabbdom/modules/class */ 20), __webpack_require__(/*! ./snabbdom_modules/hero */ 40), __webpack_require__(/*! snabbdom/modules/style */ 23), __webpack_require__(/*! snabbdom/modules/props */ 21), __webpack_require__(/*! snabbdom/modules/attributes */ 22)]),
 	  HTTP: (0, _http.makeHTTPDriver)()
 	});
 
@@ -15840,7 +15838,7 @@
 	
 	  var state$ = action$.map(function (action) {
 	    return mapContent(responses, action);
-	  }).shareReplay(1); //<- Magic
+	  }).shareReplay(1);
 	
 	  var heroContent = {
 	    DOM: state$.filter(function (x) {
@@ -16109,7 +16107,7 @@
 	
 	var falseView = (0, _cycleSnabbdom.h)('div.falsebox.hero', {
 	  style: {
-	    position: 'absolute',
+	    position: 'absolute', //needed because the two boxes must overlap during transition
 	    width: '100px', height: '100px',
 	    backgroundColor: 'rgb(255,107,64)',
 	    margin: '1rem', padding: '1rem',
@@ -16117,13 +16115,13 @@
 	    boxShadow: '1px 1px 2px 0px black',
 	    opacity: '0',
 	    delayed: { opacity: '1' },
-	    remove: { opacity: '0' } //, position: 'absolute', top: '0', left: '0'}
+	    remove: { opacity: '0' }
 	  }
 	}, [(0, _cycleSnabbdom.h)('span.falsetext.hero', { hero: { id: HERO_ID } }, HERO_TEXT)]);
 	
 	var trueView = (0, _cycleSnabbdom.h)('div.truebox.hero', {
 	  style: {
-	    position: 'absolute',
+	    position: 'absolute', //needed because the two boxes must overlap during transition
 	    width: '300px', height: '200px',
 	    backgroundColor: 'rgb(123,73,17)',
 	    margin: '5rem', padding: '1rem',
@@ -16131,7 +16129,7 @@
 	    boxShadow: '1px 1px 2px 0px black',
 	    opacity: '0',
 	    delayed: { opacity: '1' },
-	    remove: { opacity: '0' } //, position: 'absolute', top: '0', left: '0'}
+	    remove: { opacity: '0' }
 	  }
 	}, [(0, _cycleSnabbdom.h)('span.truetext.hero', { hero: { id: HERO_ID } }, HERO_TEXT)]);
 	
@@ -16155,9 +16153,9 @@
 
 /***/ },
 /* 40 */
-/*!*********************!*\
-  !*** ./src/hero.js ***!
-  \*********************/
+/*!**************************************!*\
+  !*** ./src/snabbdom_modules/hero.js ***!
+  \**************************************/
 /***/ function(module, exports) {
 
 	'use strict';
