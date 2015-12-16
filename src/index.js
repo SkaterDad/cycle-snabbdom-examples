@@ -34,8 +34,7 @@ function main(responses) {
 Cycle.run(main, {
   DOM: makeDOMDriver('#app-container', [
     require(`snabbdom/modules/class`),
-    //require(`snabbdom/modules/hero`),
-    require(`./hero`),
+    require(`./snabbdom_modules/hero`),
     require(`snabbdom/modules/style`),
     require(`snabbdom/modules/props`),
     require(`snabbdom/modules/attributes`),
