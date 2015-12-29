@@ -1,5 +1,5 @@
 import {h} from 'cycle-snabbdom'
-import {fadeInOutStyle} from '../global/styles'
+import {fadeInOutStyle} from '../../global/styles'
 
 const HERO_ID = 'test-hero-simple'
 const HERO_TEXT = 'HERO'
@@ -16,7 +16,7 @@ const falseView =
         boxShadow: '1px 1px 2px 0px black',
         opacity: '0',
         delayed: {opacity: '1'},
-        remove: {opacity: '0'}
+        remove: {opacity: '0'},
       },
     }, [
       h('span.falsetext.hero', {hero: {id: HERO_ID}}, HERO_TEXT),
@@ -35,7 +35,7 @@ const trueView =
         boxShadow: '1px 1px 2px 0px black',
         opacity: '0',
         delayed: {opacity: '1'},
-        remove: {opacity: '0'}
+        remove: {opacity: '0'},
       },
     }, [
       h('span.truetext.hero', {hero: {id: HERO_ID}}, HERO_TEXT),
@@ -51,7 +51,7 @@ const view = (toggled) =>
       h('div#box-wrapper', {style: {position: 'relative'}}, [toggled ? trueView : falseView]),
     ])
 
-function heroSimple({DOM}) {
+function HeroSimple({DOM}) {
   let vTree$ =
     DOM.select('input').events('change')
       .map(ev => ev.target.checked)
@@ -62,4 +62,4 @@ function heroSimple({DOM}) {
   return {DOM: vTree$}
 }
 
-export default heroSimple
+export default HeroSimple

@@ -1,7 +1,7 @@
 import Rx from 'rx'
 import {h} from 'cycle-snabbdom'
-import {fadeInOutStyle} from '../global/styles'
-import loadingSpinner from '../global/loading'
+import {fadeInOutStyle} from '../../global/styles'
+import loadingSpinner from '../../global/loading'
 
 function resultView({
   id,
@@ -19,7 +19,7 @@ function resultView({
       opacity: 0, transform: 'translateY(-100px)',
       delayed: {opacity: 1, transform: 'translateY(0px)'},
       remove: {opacity: 0, transform: 'translateY(-100px)'},
-    }
+    },
   }, [
     h('a.gh-owner-link', {props: {href: owner.html_url}}, [
       h('img.gh-avatar',{props: {src: owner.avatar_url}}),
@@ -68,7 +68,7 @@ function githubSearch({DOM, HTTP}) {
     })
     .do(() => console.log(`GH state emitted`))
 
-  //TODO: Prevent this from having initial state when re-entering page.
+  //Convert state to DOM
   const vtree$ = state$
     .map(({results, loading}) =>
       h('div.page-wrapper', {key: `ghpage`, style: fadeInOutStyle}, [
@@ -77,7 +77,7 @@ function githubSearch({DOM, HTTP}) {
           h('input.field', {props: {type: 'text'}}),
           h('hr'),
           h('section.search-results', {}, results.map(resultView).concat(loading ? loadingSpinner() : null)),
-        ])
+        ]),
       ])
     )
     .do(() => console.log(`GH DOM emitted`))

@@ -1,8 +1,8 @@
 import Rx from 'rx'
 import {h} from 'cycle-snabbdom'
-import {checkRequestUrl} from '../global/utils'
-import {fadeInOutStyle} from '../global/styles'
-//import loadingSpinner from '../global/loading'
+import {checkRequestUrl} from '../../global/utils'
+import {fadeInOutStyle} from '../../global/styles'
+//import loadingSpinner from '../../global/loading'
 
 function detailView({
   id,
@@ -25,7 +25,7 @@ function detailView({
   return html
 }
 
-function heroDetail({HTTP}, repoUrl = 'https://api.github.com/repos/paldepind/snabbdom') {
+function HeroDetail({HTTP}, repoUrl = 'https://api.github.com/repos/paldepind/snabbdom') {
   const GET_REQUEST_URL = repoUrl
 
   //Send HTTP request to get data for the page
@@ -47,7 +47,7 @@ function heroDetail({HTTP}, repoUrl = 'https://api.github.com/repos/paldepind/sn
         h('h1', {}, 'Repo Details'),
         h('div.page.hero-detail-container', {}, [
           detailView(results),
-        ])
+        ]),
       ])
     )
     .do(() => console.log(`Hero Detail: DOM emitted`))
@@ -58,4 +58,4 @@ function heroDetail({HTTP}, repoUrl = 'https://api.github.com/repos/paldepind/sn
   }
 }
 
-export default heroDetail
+export default HeroDetail

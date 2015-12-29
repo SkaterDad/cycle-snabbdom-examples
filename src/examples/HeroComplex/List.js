@@ -1,8 +1,8 @@
 import Rx from 'rx'
 import {h} from 'cycle-snabbdom'
-import {checkRequestUrl} from '../global/utils'
-import loadingSpinner from '../global/loading'
-import {fadeInStyle} from '../global/styles'
+import {checkRequestUrl} from '../../global/utils'
+import loadingSpinner from '../../global/loading'
+import {fadeInStyle} from '../../global/styles'
 
 function resultView({
   id,
@@ -17,7 +17,7 @@ function resultView({
   const html = h('article.hero.hero-item', {
     key: id,
     props: {
-      detailUrl: url
+      detailUrl: url,
     },
     //hero: {id: `repo${id}`},
   }, [
@@ -29,7 +29,7 @@ function resultView({
   return html
 }
 
-function heroList({HTTP}) {
+function HeroList({HTTP}) {
   const GET_REQUEST_URL = 'https://api.github.com/users/cyclejs/repos'
 
   //Send HTTP request to get data for the page
@@ -67,7 +67,7 @@ function heroList({HTTP}) {
         h('div', {style: {height: '100%', overflow: 'auto'}}, [
           h('h1', {}, 'Repo List'),
           h('section.flex', {}, results.map(resultView).concat(loading ? loadingSpinner() : null)),
-        ])
+        ]),
       ])
     )
     .do(() => console.log(`Hero list: DOM emitted`))
@@ -78,4 +78,4 @@ function heroList({HTTP}) {
   }
 }
 
-export default heroList
+export default HeroList

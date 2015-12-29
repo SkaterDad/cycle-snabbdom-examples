@@ -2,16 +2,16 @@ import Rx from 'rx'
 import Cycle from '@cycle/core'
 import {h, makeDOMDriver} from 'cycle-snabbdom'
 import {makeHTTPDriver} from '@cycle/http'
-import content from './content'
+import Content from './Content'
 
 const header = h('header', {}, [
   h('span', {style: {marginRight: '1rem'}}, 'Example Chooser:'),
   h('select.switcher', {}, [
-    h('option', {attrs: {value: 0, selected: true}}, 'Checkbox'),
-    h('option', {attrs: {value: 1}}, 'Color Changer'),
+    h('option', {attrs: {value: 1, selected: true}}, 'Color Changer'),
     h('option', {attrs: {value: 2}}, 'Github Search'),
     h('option', {attrs: {value: 3}}, 'Hero Transition (Simple)'),
     h('option', {attrs: {value: 4}}, 'Hero Transition (Complex)'),
+    h('option', {attrs: {value: 5}}, 'Hero Transition (Tests)'),
   ]),
 ])
 
@@ -24,11 +24,11 @@ function main(responses) {
     .startWith(0)
     .do((x) => {console.log(`Example Selector = ${x}`)})
 
-  const theContent = content(responses, toggle$)
+  const content = Content(responses, toggle$)
 
-  const view$ = Rx.Observable.just(view(header, theContent.DOM))
+  const view$ = Rx.Observable.just(view(header, content.DOM))
 
-  return {DOM: view$, HTTP: theContent.HTTP}
+  return {DOM: view$, HTTP: content.HTTP}
 }
 
 Cycle.run(main, {

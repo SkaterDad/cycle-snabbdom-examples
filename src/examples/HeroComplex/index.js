@@ -1,24 +1,24 @@
 //import Rx from 'rx'
-import list from './hero-list'
-import detail from './hero-detail'
+import List from './List'
+import Detail from './Detail'
 
-function mapContent(responses, action) {
+function mapContent(sources, action) {
   switch (action.view) {
   case 'list':
     console.log(`Hero: Show the list view!`)
-    return list(responses)
+    return List(sources)
   case 'details':
     console.log(`Hero: Show the details view!`)
-    return detail(responses, action.url)
+    return Detail(sources, action.url)
   default:
     console.log(`Hero: Show the list view! (default)`)
-    return list(responses)
+    return List(sources)
   }
 }
 
-function heroTransition(responses) {
+function HeroComplex(sources) {
   //User intents
-  const listItemClick$ = responses.DOM.select('.hero-item').events('click')
+  const listItemClick$ = sources.DOM.select('.hero-item').events('click')
     .filter(ev => ev.target.detailUrl)
     .map(ev => {
       return {
@@ -27,7 +27,7 @@ function heroTransition(responses) {
       }
     })
 
-  const detailCloseClick$ = responses.DOM.select('.detail-close').events('click')
+  const detailCloseClick$ = sources.DOM.select('.detail-close').events('click')
     .map(() => {
       return {
         view: `list`,
@@ -38,7 +38,7 @@ function heroTransition(responses) {
     .startWith({view: `list`})
 
   const state$ = action$
-    .map(action => mapContent(responses, action))
+    .map(action => mapContent(sources, action))
     .shareReplay(1)
 
   const heroContent = {
@@ -50,7 +50,7 @@ function heroTransition(responses) {
       .do(() => {console.log('Hero: Content HTTP filtered')}),
   }
 
-  return heroContent
+  return heroContent //sinks
 }
 
-export default heroTransition
+export default HeroComplex

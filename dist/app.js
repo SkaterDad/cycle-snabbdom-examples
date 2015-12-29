@@ -61,13 +61,13 @@
 	
 	var _http = __webpack_require__(/*! @cycle/http */ 24);
 	
-	var _content = __webpack_require__(/*! ./content */ 29);
+	var _Content = __webpack_require__(/*! ./Content */ 29);
 	
-	var _content2 = _interopRequireDefault(_content);
+	var _Content2 = _interopRequireDefault(_Content);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var header = (0, _cycleSnabbdom.h)('header', {}, [(0, _cycleSnabbdom.h)('span', { style: { marginRight: '1rem' } }, 'Example Chooser:'), (0, _cycleSnabbdom.h)('select.switcher', {}, [(0, _cycleSnabbdom.h)('option', { attrs: { value: 0, selected: true } }, 'Checkbox'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 1 } }, 'Color Changer'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 2 } }, 'Github Search'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 3 } }, 'Hero Transition (Simple)'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 4 } }, 'Hero Transition (Complex)')])]);
+	var header = (0, _cycleSnabbdom.h)('header', {}, [(0, _cycleSnabbdom.h)('span', { style: { marginRight: '1rem' } }, 'Example Chooser:'), (0, _cycleSnabbdom.h)('select.switcher', {}, [(0, _cycleSnabbdom.h)('option', { attrs: { value: 1, selected: true } }, 'Color Changer'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 2 } }, 'Github Search'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 3 } }, 'Hero Transition (Simple)'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 4 } }, 'Hero Transition (Complex)'), (0, _cycleSnabbdom.h)('option', { attrs: { value: 5 } }, 'Hero Transition (Tests)')])]);
 	
 	var view = function view(hdr, cont) {
 	  return (0, _cycleSnabbdom.h)('div.app-wrapper', {}, [hdr, (0, _cycleSnabbdom.h)('main.content-holder', {}, [cont])]);
@@ -80,15 +80,15 @@
 	    console.log('Example Selector = ' + x);
 	  });
 	
-	  var theContent = (0, _content2.default)(responses, toggle$);
+	  var content = (0, _Content2.default)(responses, toggle$);
 	
-	  var view$ = _rx2.default.Observable.just(view(header, theContent.DOM));
+	  var view$ = _rx2.default.Observable.just(view(header, content.DOM));
 	
-	  return { DOM: view$, HTTP: theContent.HTTP };
+	  return { DOM: view$, HTTP: content.HTTP };
 	}
 	
 	_core2.default.run(main, {
-	  DOM: (0, _cycleSnabbdom.makeDOMDriver)('#app-container', [__webpack_require__(/*! snabbdom/modules/class */ 20), __webpack_require__(/*! ./snabbdom_modules/hero */ 40), __webpack_require__(/*! snabbdom/modules/style */ 23), __webpack_require__(/*! snabbdom/modules/props */ 21), __webpack_require__(/*! snabbdom/modules/attributes */ 22)]),
+	  DOM: (0, _cycleSnabbdom.makeDOMDriver)('#app-container', [__webpack_require__(/*! snabbdom/modules/class */ 20), __webpack_require__(/*! ./snabbdom_modules/hero */ 41), __webpack_require__(/*! snabbdom/modules/style */ 23), __webpack_require__(/*! snabbdom/modules/props */ 21), __webpack_require__(/*! snabbdom/modules/attributes */ 22)]),
 	  HTTP: (0, _http.makeHTTPDriver)()
 	});
 
@@ -13990,12 +13990,6 @@
 	  }
 	}
 	
-	function isolateSource(response$$, scope) {
-	  return response$$.filter(function (res$) {
-	    return Array.isArray(res$.request._namespace) && res$.request._namespace.indexOf(scope) !== -1;
-	  });
-	}
-	
 	function isolateSink(request$, scope) {
 	  return request$.map(function (req) {
 	    if (typeof req === "string") {
@@ -14005,6 +13999,15 @@
 	    req._namespace.push(scope);
 	    return req;
 	  });
+	}
+	
+	function isolateSource(response$$, scope) {
+	  var isolatedResponse$$ = response$$.filter(function (res$) {
+	    return Array.isArray(res$.request._namespace) && res$.request._namespace.indexOf(scope) !== -1;
+	  });
+	  isolatedResponse$$.isolateSource = isolateSource;
+	  isolatedResponse$$.isolateSink = isolateSink;
+	  return isolatedResponse$$;
 	}
 	
 	function makeHTTPDriver() {
@@ -15413,7 +15416,7 @@
 /***/ },
 /* 29 */
 /*!************************!*\
-  !*** ./src/content.js ***!
+  !*** ./src/Content.js ***!
   \************************/
 /***/ function(module, exports, __webpack_require__) {
 
@@ -15423,49 +15426,55 @@
 	  value: true
 	});
 	
-	var _checkbox = __webpack_require__(/*! ./examples/checkbox */ 30);
+	var _isolate = __webpack_require__(/*! @cycle/isolate */ 30);
 	
-	var _checkbox2 = _interopRequireDefault(_checkbox);
+	var _isolate2 = _interopRequireDefault(_isolate);
 	
-	var _colorChange = __webpack_require__(/*! ./examples/color-change */ 31);
+	var _ColorChange = __webpack_require__(/*! ./examples/ColorChange */ 31);
 	
-	var _colorChange2 = _interopRequireDefault(_colorChange);
+	var _ColorChange2 = _interopRequireDefault(_ColorChange);
 	
-	var _githubSearch = __webpack_require__(/*! ./examples/github-search */ 33);
+	var _GithubSearch = __webpack_require__(/*! ./examples/GithubSearch */ 33);
 	
-	var _githubSearch2 = _interopRequireDefault(_githubSearch);
+	var _GithubSearch2 = _interopRequireDefault(_GithubSearch);
 	
-	var _heroTransition = __webpack_require__(/*! ./examples/hero-transition */ 35);
+	var _HeroComplex = __webpack_require__(/*! ./examples/HeroComplex */ 35);
 	
-	var _heroTransition2 = _interopRequireDefault(_heroTransition);
+	var _HeroComplex2 = _interopRequireDefault(_HeroComplex);
 	
-	var _heroSimple = __webpack_require__(/*! ./examples/hero-simple */ 39);
+	var _HeroSimple = __webpack_require__(/*! ./examples/HeroSimple */ 39);
 	
-	var _heroSimple2 = _interopRequireDefault(_heroSimple);
+	var _HeroSimple2 = _interopRequireDefault(_HeroSimple);
+	
+	var _HeroTests = __webpack_require__(/*! ./examples/HeroTests */ 40);
+	
+	var _HeroTests2 = _interopRequireDefault(_HeroTests);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function mapContent(responses, val) {
-	  switch (parseInt(val)) {
-	    case 0:
-	      return (0, _checkbox2.default)(responses);
-	    case 1:
-	      return (0, _colorChange2.default)(responses);
-	    case 2:
-	      return (0, _githubSearch2.default)(responses);
-	    case 3:
-	      return (0, _heroSimple2.default)(responses);
-	    case 4:
-	      return (0, _heroTransition2.default)(responses);
-	    default:
-	      return (0, _checkbox2.default)(responses);
-	  }
-	} //import Rx from 'rx'
+	//import Rx from 'rx'
 	
-	function content(responses, toggle$) {
+	function mapContent(sources, val) {
+	  switch (parseInt(val)) {
+	    case 1:
+	      return (0, _ColorChange2.default)(sources);
+	    case 2:
+	      return (0, _isolate2.default)(_GithubSearch2.default)(sources);
+	    case 3:
+	      return (0, _HeroSimple2.default)(sources);
+	    case 4:
+	      return (0, _HeroComplex2.default)(sources);
+	    case 5:
+	      return (0, _HeroTests2.default)(sources);
+	    default:
+	      return (0, _ColorChange2.default)(sources);
+	  }
+	}
+	
+	function Content(sources, toggle$) {
 	  var state$ = toggle$.map(function (val) {
 	    console.log('I\'m inside the content state mapping!');
-	    return mapContent(responses, val);
+	    return mapContent(sources, val);
 	  }).do(function (x) {
 	    var hasDOM = x.DOM ? true : false;
 	    var hasHTTP = x.HTTP ? true : false;
@@ -15488,45 +15497,100 @@
 	  };
 	}
 	
-	exports.default = content;
+	exports.default = Content;
 
 /***/ },
 /* 30 */
-/*!**********************************!*\
-  !*** ./src/examples/checkbox.js ***!
-  \**********************************/
-/***/ function(module, exports, __webpack_require__) {
+/*!***************************************!*\
+  !*** ./~/@cycle/isolate/lib/index.js ***!
+  \***************************************/
+/***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	var counter = 0;
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
-	
-	function checkbox(_ref) {
-	  var DOM = _ref.DOM;
-	
-	  var requests = {
-	    DOM: DOM.select('input').events('change').map(function (ev) {
-	      return ev.target.checked;
-	    }).startWith(false).do(function (x) {
-	      console.log('Checkbox value changed to ' + x);
-	    }).map(function (toggled) {
-	      return (0, _cycleSnabbdom.h)('div', [(0, _cycleSnabbdom.h)('input#box1', { props: { type: 'checkbox' } }), 'Toggle me', (0, _cycleSnabbdom.h)('p', toggled ? 'On' : 'Off')]);
-	    })
-	  };
-	  return requests;
+	function newScope() {
+	  return "cycle" + ++counter;
 	}
 	
-	exports.default = checkbox;
+	/**
+	 * Takes a `dataflowComponent` function and an optional `scope` string, and
+	 * returns a scoped version of the `dataflowComponent` function.
+	 *
+	 * When the scoped dataflow component is invoked, each source provided to the
+	 * scoped dataflowComponent is isolated to the scope using
+	 * `source.isolateSource(source, scope)`, if possible. Likewise, the sinks
+	 * returned from the scoped dataflow component are isolate to the scope using
+	 * `source.isolateSink(sink, scope)`.
+	 *
+	 * If the `scope` is not provided, a new scope will be automatically created.
+	 * This means that while **`isolate(dataflowComponent, scope)` is pure**
+	 * (referentially transparent), **`isolate(dataflowComponent)` is impure**
+	 * (not referentially transparent). Two calls to `isolate(Foo, bar)` will
+	 * generate two indistinct dataflow components. But, two calls to `isolate(Foo)`
+	 * will generate two distinct dataflow components.
+	 *
+	 * Note that both `isolateSource()` and `isolateSink()` are static members of
+	 * `source`. The reason for this is that drivers produce `source` while the
+	 * application produces `sink`, and it's the driver's responsibility to
+	 * implement `isolateSource()` and `isolateSink()`.
+	 *
+	 * @param {Function} dataflowComponent a function that takes `sources` as input
+	 * and outputs a collection of `sinks`.
+	 * @param {String} scope an optional string that is used to isolate each
+	 * `sources` and `sinks` when the returned scoped dataflow component is invoked.
+	 * @return {Function} the scoped dataflow component function that, as the
+	 * original `dataflowComponent` function, takes `sources` and returns `sinks`.
+	 * @function isolate
+	 */
+	function isolate(dataflowComponent) {
+	  var scope = arguments.length <= 1 || arguments[1] === undefined ? newScope() : arguments[1];
+	
+	  if (typeof dataflowComponent !== "function") {
+	    throw new Error("First argument given to isolate() must be a " + "'dataflowComponent' function");
+	  }
+	  if (typeof scope !== "string") {
+	    throw new Error("Second argument given to isolate() must be a " + "string for 'scope'");
+	  }
+	  return function scopedDataflowComponent(sources) {
+	    var scopedSources = {};
+	    for (var key in sources) {
+	      if (sources.hasOwnProperty(key) && typeof sources[key].isolateSource === "function") {
+	        scopedSources[key] = sources[key].isolateSource(sources[key], scope);
+	      } else if (sources.hasOwnProperty(key)) {
+	        scopedSources[key] = sources[key];
+	      }
+	    }
+	
+	    for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	      rest[_key - 1] = arguments[_key];
+	    }
+	
+	    var sinks = dataflowComponent.apply(undefined, [scopedSources].concat(rest));
+	    var scopedSinks = {};
+	    for (var key in sinks) {
+	      if (sinks.hasOwnProperty(key) && sources.hasOwnProperty(key) && typeof sources[key].isolateSink === "function") {
+	        scopedSinks[key] = sources[key].isolateSink(sinks[key], scope);
+	      } else if (sinks.hasOwnProperty(key)) {
+	        scopedSinks[key] = sinks[key];
+	      }
+	    }
+	    return scopedSinks;
+	  };
+	}
+	
+	isolate.reset = function () {
+	  return counter = 0;
+	};
+	
+	module.exports = isolate;
 
 /***/ },
 /* 31 */
-/*!**************************************!*\
-  !*** ./src/examples/color-change.js ***!
-  \**************************************/
+/*!*******************************************!*\
+  !*** ./src/examples/ColorChange/index.js ***!
+  \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15541,7 +15605,7 @@
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _styles = __webpack_require__(/*! ../global/styles */ 32);
+	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -15560,7 +15624,7 @@
 	  return newColor;
 	}
 	
-	function home(_ref) {
+	function ColorChange(_ref) {
 	  var DOM = _ref.DOM;
 	
 	  var action$ = _rx2.default.Observable.merge(DOM.select('button.colorBtn.next').events('click').map(increment), DOM.select('button.colorBtn.prev').events('click').map(-increment)).do(function (x) {
@@ -15583,7 +15647,7 @@
 	  return { DOM: vTree$ };
 	}
 	
-	exports.default = home;
+	exports.default = ColorChange;
 
 /***/ },
 /* 32 */
@@ -15638,9 +15702,9 @@
 
 /***/ },
 /* 33 */
-/*!***************************************!*\
-  !*** ./src/examples/github-search.js ***!
-  \***************************************/
+/*!********************************************!*\
+  !*** ./src/examples/GithubSearch/index.js ***!
+  \********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15655,9 +15719,9 @@
 	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
 	
-	var _styles = __webpack_require__(/*! ../global/styles */ 32);
+	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
 	
-	var _loading = __webpack_require__(/*! ../global/loading */ 34);
+	var _loading = __webpack_require__(/*! ../../global/loading */ 34);
 	
 	var _loading2 = _interopRequireDefault(_loading);
 	
@@ -15734,7 +15798,7 @@
 	    return console.log('GH state emitted');
 	  });
 	
-	  //TODO: Prevent this from having initial state when re-entering page.
+	  //Convert state to DOM
 	  var vtree$ = state$.map(function (_ref3) {
 	    var results = _ref3.results;
 	    var loading = _ref3.loading;
@@ -15780,9 +15844,9 @@
 
 /***/ },
 /* 35 */
-/*!*****************************************!*\
-  !*** ./src/examples/hero-transition.js ***!
-  \*****************************************/
+/*!*******************************************!*\
+  !*** ./src/examples/HeroComplex/index.js ***!
+  \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15791,35 +15855,35 @@
 	  value: true
 	});
 	
-	var _heroList = __webpack_require__(/*! ./hero-list */ 36);
+	var _List = __webpack_require__(/*! ./List */ 36);
 	
-	var _heroList2 = _interopRequireDefault(_heroList);
+	var _List2 = _interopRequireDefault(_List);
 	
-	var _heroDetail = __webpack_require__(/*! ./hero-detail */ 38);
+	var _Detail = __webpack_require__(/*! ./Detail */ 38);
 	
-	var _heroDetail2 = _interopRequireDefault(_heroDetail);
+	var _Detail2 = _interopRequireDefault(_Detail);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	//import Rx from 'rx'
 	
-	function mapContent(responses, action) {
+	function mapContent(sources, action) {
 	  switch (action.view) {
 	    case 'list':
 	      console.log('Hero: Show the list view!');
-	      return (0, _heroList2.default)(responses);
+	      return (0, _List2.default)(sources);
 	    case 'details':
 	      console.log('Hero: Show the details view!');
-	      return (0, _heroDetail2.default)(responses, action.url);
+	      return (0, _Detail2.default)(sources, action.url);
 	    default:
 	      console.log('Hero: Show the list view! (default)');
-	      return (0, _heroList2.default)(responses);
+	      return (0, _List2.default)(sources);
 	  }
 	}
 	
-	function heroTransition(responses) {
+	function HeroComplex(sources) {
 	  //User intents
-	  var listItemClick$ = responses.DOM.select('.hero-item').events('click').filter(function (ev) {
+	  var listItemClick$ = sources.DOM.select('.hero-item').events('click').filter(function (ev) {
 	    return ev.target.detailUrl;
 	  }).map(function (ev) {
 	    return {
@@ -15828,7 +15892,7 @@
 	    };
 	  });
 	
-	  var detailCloseClick$ = responses.DOM.select('.detail-close').events('click').map(function () {
+	  var detailCloseClick$ = sources.DOM.select('.detail-close').events('click').map(function () {
 	    return {
 	      view: 'list'
 	    };
@@ -15837,7 +15901,7 @@
 	  var action$ = listItemClick$.merge(detailCloseClick$).startWith({ view: 'list' });
 	
 	  var state$ = action$.map(function (action) {
-	    return mapContent(responses, action);
+	    return mapContent(sources, action);
 	  }).shareReplay(1);
 	
 	  var heroContent = {
@@ -15863,16 +15927,16 @@
 	    })
 	  };
 	
-	  return heroContent;
+	  return heroContent; //sinks
 	}
 	
-	exports.default = heroTransition;
+	exports.default = HeroComplex;
 
 /***/ },
 /* 36 */
-/*!***********************************!*\
-  !*** ./src/examples/hero-list.js ***!
-  \***********************************/
+/*!******************************************!*\
+  !*** ./src/examples/HeroComplex/List.js ***!
+  \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15887,13 +15951,13 @@
 	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
 	
-	var _utils = __webpack_require__(/*! ../global/utils */ 37);
+	var _utils = __webpack_require__(/*! ../../global/utils */ 37);
 	
-	var _loading = __webpack_require__(/*! ../global/loading */ 34);
+	var _loading = __webpack_require__(/*! ../../global/loading */ 34);
 	
 	var _loading2 = _interopRequireDefault(_loading);
 	
-	var _styles = __webpack_require__(/*! ../global/styles */ 32);
+	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -15922,7 +15986,7 @@
 	  return html;
 	}
 	
-	function heroList(_ref2) {
+	function HeroList(_ref2) {
 	  var HTTP = _ref2.HTTP;
 	
 	  var GET_REQUEST_URL = 'https://api.github.com/users/cyclejs/repos';
@@ -15974,7 +16038,7 @@
 	  };
 	}
 	
-	exports.default = heroList;
+	exports.default = HeroList;
 
 /***/ },
 /* 37 */
@@ -15999,9 +16063,9 @@
 
 /***/ },
 /* 38 */
-/*!*************************************!*\
-  !*** ./src/examples/hero-detail.js ***!
-  \*************************************/
+/*!********************************************!*\
+  !*** ./src/examples/HeroComplex/Detail.js ***!
+  \********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16016,13 +16080,13 @@
 	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
 	
-	var _utils = __webpack_require__(/*! ../global/utils */ 37);
+	var _utils = __webpack_require__(/*! ../../global/utils */ 37);
 	
-	var _styles = __webpack_require__(/*! ../global/styles */ 32);
+	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	//import loadingSpinner from '../global/loading'
+	//import loadingSpinner from '../../global/loading'
 	
 	function detailView(_ref) {
 	  var id = _ref.id;
@@ -16044,7 +16108,7 @@
 	  return html;
 	}
 	
-	function heroDetail(_ref2) {
+	function HeroDetail(_ref2) {
 	  var HTTP = _ref2.HTTP;
 	  var repoUrl = arguments.length <= 1 || arguments[1] === undefined ? 'https://api.github.com/repos/paldepind/snabbdom' : arguments[1];
 	
@@ -16083,13 +16147,13 @@
 	  };
 	}
 	
-	exports.default = heroDetail;
+	exports.default = HeroDetail;
 
 /***/ },
 /* 39 */
-/*!*************************************!*\
-  !*** ./src/examples/hero-simple.js ***!
-  \*************************************/
+/*!******************************************!*\
+  !*** ./src/examples/HeroSimple/index.js ***!
+  \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16100,7 +16164,7 @@
 	
 	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
 	
-	var _styles = __webpack_require__(/*! ../global/styles */ 32);
+	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
 	
 	var HERO_ID = 'test-hero-simple';
 	var HERO_TEXT = 'HERO';
@@ -16137,7 +16201,7 @@
 	  return (0, _cycleSnabbdom.h)('div.page', { key: 'heroSimplePage', style: _styles.fadeInOutStyle }, [(0, _cycleSnabbdom.h)('input#box1', { props: { type: 'checkbox' } }), 'Toggle me', (0, _cycleSnabbdom.h)('div#box-wrapper', { style: { position: 'relative' } }, [toggled ? trueView : falseView])]);
 	};
 	
-	function heroSimple(_ref) {
+	function HeroSimple(_ref) {
 	  var DOM = _ref.DOM;
 	
 	  var vTree$ = DOM.select('input').events('change').map(function (ev) {
@@ -16149,10 +16213,57 @@
 	  return { DOM: vTree$ };
 	}
 	
-	exports.default = heroSimple;
+	exports.default = HeroSimple;
 
 /***/ },
 /* 40 */
+/*!*****************************************!*\
+  !*** ./src/examples/HeroTests/index.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	
+	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
+	
+	var HERO_ID_KITTY1 = 'heroKitty1';
+	var HERO_ID_KITTY2 = 'heroKitty2';
+	var HERO_H1 = 'heroH1';
+	var HERO_SPAN = 'heroSpan';
+	var HERO_P_FIXED = 'heroPFixed';
+	var HERO_P_PERCENT = 'heroPPercent';
+	var HERO_SHADOWY = 'heroShadowy';
+	
+	var falseView = (0, _cycleSnabbdom.h)('div.page-wrapper.false', { style: _styles.fadeInOutStyle }, [(0, _cycleSnabbdom.h)('div.row', {}, [(0, _cycleSnabbdom.h)('div.col', {}, [(0, _cycleSnabbdom.h)('img.fixed.hero', { props: { src: 'img/kitty1.jpg' }, hero: { id: HERO_ID_KITTY1 } }), (0, _cycleSnabbdom.h)('p.hero', { hero: { id: HERO_P_FIXED } }, 'Image with fixed sizing.')]), (0, _cycleSnabbdom.h)('div.col', {}, [(0, _cycleSnabbdom.h)('img.percent.hero', { props: { src: 'img/kitty2.jpg' }, hero: { id: HERO_ID_KITTY2 } }), (0, _cycleSnabbdom.h)('p.hero', { hero: { id: HERO_P_PERCENT } }, 'Image with percent sizing.')]), (0, _cycleSnabbdom.h)('div.col.whitetext', {}, [(0, _cycleSnabbdom.h)('h1.hero', { hero: { id: HERO_H1 } }, 'Big Text.'), (0, _cycleSnabbdom.h)('div.shadowy1.hero', { hero: { id: HERO_SHADOWY } }, [])]), (0, _cycleSnabbdom.h)('div.col', {}, [(0, _cycleSnabbdom.h)('span.small.hero', { hero: { id: HERO_SPAN } }, 'Small text.'), (0, _cycleSnabbdom.h)('p', {}, 'Left justified')])])]);
+	
+	var trueView = (0, _cycleSnabbdom.h)('div.page-wrapper.true', { style: _styles.fadeInOutStyle }, [(0, _cycleSnabbdom.h)('div', { style: { height: '150px', background: 'red' } }, []), (0, _cycleSnabbdom.h)('div.row', {}, [(0, _cycleSnabbdom.h)('div.col', {}, [(0, _cycleSnabbdom.h)('img.fixed.hero', { props: { src: 'img/kitty2.jpg' }, hero: { id: HERO_ID_KITTY2 } }), (0, _cycleSnabbdom.h)('p.hero', { hero: { id: HERO_P_FIXED } }, 'Image with fixed sizing.')]), (0, _cycleSnabbdom.h)('div.col-center', {}, [(0, _cycleSnabbdom.h)('span.small.hero', { hero: { id: HERO_SPAN } }, 'Small text.'), (0, _cycleSnabbdom.h)('p', {}, 'Centered')]), (0, _cycleSnabbdom.h)('div.col', {}, [(0, _cycleSnabbdom.h)('p.hero', { hero: { id: HERO_P_PERCENT } }, 'Image with percent sizing.'), (0, _cycleSnabbdom.h)('img.percent.hero', { props: { src: 'img/kitty1.jpg' }, hero: { id: HERO_ID_KITTY1 } })]), (0, _cycleSnabbdom.h)('div.col-right', {}, [(0, _cycleSnabbdom.h)('div.shadowy2.hero', { hero: { id: HERO_SHADOWY } }, []), (0, _cycleSnabbdom.h)('h1.hero.small', { hero: { id: HERO_H1 } }, 'Big Text.')])])]);
+	
+	var view = function view(value) {
+	  return (0, _cycleSnabbdom.h)('div.heroTests', {}, [(0, _cycleSnabbdom.h)('input.clickme', { props: { type: 'checkbox' } }), 'Click Me!', (0, _cycleSnabbdom.h)('div', { style: { position: 'relative' } }, [value ? trueView : falseView])]);
+	};
+	
+	function HeroTests(_ref) {
+	  var DOM = _ref.DOM;
+	
+	  var checked$ = DOM.select('.clickme').events('change').map(function (ev) {
+	    return ev.target.checked;
+	  }).startWith(false);
+	
+	  var vTree$ = checked$.map(view);
+	
+	  return { DOM: vTree$ };
+	}
+	
+	exports.default = HeroTests;
+
+/***/ },
+/* 41 */
 /*!**************************************!*\
   !*** ./src/snabbdom_modules/hero.js ***!
   \**************************************/
@@ -16176,6 +16287,47 @@
 	  });
 	}
 	
+	function getTextNodeRect(textNode) {
+	  var rect;
+	  if (document.createRange) {
+	    var range = document.createRange();
+	    range.selectNodeContents(textNode);
+	    if (range.getBoundingClientRect) {
+	      rect = range.getBoundingClientRect();
+	    }
+	  }
+	  return rect;
+	}
+	
+	function calcTransformOrigin(isTextNode, textRect, boundingRect) {
+	  if (isTextNode) {
+	    if (textRect) {
+	      //calculate pixels to center of text from left edge of bounding box
+	      var relativeCenterX = textRect.left + textRect.width / 2 - boundingRect.left;
+	      var relativeCenterY = textRect.top + textRect.height / 2 - boundingRect.top;
+	      return relativeCenterX + 'px ' + relativeCenterY + 'px';
+	    }
+	  }
+	  return '0 0'; //top left
+	}
+	
+	function getTextDx(oldTextRect, newTextRect) {
+	  if (oldTextRect && newTextRect) {
+	    return oldTextRect.left + oldTextRect.width / 2 - (newTextRect.left + newTextRect.width / 2);
+	  }
+	  return 0;
+	}
+	function getTextDy(oldTextRect, newTextRect) {
+	  if (oldTextRect && newTextRect) {
+	    return oldTextRect.top + oldTextRect.height / 2 - (newTextRect.top + newTextRect.height / 2);
+	  }
+	  return 0;
+	}
+	
+	function isTextElement(elm) {
+	  return elm.childNodes.length === 1 && elm.childNodes[0].nodeType === 3;
+	}
+	
 	var removed, created;
 	
 	function pre(oldVnode, vnode) {
@@ -16194,49 +16346,78 @@
 	function destroy(vnode) {
 	  var hero = vnode.data.hero;
 	  if (hero && hero.id) {
-	    vnode.lastRect = vnode.elm.getBoundingClientRect(); //NEW - save the bounding rectangle to a new property on the vnode
+	    var elm = vnode.elm;
+	    vnode.isTextNode = isTextElement(elm); //is this a text node?
+	    vnode.boundingRect = elm.getBoundingClientRect(); //save the bounding rectangle to a new property on the vnode
+	    vnode.textRect = vnode.isTextNode ? getTextNodeRect(elm.childNodes[0]) : null; //save bounding rect of inner text node
+	    var computedStyle = window.getComputedStyle(elm, null); //get current styles (includes inherited properties)
+	    vnode.savedStyle = JSON.parse(JSON.stringify(computedStyle)); //save a copy of computed style values
 	    removed[hero.id] = vnode;
 	  }
 	}
 	
 	function post() {
-	  var i, id, newElm, oldVnode, oldElm, hRatio, wRatio, oldRect, newRect, dx, dy, origTransform, origTransition, newStyle, oldStyle;
+	  var i, id, newElm, oldVnode, oldElm, hRatio, wRatio, oldRect, newRect, dx, dy, origTransform, origTransition, newStyle, oldStyle, newComputedStyle, isTextNode, newTextRect, oldTextRect;
 	  for (i = 0; i < created.length; i += 2) {
 	    id = created[i];
 	    newElm = created[i + 1].elm;
 	    oldVnode = removed[id];
 	    if (oldVnode) {
+	      isTextNode = oldVnode.isTextNode && isTextElement(newElm); //Are old & new both text?
 	      newStyle = newElm.style;
+	      newComputedStyle = window.getComputedStyle(newElm, null); //get full computed style for new element
 	      oldElm = oldVnode.elm;
 	      oldStyle = oldElm.style;
+	      //Overall element bounding boxes
 	      newRect = newElm.getBoundingClientRect();
-	      oldRect = oldVnode.lastRect; // oldElm.getBoundingClientRect(); //NEW - USE PREVIOUSLY SAVED BOUNDING RECTANGLE
-	      dx = oldRect.left - newRect.left;
-	      dy = oldRect.top - newRect.top;
-	      wRatio = newRect.width / Math.max(oldRect.width, 1);
+	      oldRect = oldVnode.boundingRect; //previously saved bounding rect
+	      //Text node bounding boxes & distances
+	      if (isTextNode) {
+	        newTextRect = getTextNodeRect(newElm.childNodes[0]);
+	        oldTextRect = oldVnode.textRect;
+	        dx = getTextDx(oldTextRect, newTextRect);
+	        dy = getTextDy(oldTextRect, newTextRect);
+	      } else {
+	        //Calculate distances between old & new positions
+	        dx = oldRect.left - newRect.left;
+	        dy = oldRect.top - newRect.top;
+	      }
 	      hRatio = newRect.height / Math.max(oldRect.height, 1);
+	      wRatio = isTextNode ? hRatio : newRect.width / Math.max(oldRect.width, 1); //text scales based on hRatio
 	      // Animate new element
 	      origTransform = newStyle.transform;
 	      origTransition = newStyle.transition;
+	      if (newComputedStyle.display === 'inline') //inline elements cannot be transformed
+	        newStyle.display = 'inline-block'; //this does not appear to have any negative side effects
 	      newStyle.transition = origTransition + 'transform 0s';
-	      newStyle.transformOrigin = '0 0';
+	      newStyle.transformOrigin = calcTransformOrigin(isTextNode, newTextRect, newRect);
 	      newStyle.opacity = '0';
 	      newStyle.transform = origTransform + 'translate(' + dx + 'px, ' + dy + 'px) ' + 'scale(' + 1 / wRatio + ', ' + 1 / hRatio + ')';
 	      setNextFrame(newStyle, 'transition', origTransition);
 	      setNextFrame(newStyle, 'transform', origTransform);
 	      setNextFrame(newStyle, 'opacity', '1');
 	      // Animate old element
+	      for (var key in oldVnode.savedStyle) {
+	        //re-apply saved inherited properties
+	        if (parseInt(key) != key) {
+	          var ms = key.substring(0, 2) === 'ms';
+	          var moz = key.substring(0, 3) === 'moz';
+	          var webkit = key.substring(0, 6) === 'webkit';
+	          if (!ms && !moz && !webkit) //ignore prefixed style properties
+	            oldStyle[key] = oldVnode.savedStyle[key];
+	        }
+	      }
 	      oldStyle.position = 'absolute';
-	      oldStyle.top = newRect.top + 'px';
-	      oldStyle.left = newRect.left + 'px';
-	      oldStyle.width = oldRect.width + 'px'; //NEW - Needed for elements who were sized relative to their parents
-	      oldStyle.height = oldRect.height + 'px'; //NEW - Needed for elements who were sized relative to their parents
-	      oldStyle.margin = 0; //NEW
-	      oldStyle.transformOrigin = '0 0';
-	      oldStyle.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+	      oldStyle.top = oldRect.top + 'px'; //start at existing position
+	      oldStyle.left = oldRect.left + 'px';
+	      oldStyle.width = oldRect.width + 'px'; //Needed for elements who were sized relative to their parents
+	      oldStyle.height = oldRect.height + 'px'; //Needed for elements who were sized relative to their parents
+	      oldStyle.margin = 0; //Margin on hero element leads to incorrect positioning
+	      oldStyle.transformOrigin = calcTransformOrigin(isTextNode, oldTextRect, oldRect);
+	      oldStyle.transform = '';
 	      oldStyle.opacity = '1';
 	      document.body.appendChild(oldElm);
-	      setNextFrame(oldStyle, 'transform', 'scale(' + wRatio + ', ' + hRatio + ')');
+	      setNextFrame(oldStyle, 'transform', 'translate(' + -dx + 'px, ' + -dy + 'px) scale(' + wRatio + ', ' + hRatio + ')'); //scale must be on far right for translate to be correct
 	      setNextFrame(oldStyle, 'opacity', '0');
 	      oldElm.addEventListener('transitionend', function (ev) {
 	        if (ev.propertyName === 'transform') document.body.removeChild(ev.target);
@@ -16247,7 +16428,6 @@
 	}
 	
 	module.exports = { pre: pre, create: create, destroy: destroy, post: post };
-	
 	/*eslint-enable */
 
 /***/ }

@@ -9,7 +9,7 @@ function loadingSpinner() {
       h('div.rect3'),
       h('div.rect4'),
       h('div.rect5'),
-    ])
+    ]),
   ])
 }
 

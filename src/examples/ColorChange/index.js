@@ -1,6 +1,6 @@
 import {h} from 'cycle-snabbdom'
 import Rx from 'rx'
-import {fadeInOutStyle} from '../global/styles'
+import {fadeInOutStyle} from '../../global/styles'
 
 const colors = [
   {bg: 'White', font: 'Black'},
@@ -23,7 +23,7 @@ function nextColorIndex(curr, inc) {
   return newColor
 }
 
-function home({DOM}) {
+function ColorChange({DOM}) {
   let action$ = Rx.Observable.merge(
     DOM.select('button.colorBtn.next').events('click').map(increment),
     DOM.select('button.colorBtn.prev').events('click').map(-increment)
@@ -45,8 +45,8 @@ function home({DOM}) {
               h('em',{style: {color: colors[color].font}},'Cycle (get it?) through 5 colors.'),
               h('button.colorBtn.next', {}, `Go to ${colors[nextBg].bg}`),
               h('button.colorBtn.prev', {}, `Back to ${colors[prevBg].bg}`),
-            ])
-          ])
+            ]),
+          ]),
         ])
       })
     .do(() => console.log(`Colors DOM emitted`))
@@ -54,4 +54,4 @@ function home({DOM}) {
   return {DOM: vTree$}
 }
 
-export default home
+export default ColorChange

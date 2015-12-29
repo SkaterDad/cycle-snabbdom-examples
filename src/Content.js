@@ -1,31 +1,32 @@
 //import Rx from 'rx'
-import checkbox from './examples/checkbox'
-import colors from './examples/color-change'
-import github from './examples/github-search'
-import hero from './examples/hero-transition'
-import heroSimple from './examples/hero-simple'
+import isolate from '@cycle/isolate'
+import Colors from './examples/ColorChange'
+import Github from './examples/GithubSearch'
+import HeroComplex from './examples/HeroComplex'
+import HeroSimple from './examples/HeroSimple'
+import HeroTests from './examples/HeroTests'
 
-function mapContent(responses, val) {
+function mapContent(sources, val) {
   switch (parseInt(val)) {
-  case 0:
-    return checkbox(responses)
   case 1:
-    return colors(responses)
+    return Colors(sources)
   case 2:
-    return github(responses)
+    return isolate(Github)(sources)
   case 3:
-    return heroSimple(responses)
+    return HeroSimple(sources)
   case 4:
-    return hero(responses)
+    return HeroComplex(sources)
+  case 5:
+    return HeroTests(sources)
   default:
-    return checkbox(responses)
+    return Colors(sources)
   }
 }
 
-function content(responses, toggle$) {
+function Content(sources, toggle$) {
   const state$ = toggle$.map(val => {
     console.log('I\'m inside the content state mapping!')
-    return mapContent(responses, val)
+    return mapContent(sources, val)
   })
     .do(x => {
       const hasDOM = x.DOM ? true : false
@@ -44,5 +45,4 @@ function content(responses, toggle$) {
   }
 }
 
-
-export default content
+export default Content

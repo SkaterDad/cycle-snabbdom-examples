@@ -124,7 +124,7 @@ header {
 
 /* HERO TRANSITION STUFF */
 .hero {
-  transition: transform 1s ease-in-out, opacity 1s ease-in-out; }
+  transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out; }
 
 .falsetext, .truetext {
   color: white; }
@@ -175,6 +175,48 @@ header {
     transition: background-color 0.3s ease; }
     .hero-detail button:hover {
       background-color: white; }
+
+/* HERO TESTS EXAMPLE */
+.heroTests .row {
+  width: 100%;
+  background: pink;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: space-between; }
+.heroTests .col {
+  flex: 1;
+  text-align: left;
+  padding: 1rem; }
+.heroTests .col-center {
+  flex: 2;
+  text-align: center;
+  padding: 1rem;
+  background: lime; }
+.heroTests .col-right {
+  flex: 1;
+  text-align: right;
+  padding: 1rem;
+  background: #ffffc8; }
+.heroTests img.fixed {
+  width: 100px;
+  height: 200px; }
+.heroTests img.percent {
+  width: 50%;
+  height: auto; }
+.heroTests .small {
+  font-size: 0.5rem; }
+.heroTests .whitetext {
+  color: white; }
+.heroTests .shadowy1 {
+  box-shadow: 1px 1px 2px 0px black;
+  width: 75%;
+  height: 100px;
+  background: white; }
+.heroTests .shadowy2 {
+  box-shadow: 1px 1px 2px 0px black;
+  width: 10%;
+  height: 15px;
+  background: white; }
 
 /* loading spinner */
 /* from https://github.com/tobiasahlin/SpinKit */
