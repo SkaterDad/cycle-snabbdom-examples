@@ -2,36 +2,37 @@ import Rx from 'rx'
 import Cycle from '@cycle/core'
 import {h, makeDOMDriver} from 'cycle-snabbdom'
 import {makeHTTPDriver} from '@cycle/http'
+import {makeHistoryDriver, filterLinks} from '@cycle/history'
 import Content from './Content'
 
 const header = h('header', {}, [
-  h('span', {style: {marginRight: '1rem'}}, 'Example Chooser:'),
-  h('select.switcher', {}, [
-    h('option', {attrs: {value: 1, selected: true}}, 'Color Changer'),
-    h('option', {attrs: {value: 2}}, 'Github Search'),
-    h('option', {attrs: {value: 3}}, 'Hero Transition (Simple)'),
-    h('option', {attrs: {value: 4}}, 'Hero Transition (Complex)'),
-    h('option', {attrs: {value: 5}}, 'Hero Transition (Tests)'),
-  ]),
+  h('a', {attrs: {href: '/'}}, 'Color Changer'),
+  h('a', {attrs: {href: '/github'}}, 'Github Search'),
+  h('a', {attrs: {href: '/hero-simple'}}, 'Hero Transition (Simple)'),
+  h('a', {attrs: {href: '/hero-complex'}}, 'Hero Transition (Complex)'),
+  h('a', {attrs: {href: '/hero-tests'}}, 'Hero Transition (Tests)'),
 ])
 
 const view = (hdr, cont) =>
   h('div.app-wrapper', {}, [hdr, h('main.content-holder', {}, [cont])])
 
-function main(responses) {
-  let toggle$ = responses.DOM.select('.switcher').events('change')
-    .map(ev => ev.target.value)
-    .startWith(0)
-    .do((x) => {console.log(`Example Selector = ${x}`)})
+function main(sources) {
+  //Link filtering
+  const url$ = sources.DOM
+    .select('a')
+    .events('click')
+    .filter(filterLinks)
+    .map(event => event.target.pathname)
 
-  const content = Content(responses, toggle$)
+  const content = Content(sources)
 
   const view$ = Rx.Observable.just(view(header, content.DOM))
 
-  return {DOM: view$, HTTP: content.HTTP}
+  return {DOM: view$, HTTP: content.HTTP, History: url$}
 }
 
 Cycle.run(main, {
+
   DOM: makeDOMDriver('#app-container', [
     require(`snabbdom/modules/class`),
     require(`./snabbdom_modules/hero`),
@@ -40,4 +41,5 @@ Cycle.run(main, {
     require(`snabbdom/modules/attributes`),
   ]),
   HTTP: makeHTTPDriver(),
+  History: makeHistoryDriver({hash: true, queries: false}),
 })

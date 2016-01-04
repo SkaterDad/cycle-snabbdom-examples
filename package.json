@@ -10,9 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "@cycle/core": "^6.0.0",
+    "@cycle/history": "^1.1.0",
     "@cycle/http": "^7.0.0",
     "@cycle/isolate": "^1.2.0",
-    "cycle-history": "^0.5.0",
     "cycle-snabbdom": "^0.4.0",
     "rx": "^4.0.6",
     "rx-combine-latest-obj": "^1.0.2",

@@ -16,8 +16,6 @@ body {
 a {
   color: inherit;
   text-decoration: none; }
-  a:hover {
-    text-decoration: underline; }
 
 header {
   background: #3c3c3c;
@@ -25,9 +23,18 @@ header {
   margin-bottom: 1rem;
   box-shadow: 1px 1px 1px 1px black;
   color: white;
-  padding: 0rem 1rem; }
+  padding: 0.2rem 1rem; }
   header select {
     padding: 0.2rem; }
+  header a {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.0em 0.5em;
+    border-radius: 3px;
+    background: rgba(200, 255, 200, 0.2);
+    transition: background-color 0.3s ease; }
+    header a:hover {
+      background: rgba(200, 255, 200, 0.5); }
 
 .app-wrapper {
   position: relative;
@@ -124,7 +131,7 @@ header {
 
 /* HERO TRANSITION STUFF */
 .hero {
-  transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out; }
+  transition: transform 1s ease-in-out, opacity 1s ease-in-out; }
 
 .falsetext, .truetext {
   color: white; }

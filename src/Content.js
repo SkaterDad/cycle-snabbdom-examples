@@ -1,33 +1,22 @@
-//import Rx from 'rx'
-import isolate from '@cycle/isolate'
-import Colors from './examples/ColorChange'
-import Github from './examples/GithubSearch'
-import HeroComplex from './examples/HeroComplex'
-import HeroSimple from './examples/HeroSimple'
-import HeroTests from './examples/HeroTests'
+import routes from './routes'
+import switchPath from 'switch-path'
 
-function mapContent(sources, val) {
-  switch (parseInt(val)) {
-  case 1:
-    return Colors(sources)
-  case 2:
-    return isolate(Github)(sources)
-  case 3:
-    return HeroSimple(sources)
-  case 4:
-    return HeroComplex(sources)
-  case 5:
-    return HeroTests(sources)
-  default:
-    return Colors(sources)
-  }
-}
-
-function Content(sources, toggle$) {
-  const state$ = toggle$.map(val => {
-    console.log('I\'m inside the content state mapping!')
-    return mapContent(sources, val)
-  })
+function Content(sources) {
+  const state$ = sources.History
+    //.startWith({pathname: '/'})
+    .map(location => {
+      //temporary for testing
+      console.dir(location)
+      //Pass current url into router to get the appropriate value
+      const {value} = switchPath(location.pathname, routes)
+      console.dir(value)
+      //If function returned, pass it the sources object
+      if (typeof value === 'function') {
+        return value(sources)
+      }
+      //else just return the route value, which must be DOM.
+      return {DOM: value}
+    })
     .do(x => {
       const hasDOM = x.DOM ? true : false
       const hasHTTP = x.HTTP ? true : false
