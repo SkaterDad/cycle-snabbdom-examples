@@ -1,7 +1,6 @@
 /*eslint-disable */
-
 /* global requestAnimationFrame */
-var raf = requestAnimationFrame || setTimeout;
+var raf = (window && window.requestAnimationFrame) || setTimeout;
 var nextFrame = function(fn) { raf(function() { raf(fn); }); };
 
 function setNextFrame(obj, prop, val) {
@@ -154,4 +153,3 @@ function post() {
 
 module.exports = {pre: pre, create: create, destroy: destroy, post: post};
 /*eslint-enable */
-

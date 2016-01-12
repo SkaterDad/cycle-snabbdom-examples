@@ -16,6 +16,9 @@ html, body {
 h1 {
   margin: 0
 }
+main {
+  display: block; /* ie sucks */
+}
 body {
   background-color: $backgroundColor;
   font-family: Helvetica, Sans;
@@ -32,21 +35,29 @@ header {
   margin-bottom: $headerBottom;
   box-shadow: 1px 1px 1px 1px black;
   color: white;
-  padding: 0.2rem 1rem;
-  
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0rem;
+
   select {
     padding: 0.2rem;
   }
-  
+
   a {
     display: inline-block;
     margin: 0.25rem;
+    margin-bottom: 0;
     padding: 0.0em 0.5em;
-    border-radius: 3px;
-    background: rgba(200,255,200,0.2);
-    transition: background-color 0.3s ease;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
     &:hover {
-      background: rgba(200,255,200,0.5);
+      opacity: 1;
+    }
+    &.active {
+      border-bottom: 2px solid rgb(200,250,200);
+      opacity: 1;
+      color: rgb(200,250,200);
     }
   }
 }
@@ -102,7 +113,7 @@ header {
   box-shadow: $standardShadow;
   height: calc(100% - #{$pageBtmMarg});
   color: $darkGray;
-  
+
   .label {
     margin-right: 0.5rem;
   }
@@ -145,7 +156,7 @@ header {
 .gh-link {
   width: 85%;
   padding: 0.25rem;
-  
+
   h1 {
     font-size: 1.2rem;
     margin: 0;
@@ -205,7 +216,7 @@ $heroTime: 1.0s;
   box-shadow: $standardShadow;
   margin: 1rem;
   color: $darkGray;
-  
+
   button {
     background-color: rgba(white,0.7);
     border: 1px solid $darkGray;
@@ -327,15 +338,15 @@ $heroTime: 1.0s;
 }
 
 @-webkit-keyframes sk-stretchdelay {
-  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }  
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
   20% { -webkit-transform: scaleY(1.0) }
 }
 
 @keyframes sk-stretchdelay {
-  0%, 40%, 100% { 
+  0%, 40%, 100% {
     transform: scaleY(0.4);
     -webkit-transform: scaleY(0.4);
-  }  20% { 
+  }  20% {
     transform: scaleY(1.0);
     -webkit-transform: scaleY(1.0);
   }

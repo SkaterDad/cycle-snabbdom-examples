@@ -65,7 +65,7 @@ function HeroList({HTTP}) {
     .map(({results, loading}) =>
       h('div.page-wrapper', {key: `herolistpage`, style: fadeInStyle}, [
         h('div', {style: {height: '100%', overflow: 'auto'}}, [
-          h('h1', {}, 'Repo List'),
+          h('h1', {}, 'Repo List FTW'),
           h('section.flex', {}, results.map(resultView).concat(loading ? loadingSpinner() : null)),
         ]),
       ])

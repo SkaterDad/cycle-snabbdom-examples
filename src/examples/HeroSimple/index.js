@@ -51,7 +51,7 @@ const view = (toggled) =>
       h('div#box-wrapper', {style: {position: 'relative'}}, [toggled ? trueView : falseView]),
     ])
 
-function HeroSimple({DOM}) {
+const HeroSimple = ({DOM}) => {
   let vTree$ =
     DOM.select('input').events('change')
       .map(ev => ev.target.checked)

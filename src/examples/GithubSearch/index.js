@@ -73,7 +73,7 @@ function githubSearch({DOM, HTTP}) {
     .map(({results, loading}) =>
       h('div.page-wrapper', {key: `ghpage`, style: fadeInOutStyle}, [
         h('div.page.github-search-container', {}, [
-          h('label.label', {}, 'Search:'),
+          h('label.label', {}, 'Search Github Repos:'),
           h('input.field', {props: {type: 'text'}}),
           h('hr'),
           h('section.search-results', {}, results.map(resultView).concat(loading ? loadingSpinner() : null)),

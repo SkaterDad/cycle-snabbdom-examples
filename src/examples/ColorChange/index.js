@@ -2,7 +2,7 @@ import {h} from 'cycle-snabbdom'
 import Rx from 'rx'
 import {fadeInOutStyle} from '../../global/styles'
 
-const colors = [
+let colors = [
   {bg: 'White', font: 'Black'},
   {bg: 'Gray', font: 'White'},
   {bg: 'Green', font: 'Yellow'},
@@ -23,7 +23,22 @@ function nextColorIndex(curr, inc) {
   return newColor
 }
 
-function ColorChange({DOM}) {
+const view = (color) => {
+  const nextBg = nextColorIndex(color, increment)
+  const prevBg = nextColorIndex(color, -increment)
+  return h('div.page-wrapper',{key: `colorpage`, style: fadeInOutStyle},[
+    h('div.page',{},[
+      h('div.color-change-container.flexcenter', {style: {backgroundColor: colors[color].bg}}, [
+        h('h3',{style: {color: colors[color].font}},'Magic Color Changer'),
+        h('em',{style: {color: colors[color].font}},'Cycle (get it?) through 5 colors.'),
+        h('button.colorBtn.next', {}, `Go to ${colors[nextBg].bg}`),
+        h('button.colorBtn.prev', {}, `Back to ${colors[prevBg].bg}`),
+      ]),
+    ]),
+  ])
+}
+
+const ColorChange = ({DOM}) => {
   let action$ = Rx.Observable.merge(
     DOM.select('button.colorBtn.next').events('click').map(increment),
     DOM.select('button.colorBtn.prev').events('click').map(-increment)
@@ -34,21 +49,7 @@ function ColorChange({DOM}) {
     .do((x) => console.log(`Colors index emitted: ${x}`))
 
   let vTree$ = color$
-      .map((color) => {
-        let nextBg = nextColorIndex(color, increment)
-        let prevBg = nextColorIndex(color, -increment)
-
-        return h('div.page-wrapper',{key: `colorpage`, style: fadeInOutStyle},[
-          h('div.page',{},[
-            h('div.color-change-container.flexcenter', {style: {backgroundColor: colors[color].bg}}, [
-              h('h3',{style: {color: colors[color].font}},'Magic Color Changer'),
-              h('em',{style: {color: colors[color].font}},'Cycle (get it?) through 5 colors.'),
-              h('button.colorBtn.next', {}, `Go to ${colors[nextBg].bg}`),
-              h('button.colorBtn.prev', {}, `Back to ${colors[prevBg].bg}`),
-            ]),
-          ]),
-        ])
-      })
+    .map(view)
     .do(() => console.log(`Colors DOM emitted`))
 
   return {DOM: vTree$}
