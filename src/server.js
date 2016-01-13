@@ -1,6 +1,6 @@
 'use strict'
 const isDeveloping = process.env.NODE_ENV !== 'production'
-const port = isDeveloping ? 3000 : process.env.PORT
+const port = 3000//isDeveloping ? 3000 : process.env.PORT
 
 const express = require('express')
 const server = express()
@@ -9,6 +9,7 @@ const server = express()
 // This is the real meat of the example
 // ************************************
 if (isDeveloping) {
+  console.log('Node env=dev, so we\'ll set up Webpack hot loading! Be patient.')
   // Step 1: Create & configure a webpack compiler
   const webpack = require('webpack')
   const webpackConfig = require('../webpack.config.js')
@@ -39,10 +40,15 @@ server.use(`/img`, express.static(`img`))
 
 //TODO: Add server-side rendering of our Cycle app
 server.get('/*', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
+  if (isDeveloping) {
+    res.sendFile(__dirname + '/index.dev.html')
+  } else {
+    res.sendFile(__dirname + '/index.html')
+  }
 })
 
 let listener = server.listen(port, () => {
   const host = listener.address().address
   console.log('Example app listening at http://%s:%s', host, port)
+  console.log('Node environment = ' + process.env.NODE_ENV)
 })

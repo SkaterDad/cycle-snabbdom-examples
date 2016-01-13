@@ -4,14 +4,9 @@ var webpack = require('webpack'),
     ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
-    devtool: 'source-map',
-    entry: [
-        'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
-        './src/index.js'
-    ],
+    entry: './src/index.js',
     output: {
         path: path.join(__dirname, 'dist'),
-        publicPath: '/dist/',
         filename: 'bundle.js'
     },
     module: {
@@ -21,7 +16,7 @@ module.exports = {
         loaders: [
             {
                 test: /\.scss$/,
-                loaders: ['style', 'css', 'autoprefixer', 'sass']
+                loader: ExtractTextPlugin.extract("style-loader", "css-loader!autoprefixer-loader!sass-loader")
                 //TODO:  Replace autoprefixer-loader & sass with PostCSS plugin
             },
             {
@@ -32,8 +27,8 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin()
+        new ExtractTextPlugin("app.css"),
+        new webpack.optimize.OccurenceOrderPlugin(),
     ]
 };
 /*eslint-enable*/

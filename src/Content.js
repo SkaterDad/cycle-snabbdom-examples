@@ -4,7 +4,7 @@ import {h} from 'cycle-snabbdom'
 
 const headerLinks = [
   {path: '/', text: 'Color Changer'},
-  {path: '/github', text: 'Github Search'},
+  {path: '/github', text: 'Github Search!'},
   {path: '/hero-simple', text: 'Hero Transition (Simple)'},
   {path: '/hero-complex', text: 'Hero Transition (Complex)'},
   {path: '/hero-tests', text: 'Hero Transition (Goofy)'},
