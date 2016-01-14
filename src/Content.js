@@ -1,6 +1,10 @@
 import routes from './routes'
-import switchPath from 'switch-path'
+//import switchPath from 'switch-path'
+import Mapper from 'url-mapper'
 import {h} from 'cycle-snabbdom'
+
+//Initialize url mapper
+const urlMapper = Mapper()
 
 const headerLinks = [
   {path: '/', text: 'Color Changer'},
@@ -10,8 +14,12 @@ const headerLinks = [
   {path: '/hero-tests', text: 'Hero Transition (Goofy)'},
 ]
 
+//TODO: This probably won't work server side if we try that.
 function isCurrentRoute(link) {
-  return link === window.location.pathname
+  if (link === '/') {
+    return link === window.location.pathname
+  }
+  return window.location.pathname.indexOf(link) >= 0
 }
 
 const createLink = ({path, text}) =>
@@ -19,22 +27,26 @@ const createLink = ({path, text}) =>
 
 const header = () => h('header', {}, headerLinks.map(createLink))
 
-const view = (cont, containerClass) =>
-  h('div.' + containerClass, {}, [header(), h('main.content-holder', {}, [cont])])
+const view = (cont, rootSelector) =>
+  h('div' + rootSelector, {}, [header(), h('main.content-holder', {}, [cont])])
 
-const Content = (sources, PRIMARY_CONTAINER_CLASS) => {
+function getRouteValue(location, sources) {
+  console.log.bind(location)
+  //Pass current url into router to get the appropriate value
+  const {match, values} = urlMapper.map(location.pathname, routes)
+  console.log.bind(match)
+  console.log.bind(values)
+  //If function returned, pass it the sources object
+  if (typeof match === 'function') {
+    return match(sources, values)
+  }
+  //else just return the route value, which must be DOM.
+  return {DOM: match}
+}
+
+const Content = (sources, ROOT_SELECTOR) => {
   const route$ = sources.History
-    //.startWith({pathname: '/'})
-    .map(location => {
-      //Pass current url into router to get the appropriate value
-      const {value} = switchPath(location.pathname, routes)
-      //If function returned, pass it the sources object
-      if (typeof value === 'function') {
-        return value(sources)
-      }
-      //else just return the route value, which must be DOM.
-      return {DOM: value}
-    })
+    .map(location => getRouteValue(location, sources))
     .do(x => {
       const hasDOM = x.DOM ? true : false
       const hasHTTP = x.HTTP ? true : false
@@ -43,7 +55,7 @@ const Content = (sources, PRIMARY_CONTAINER_CLASS) => {
     .shareReplay(1) //Hot Module Replacement needed this to be shareReplay(1) instead of just share()
 
   return {
-    DOM: route$.pluck('DOM').map(x => view(x, PRIMARY_CONTAINER_CLASS))
+    DOM: route$.pluck('DOM').map(x => view(x, ROOT_SELECTOR))
       .do(() => {console.log('Content DOM plucked')}),
     HTTP: route$.pluck('HTTP')
       .do(() => {console.log('Content HTTP plucked')})

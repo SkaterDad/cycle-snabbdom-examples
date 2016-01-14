@@ -6,19 +6,15 @@ import {fadeInStyle} from '../../global/styles'
 
 function resultView({
   id,
-  url = 'https://api.github.com/',
   full_name = 'Unknown Repo Name',
   description = 'No description given.',
   owner = {
-    html_url: 'https://github.com/',
     avatar_url: '',
     login: '?',
   }}) {
-  const html = h('article.hero.hero-item', {
+  return h('a.hero.hero-item', {
     key: id,
-    props: {
-      detailUrl: url,
-    },
+    attrs: {href: '/hero-complex/' + full_name},
     //hero: {id: `repo${id}`},
   }, [
     h('img.hero', {props: {src: owner.avatar_url}, hero: {id: `repo${id}`}}),
@@ -26,7 +22,6 @@ function resultView({
     h('div.small', {}, description),
     h('div.small', {}, `by ${owner.login}`),
   ])
-  return html
 }
 
 function HeroList({HTTP}) {

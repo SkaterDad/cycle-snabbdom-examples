@@ -20,17 +20,17 @@ function detailView({
     h('h1', {}, full_name),
     h('span', {}, `Stars: ${stargazers_count}  -  Language: ${language}`),
     h('p', {}, description),
-    h('button.detail-close', {}, 'Back to List'),
   ])
   return html
 }
 
-function HeroDetail({HTTP}, repoUrl = 'https://api.github.com/repos/paldepind/snabbdom') {
-  const GET_REQUEST_URL = repoUrl
+function HeroDetail({HTTP}, values) {
+  const GET_REQUEST_URL = 'https://api.github.com/repos/' + values.owner + '/' + values.repo //location.pathname.replace('/hero-complex', '')
 
   //Send HTTP request to get data for the page
   const searchRequest$ = Rx.Observable.just(GET_REQUEST_URL)
     .do((x) => console.log(`Hero Detail: Sent GET request to: ${x}`))
+    .shareReplay(1)
 
   // Convert the stream of HTTP responses to virtual DOM elements.
   const searchResponse$ = HTTP
