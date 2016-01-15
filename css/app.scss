@@ -1,3 +1,4 @@
+/*! My App CSS */
 $headerHeight: 2rem;
 $headerBottom: 1rem;
 $overallHeaderHeight: $headerHeight + $headerBottom;
@@ -6,23 +7,24 @@ $standardShadow: 1px 1px 2px 0px black;
 $darkGray: rgb(60,60,60);
 $backgroundColor: rgb(150,170,130);
 
-* {
-  box-sizing: border-box;
-}
 html, body {
   height: 100%;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 h1 {
   margin: 0
 }
-main {
-  display: block; /* ie sucks */
-}
+
 body {
   background-color: $backgroundColor;
   font-family: Helvetica, Sans;
-  padding: 0;
 }
 
 a {
@@ -69,6 +71,7 @@ header {
 .app-container {
   position: relative;
   height: 100%;
+  padding-bottom: $pageBtmMarg;
 }
 .content-holder {
   height: calc(100% - #{$overallHeaderHeight});
@@ -116,7 +119,7 @@ header {
   background: white;
   padding: 1rem;
   box-shadow: $standardShadow;
-  height: calc(100% - #{$pageBtmMarg});
+  height: calc(100% - #{$pageBtmMarg*0.5});
   color: $darkGray;
 
   .label {
@@ -133,7 +136,7 @@ header {
 .search-results {
   position: relative;
   overflow-y: auto;
-  height: calc(100% - #{$pageBtmMarg}*2);
+  height: calc(100% - #{$pageBtmMarg}*3);
 }
 .search-result {
   display: flex;
@@ -206,8 +209,6 @@ $heroTime: 1.0s;
   }
 }
 
-.hero-detail-container {
-}
 .hero-details-avatar {
   display: block;
   width: 100px;

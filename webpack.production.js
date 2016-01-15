@@ -1,7 +1,8 @@
 /*eslint-disable*/
 var webpack = require('webpack'),
     path = require('path'),
-    ExtractTextPlugin = require('extract-text-webpack-plugin');
+    ExtractTextPlugin = require('extract-text-webpack-plugin'),
+    autoprefixer = require('autoprefixer');
 
 module.exports = {
     entry: './src/index.js',
@@ -15,9 +16,8 @@ module.exports = {
         ],
         loaders: [
             {
-                test: /\.scss$/,
-                loader: ExtractTextPlugin.extract("style-loader", "css-loader!autoprefixer-loader!sass-loader")
-                //TODO:  Replace autoprefixer-loader & sass with PostCSS plugin
+                test: /\.s?css$/, //match css or scss
+                loader: ExtractTextPlugin.extract("style", "css!postcss!sass")
             },
             {
                 test: /\.js$/,
@@ -26,9 +26,12 @@ module.exports = {
             }
         ]
     },
+    postcss: function () {
+        return [autoprefixer];
+    },
     plugins: [
-        new ExtractTextPlugin("app.css"),
-        new webpack.optimize.OccurenceOrderPlugin(),
+        new ExtractTextPlugin("bundle.css"),
+        new webpack.optimize.OccurenceOrderPlugin()
     ]
 };
 /*eslint-enable*/

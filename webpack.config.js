@@ -1,7 +1,7 @@
 /*eslint-disable*/
 var webpack = require('webpack'),
     path = require('path'),
-    ExtractTextPlugin = require('extract-text-webpack-plugin');
+    autoprefixer = require('autoprefixer');
 
 module.exports = {
     devtool: 'source-map',
@@ -20,9 +20,8 @@ module.exports = {
         ],
         loaders: [
             {
-                test: /\.scss$/,
-                loaders: ['style', 'css', 'autoprefixer', 'sass']
-                //TODO:  Replace autoprefixer-loader & sass with PostCSS plugin
+                test: /\.s?css$/,
+                loaders: ['style', 'css', 'postcss', 'sass']
             },
             {
                 test: /\.js$/,
@@ -30,6 +29,9 @@ module.exports = {
                 exclude: /node_modules/,
             }
         ]
+    },
+    postcss: function () {
+        return [autoprefixer];
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),

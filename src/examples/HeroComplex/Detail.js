@@ -25,7 +25,8 @@ function detailView({
 }
 
 function HeroDetail({HTTP}, values) {
-  const GET_REQUEST_URL = 'https://api.github.com/repos/' + values.owner + '/' + values.repo //location.pathname.replace('/hero-complex', '')
+  //create the api url from values passed from Url-Mapper
+  const GET_REQUEST_URL = 'https://api.github.com/repos/' + values.owner + '/' + values.repo
 
   //Send HTTP request to get data for the page
   const searchRequest$ = Rx.Observable.just(GET_REQUEST_URL)

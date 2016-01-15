@@ -3,6 +3,7 @@ import {makeDOMDriver} from 'cycle-snabbdom'
 import {makeHTTPDriver} from '@cycle/http'
 import {makeHistoryDriver} from '@cycle/history'
 import app from './app'
+import 'normalize.css'
 import '../css/app.scss' //webpack will process this
 
 const ROOT_SELECTOR = '.app-container'
