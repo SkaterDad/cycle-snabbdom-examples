@@ -16,7 +16,7 @@
     "@cycle/history": "^1.1.0",
     "@cycle/http": "^7.0.0",
     "@cycle/isolate": "^1.2.0",
-    "cycle-restart": "0.0.3",
+    "cycle-restart": "^0.0.4",
     "cycle-snabbdom": "^0.4.2",
     "express": "^4.13.3",
     "normalize.css": "^3.0.3",
