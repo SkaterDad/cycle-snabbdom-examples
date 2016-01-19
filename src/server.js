@@ -1,5 +1,6 @@
 'use strict'
 const isDeveloping = process.env.NODE_ENV !== 'production'
+const isExperimental = process.env.NODE_ENV === 'exp'
 const port = 3000//isDeveloping ? 3000 : process.env.PORT
 
 const express = require('express')
@@ -12,7 +13,7 @@ if (isDeveloping) {
   console.log('Node env=dev, so we\'ll set up Webpack hot loading! Be patient.')
   // Step 1: Create & configure a webpack compiler
   const webpack = require('webpack')
-  const webpackConfig = require('../webpack.config.js')
+  const webpackConfig = isExperimental ? require('../webpack.restart.js') : require('../webpack.config.js')
   const compiler = webpack(webpackConfig)
   const webpackDevMiddleware = require('webpack-dev-middleware')
   const webpackHotMiddleware = require('webpack-hot-middleware')

@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-prod": "./node_modules/.bin/webpack --config webpack.production.js -p --progress --colors",
     "prod": "set NODE_ENV=production&& npm run build-prod && node src/server.js",
-    "dev": "set NODE_ENV=development&& node src/server.js"
+    "dev": "set NODE_ENV=development&& node src/server.js",
+    "exp": "set NODE_ENV=exp&& node src/server.js"
   },
   "author": "Mike Montoya",
   "license": "MIT",
@@ -16,7 +17,7 @@
     "@cycle/history": "^1.1.0",
     "@cycle/http": "^7.0.0",
     "@cycle/isolate": "^1.2.0",
-    "cycle-restart": "^0.0.4",
+    "cycle-restart": "^0.0.5",
     "cycle-snabbdom": "^0.4.2",
     "express": "^4.13.3",
     "normalize.css": "^3.0.3",
