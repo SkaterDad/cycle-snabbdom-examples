@@ -14,21 +14,24 @@ const headerLinks = [
   {path: '/hero-tests', text: 'Hero Transition (Goofy)'},
 ]
 
-//TODO: This probably won't work server side if we try that.
-function isCurrentRoute(link) {
-  if (link === '/') {
-    return link === window.location.pathname
+//Check link against currenty history driver location
+function isCurrentRoute(link, location) {
+  if (!location.pathname) {
+    return false
   }
-  return window.location.pathname.indexOf(link) >= 0
+  if (link === '/') {
+    return link === location.pathname
+  }
+  return location.pathname.indexOf(link) >= 0
 }
 
-const createLink = ({path, text}) =>
-  h('a', {class: {active: isCurrentRoute(path)}, attrs: {href: path}}, text)
+const createLink = ({path, text}, location) =>
+  h('a', {class: {active: isCurrentRoute(path, location)}, attrs: {href: path}}, text)
 
-const header = () => h('header', {}, headerLinks.map(createLink))
+const header = (his) => h('header', {}, headerLinks.map(x => createLink(x, his)))
 
-const view = (cont, rootSelector) =>
-  h('div' + rootSelector, {}, [header(), h('main.content-holder', {}, [cont])])
+const view = (cont, rootSelector, location) =>
+  h('div' + rootSelector, {}, [header(location), h('main.content-holder', {}, [cont])])
 
 function getRouteValue(location, sources) {
   console.log.bind(location)
@@ -55,7 +58,8 @@ const Content = (sources, ROOT_SELECTOR) => {
     .shareReplay(1) //Hot Module Replacement needed this to be shareReplay(1) instead of just share()
 
   return {
-    DOM: route$.pluck('DOM').map(x => view(x, ROOT_SELECTOR))
+    DOM: route$.pluck('DOM').withLatestFrom(sources.History, (dom, location) => {return {dom, location}})
+      .map(x => view(x.dom, ROOT_SELECTOR, x.location))
       .do(() => {console.log('Content DOM plucked')}),
     HTTP: route$.pluck('HTTP')
       .do(() => {console.log('Content HTTP plucked')})
