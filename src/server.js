@@ -6,9 +6,7 @@ const port = 3000//isDeveloping ? 3000 : process.env.PORT
 const express = require('express')
 const server = express()
 
-// ************************************
-// This is the real meat of the example
-// ************************************
+//In Dev Mode, serve client JS bundle with hot module replacement
 if (isDeveloping) {
   console.log('Node env=dev, so we\'ll set up Webpack hot loading! Be patient.')
   // Step 1: Create & configure a webpack compiler
