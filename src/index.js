@@ -1,5 +1,6 @@
 import Cycle from '@cycle/core'
-import {makeDOMDriver} from 'cycle-snabbdom'
+import {modules, makeDOMDriver} from 'cycle-snabbdom'
+const {StyleModule, PropsModule, AttrsModule, ClassModule, HeroModule} = modules
 import {makeHTTPDriver} from '@cycle/http'
 import {makeHistoryDriver} from '@cycle/history'
 import app from './app'
@@ -9,13 +10,9 @@ import '../css/app.scss' //webpack will process this
 const ROOT_SELECTOR = '.app-container'
 
 const drivers = {
-  DOM: makeDOMDriver(ROOT_SELECTOR, [
-    require(`snabbdom/modules/class`),
-    require(`snabbdom/modules/hero`),
-    require(`snabbdom/modules/style`),
-    require(`snabbdom/modules/props`),
-    require(`snabbdom/modules/attributes`),
-  ]),
+  DOM: makeDOMDriver(ROOT_SELECTOR, {modules:
+    [StyleModule, PropsModule, AttrsModule, ClassModule, HeroModule]
+  }),
   HTTP: makeHTTPDriver(),
   History: makeHistoryDriver({hash: false, queries: true}),
 }
