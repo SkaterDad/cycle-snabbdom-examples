@@ -1,3 +1,6 @@
+# DISCLAIMER
+This branch is still under heavy development!  Currently there are broken pieces.
+
 # cycle-snabbdom-examples
 Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://github.com/paldepind/snabbdom) as the v-dom library (by way of the [cycle-snabbdom](https://github.com/TylorS/cycle-snabbdom) driver).
 
@@ -18,4 +21,3 @@ Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://gi
 ## Future plans
 
 * Document how some of these examples work in more detail.  There is a careful balance of `position: relative` and `position: absolute` on certain elements and containers.
-* Continue modifying the snabbdom hero module to make it more bulletproof and flexible.  As of now, I recommend against doing hero transitions if the node has children.
