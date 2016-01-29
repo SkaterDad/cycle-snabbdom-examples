@@ -1,5 +1,6 @@
 import {h} from 'cycle-snabbdom'
 import {fadeInOutStyle} from '../../global/styles'
+import './styles.scss'
 
 const HERO_ID_KITTY1 = 'heroKitty1'
 const HERO_ID_KITTY2 = 'heroKitty2'

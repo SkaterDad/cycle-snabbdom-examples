@@ -1,11 +1,11 @@
 import {h} from 'cycle-snabbdom'
 import isolate from '@cycle/isolate'
-import Colors from './examples/ColorChange'
-import Github from './examples/GithubSearch'
-import HeroComplexList from './examples/HeroComplex/List'
-import HeroComplexDetail from './examples/HeroComplex/Detail'
-import HeroSimple from './examples/HeroSimple'
-import HeroTests from './examples/HeroTests'
+import Colors from './components/ColorChange'
+import Github from './components/GithubSearch'
+import HeroComplexList from './components/HeroComplex/List'
+import HeroComplexDetail from './components/HeroComplex/Detail'
+import HeroSimple from './components/HeroSimple'
+import HeroTests from './components/HeroTests'
 
 const routes = {
   '/': Colors,

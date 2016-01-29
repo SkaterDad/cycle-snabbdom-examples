@@ -35,10 +35,10 @@ const view = (cont, rootSelector, location) =>
 
 function getRouteValue(location, sources) {
   console.log.bind(location)
-  //Pass current url into router to get the appropriate value
+  //Pass current url into path matcher to get the appropriate value
+  // match: The route component
+  // values: Object of dynamic url segment values and query params
   const {match, values} = urlMapper.map(location.pathname, routes)
-  console.log.bind(match)
-  console.log.bind(values)
   //If function returned, pass it the sources object
   if (typeof match === 'function') {
     return match(sources, values)
@@ -63,7 +63,7 @@ const Content = (sources, ROOT_SELECTOR) => {
       .do(() => {console.log('Content DOM plucked')}),
     HTTP: route$.pluck('HTTP')
       .do(() => {console.log('Content HTTP plucked')})
-      .filter(x => x).flatMapLatest(x => x)
+      .filter(x => !!x).flatMapLatest(x => x)
       .do(() => {console.log('Content HTTP filtered')}),
   }
 }

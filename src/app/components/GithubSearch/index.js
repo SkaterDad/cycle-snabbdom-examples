@@ -2,6 +2,7 @@ import Rx from 'rx'
 import {h} from 'cycle-snabbdom'
 import {fadeInOutStyle} from '../../global/styles'
 import loadingSpinner from '../../global/loading'
+import './styles.scss'
 
 function resultView({
   id,

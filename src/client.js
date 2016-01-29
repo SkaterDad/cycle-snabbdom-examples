@@ -1,22 +1,28 @@
+//App-Level Stylesheets
+import 'normalize.css'
+import './app/app.scss'
+
 import Cycle from '@cycle/core'
 import {modules, makeDOMDriver} from 'cycle-snabbdom'
 const {StyleModule, PropsModule, AttrsModule, ClassModule, HeroModule} = modules
 import {makeHTTPDriver} from '@cycle/http'
 import {makeHistoryDriver} from '@cycle/history'
-import app from './app'
-import 'normalize.css'
-import '../css/app.scss' //webpack will process this
+import app from './app/app'
 
+//Define selector string of root vTree element.
+//See the (module.hot) section below for explanation.
 const ROOT_SELECTOR = '.app-container'
 
+//Define what drivers our Cycle app will use
 const drivers = {
-  DOM: makeDOMDriver(ROOT_SELECTOR, {modules:
-    [StyleModule, PropsModule, AttrsModule, ClassModule, HeroModule]
+  DOM: makeDOMDriver(ROOT_SELECTOR, {
+    modules: [StyleModule, PropsModule, AttrsModule, ClassModule, HeroModule],
   }),
   HTTP: makeHTTPDriver(),
   History: makeHistoryDriver({hash: false, queries: true}),
 }
 
+//Initialize Cycle.js!
 Cycle.run(app, drivers)
 
 //Code to enable Webpack Hot Module Replacement.

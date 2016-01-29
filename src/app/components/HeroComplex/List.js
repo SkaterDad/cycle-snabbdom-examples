@@ -3,6 +3,7 @@ import {h} from 'cycle-snabbdom'
 import {checkRequestUrl} from '../../global/utils'
 import loadingSpinner from '../../global/loading'
 import {fadeInStyle} from '../../global/styles'
+import './styles.scss'
 
 function resultView({
   id,
@@ -25,7 +26,7 @@ function resultView({
 }
 
 function HeroList({HTTP}) {
-  const GET_REQUEST_URL = 'https://api.github.com/users/cyclejs/repos'
+  const GET_REQUEST_URL = 'http://localhost:3000/data' //'https://api.github.com/users/cyclejs/repos'
 
   //Send HTTP request to get data for the page
   //.shareReplay(1) is needed because this observable

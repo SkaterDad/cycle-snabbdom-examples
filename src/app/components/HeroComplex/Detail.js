@@ -3,6 +3,7 @@ import {h} from 'cycle-snabbdom'
 import {checkRequestUrl} from '../../global/utils'
 import {fadeInOutStyle} from '../../global/styles'
 //import loadingSpinner from '../../global/loading'
+import './styles.scss'
 
 function detailView({
   id,

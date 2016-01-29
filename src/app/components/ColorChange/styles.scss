@@ -1,0 +1,28 @@
+@import '../../global/styles';
+
+.colorBtn, form {
+  border: none;
+  position: relative;
+  top: 0px;
+  background-color: rgb(230,250,230);
+  padding: 1rem;
+  border-radius: 2px;
+  box-shadow: 1px 2px 5px 0px rgba(black,0.75);
+  margin: 1rem;
+  width: 25%;
+  transition: background-color 0.25s ease-in-out;
+  &:hover {
+    background-color: white;
+  }
+}
+form button {
+  background: white;
+  border: none;
+  padding: 1rem;
+  border: 1px solid rgba(black, 0.25);
+}
+.color-change-container {
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+  padding: 2rem;
+  box-shadow: $standardShadow;
+}
