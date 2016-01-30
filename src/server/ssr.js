@@ -36,7 +36,7 @@ function wrapVTreeWithHTMLBoilerplate(vtree, isDevMode) {
       head(headParts(isDevMode)),
       body([
         vtree,
-        script({attrs: {src: './dist/bundle.js'}}),
+        //script({attrs: {src: './dist/bundle.js'}}),
       ]),
     ])
   )

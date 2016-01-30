@@ -7,9 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-prod": "./node_modules/.bin/webpack --config webpack.production.js -p --progress --colors",
     "prod": "set NODE_ENV=production&& npm run build-prod && node src/server/server.js",
-    "dev": "set NODE_ENV=development&& node src/server/server.js",
+    "hot-client": "set NODE_ENV=development&& node src/server/server.hotclient.js",
     "hot-server": "./node_modules/.bin/webpack --progress --colors --watch --config webpack.server.js",
-    "run-hot-server": "set NODE_ENV=development&& node build/server.js",
+    "run-hot-server": "npm run build-prod && set NODE_ENV=development&& node build/server.js",
     "run-prod-server": "set NODE_ENV=production&& node build/server.js"
   },
   "author": "Mike Montoya",
