@@ -38,7 +38,10 @@ function HeroList({HTTP}) {
 
   // Convert the stream of HTTP responses to virtual DOM elements.
   const dataResponse$ = HTTP
-    .filter(res$ => checkRequestUrl(res$, GET_REQUEST_URL))
+    .filter(res$ => {
+      console.dir(res$)
+      return checkRequestUrl(res$, GET_REQUEST_URL)
+    })
     .flatMapLatest(x => x) //Needed because HTTP gives an Observable when you map it
     .map(res => res.body)
     .startWith([])

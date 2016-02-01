@@ -14,7 +14,7 @@ if (isDeveloping) {
   console.log('Setting up Webpack hot loading! Wait for successful bundle creation before opening the app.')
   // Step 1: Create & configure a webpack compiler
   const webpack = require('webpack')
-  const webpackConfig = isExperimental ? require('../../webpack.restart.js') : require('../../webpack.config.js')
+  const webpackConfig = isExperimental ? require('../../webpack.config.restart.js') : require('../../webpack.config.js')
   const compiler = webpack(webpackConfig)
   const webpackDevMiddleware = require('webpack-dev-middleware')
   const webpackHotMiddleware = require('webpack-hot-middleware')
