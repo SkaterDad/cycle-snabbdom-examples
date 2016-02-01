@@ -7,7 +7,7 @@ module.exports = {
     devtool: 'source-map',
     entry: [
         'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
-        './src/client.js'
+        './src/client.restart.js'
     ],
     output: {
         path: path.join(__dirname, 'dist'),
@@ -26,8 +26,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 loaders: ['babel?cacheDirectory=true&presets=es2015'],
-                exclude: /node_modules.((?!snabbdom-to-html)).*/ //webpack pulls in snabbdom-to-html as part of cycle-snabbdom.  Uflify doesn't like es6 code.
-//                exclude: /node_modules/,
+                exclude: /node_modules/,
             }
         ]
     },

@@ -1,6 +1,7 @@
 'use strict'
 //Environment-related constants
 const isDeveloping = process.env.NODE_ENV !== 'production'
+const isExperimental = process.env.NODE_ENV === 'exp'
 const port = process.env.PORT ? process.env.PORT : 3000
 const host = process.env.IP ? process.env.IP : 'localhost'
 
@@ -13,7 +14,7 @@ if (isDeveloping) {
   console.log('Setting up Webpack hot loading! Wait for successful bundle creation before opening the app.')
   // Step 1: Create & configure a webpack compiler
   const webpack = require('webpack')
-  const webpackConfig = require('../../webpack.config.js')
+  const webpackConfig = isExperimental ? require('../../webpack.restart.js') : require('../../webpack.config.js')
   const compiler = webpack(webpackConfig)
   const webpackDevMiddleware = require('webpack-dev-middleware')
   const webpackHotMiddleware = require('webpack-hot-middleware')
