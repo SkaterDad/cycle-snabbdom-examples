@@ -46,13 +46,13 @@ function prependHTML5Doctype(appHTML) {
   return `<!doctype html>${appHTML}`
 }
 
-function wrapAppResultWithBoilerplate(appFn, domToTake, isDevMode) {
+function wrapAppResultWithBoilerplate(appFn, httpToTake, isDevMode) {
   return function wrappedAppFn(sources) {
     const theApp = appFn(sources)
     return {
       //DOM: theApp.DOM.take(domToTake).map(wrapVTreeWithHTMLBoilerplate, isDevMode),
       DOM: theApp.DOM.take(1).map(wrapVTreeWithHTMLBoilerplate, isDevMode),
-      HTTP: theApp.HTTP.take(1),
+      HTTP: theApp.HTTP.take(httpToTake), //github search page required take(0), hero-complex requires take(1). others don't care.
       History: theApp.History,
     }
   }
@@ -61,13 +61,13 @@ function wrapAppResultWithBoilerplate(appFn, domToTake, isDevMode) {
 let serverApp = (req, res) => {
   //Prepare Cycle.js app for Server Rendering
   //In this case, we wrap the app's vTree with the full page HTML.
+
   //TODO: Add this information to the route definitions, then read them here.
-  //Might not even be needed.
-  const domToTake = 1  //req.url === '/repos' ? 4 : 1
+  const httpToTake = req.url === '/hero-complex' ? 1 : 0
 
   const isDevMode = process.env.NODE_ENV !== 'production'
 
-  let wrappedAppFn = wrapAppResultWithBoilerplate(app, domToTake, isDevMode)
+  let wrappedAppFn = wrapAppResultWithBoilerplate(app, httpToTake, isDevMode)
 
   console.log('Server rendering!')
 

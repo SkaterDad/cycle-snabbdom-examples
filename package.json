@@ -10,7 +10,7 @@
     "hot-client": "set NODE_ENV=development&& node src/server/server.hotclient.js",
     "exp": "set NODE_ENV=exp&& node src/server/server.hotclient.js",
     "hot-server": "./node_modules/.bin/webpack --progress --colors --watch --config webpack.server.js",
-    "run-hot-server": "npm run build-prod && set NODE_ENV=development&& node build/server.js",
+    "run-hot-server": "set NODE_ENV=development&& node build/server.js",
     "run-prod-server": "set NODE_ENV=production&& node build/server.js"
   },
   "author": "Mike Montoya",
