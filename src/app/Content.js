@@ -1,5 +1,4 @@
 import routes from './routes'
-//import switchPath from 'switch-path'
 import Mapper from 'url-mapper'
 import {h} from 'cycle-snabbdom'
 

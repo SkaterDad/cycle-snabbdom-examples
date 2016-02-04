@@ -85,7 +85,11 @@ function githubSearch({DOM, HTTP}) {
 
   return {
     DOM: vtree$,
-    HTTP: searchRequest$,
+    //Kickstart the HTTP sink with a blank string.
+    //I'm doing this so the Server Rendering has something to 'take()'
+    //Unless I put more info into the router config, it's going to be needed for
+    //any component which has an HTTP stream that isn't used initially.
+    HTTP: Rx.Observable.just('').merge(searchRequest$),
   }
 }
 

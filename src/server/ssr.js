@@ -5,7 +5,6 @@ let {
   title,
   link,
   body,
-  div,
   meta,
   script,
   makeHTMLDriver,
@@ -14,45 +13,43 @@ let {makeHTTPDriver} = require('@cycle/http')
 let {makeServerHistoryDriver} = require('@cycle/history')
 let app = require('../app/app').default
 
-const baseHead = [
-  meta({attrs: {charset: 'utf-8'}}),
-  meta({attrs: {name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0'}}),
-  meta({attrs: {name: 'description', content: 'Cycle.js Snabbdom Examples'}}),
-  title('Cycle.js Snabbdom Examples'),
-]
-
 function headParts(isDevMode) {
+  const baseHead = [
+    meta({attrs: {charset: 'utf-8'}}),
+    meta({attrs: {name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0'}}),
+    meta({attrs: {name: 'description', content: 'Cycle.js Snabbdom Examples'}}),
+    title('Cycle.js Snabbdom Examples'),
+  ]
+
   if (!isDevMode) {
     return baseHead.concat(
       link({attrs: {rel: 'stylesheet', href: './dist/bundle.css'}})
     )
   }
+
   return baseHead
 }
 
 function wrapVTreeWithHTMLBoilerplate(vtree, isDevMode) {
-  return (
-    html([
-      head(headParts(isDevMode)),
-      body([
-        vtree,
-        //script({attrs: {src: './dist/bundle.js'}}),
-      ]),
-    ])
-  )
+  return html([
+    head(headParts(isDevMode)),
+    body([
+      vtree,
+      //script({attrs: {src: './dist/bundle.js'}}),
+    ]),
+  ])
 }
 
 function prependHTML5Doctype(appHTML) {
   return `<!doctype html>${appHTML}`
 }
 
-function wrapAppResultWithBoilerplate(appFn, httpToTake, isDevMode) {
+function wrapAppResultWithBoilerplate(appFn, {domToTake, httpToTake, isDevMode}) {
   return function wrappedAppFn(sources) {
     const theApp = appFn(sources)
     return {
-      //DOM: theApp.DOM.take(domToTake).map(wrapVTreeWithHTMLBoilerplate, isDevMode),
-      DOM: theApp.DOM.take(1).map(wrapVTreeWithHTMLBoilerplate, isDevMode),
-      HTTP: theApp.HTTP.take(httpToTake), //github search page required take(0), hero-complex requires take(1). others don't care.
+      DOM: theApp.DOM.take(domToTake).map(wrapVTreeWithHTMLBoilerplate, isDevMode),
+      HTTP: theApp.HTTP.take(httpToTake),
       History: theApp.History,
     }
   }
@@ -62,12 +59,14 @@ let serverApp = (req, res) => {
   //Prepare Cycle.js app for Server Rendering
   //In this case, we wrap the app's vTree with the full page HTML.
 
-  //TODO: Add this information to the route definitions, then read them here.
-  const httpToTake = req.url === '/hero-complex' ? 1 : 0
+  //TODO: Add some of this information to the route definitions, then read them here.
+  const ssrOptions = {
+    domToTake: 1,
+    httpToTake: 1, //potentially tie this to route defs.  some routes don't have HTTP
+    isDevMode: process.env.NODE_ENV !== 'production',
+  }
 
-  const isDevMode = process.env.NODE_ENV !== 'production'
-
-  let wrappedAppFn = wrapAppResultWithBoilerplate(app, httpToTake, isDevMode)
+  let wrappedAppFn = wrapAppResultWithBoilerplate(app, ssrOptions)
 
   console.log('Server rendering!')
 
