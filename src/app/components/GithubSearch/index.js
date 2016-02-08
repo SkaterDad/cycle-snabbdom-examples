@@ -34,25 +34,31 @@ function resultView({
   return html
 }
 
-function githubSearch({DOM, HTTP}) {
-  const GITHUB_SEARCH_API = 'https://api.github.com/search/repositories?q='
+function githubSearch({DOM, HTTP}, {search = ''}, pathname) {
+  //const GITHUB_SEARCH_API = 'https://api.github.com/search/repositories?q='
+  const GITHUB_SEARCH_API = 'http://localhost:3000/mocksearch?q='
 
-  // Requests for Github repositories happen when the input field changes,
-  // debounced by 500ms, ignoring empty input field.
-  const searchRequest$ = DOM.select('.field').events('input')
+  //Query text
+  const query$ = DOM.select('.field').events('input')
     .do(() => {console.log(`GH input changed`)})
     .debounce(500)
     .map(ev => ev.target.value.trim()) //added trim to reduce useless searches
+    .share()
+
+  // Requests for Github repositories happen when the input field changes,
+  // debounced by 500ms, ignoring empty input field.
+  const searchRequest$ = query$
+    .startWith(search)
     .filter(query => query.length > 0)
     .map(q => GITHUB_SEARCH_API + encodeURI(q))
     .do((x) => console.log(`GH search request emitted: ${x}`))
-    .share() //needed because multiple observables will subscribe
+    .shareReplay(1) //needed because multiple observables will subscribe
 
   // Convert the stream of HTTP responses to virtual DOM elements.
   const searchResponse$ = HTTP
     .filter(res$ => res$ && res$.request.url.indexOf(GITHUB_SEARCH_API) === 0)
     .flatMapLatest(x => x) //Needed because HTTP gives an Observable when you map it
-    .map(res => res.body.items)
+    .map(res => res.body)//.items)
     .startWith([])
     .do((x) => console.log(`GH search response emitted: ${x.length} items`))
     .share() //needed because multiple observables will subscribe
@@ -60,6 +66,7 @@ function githubSearch({DOM, HTTP}) {
   //loading indication.  true if request is newer than response
   const loading$ = searchRequest$.map(true).merge(searchResponse$.map(false))
     .startWith(false)
+    .debounce(250)
     .do((x) => console.log(`GH loading status emitted: ${x}`))
 
   //Combined state observable which triggers view updates
@@ -75,7 +82,7 @@ function githubSearch({DOM, HTTP}) {
       h('div.page-wrapper', {key: `ghpage`, style: fadeInOutStyle}, [
         h('div.page.github-search-container', {}, [
           h('label.label', {}, 'Search Github Repos:'),
-          h('input.field', {props: {type: 'text'}}),
+          h('input.field', {key: 'searchbox', props: {type: 'text', value: search}}),
           h('hr'),
           h('section.search-results', {}, results.map(resultView).concat(loading ? loadingSpinner() : null)),
         ]),
@@ -90,6 +97,7 @@ function githubSearch({DOM, HTTP}) {
     //Unless I put more info into the router config, it's going to be needed for
     //any component which has an HTTP stream that isn't used initially.
     HTTP: Rx.Observable.just('').merge(searchRequest$),
+    Query: query$.map(q => { return {path: pathname, query: {search: q}}}), //This will make its way to the history driver to update the url w/ query parms
   }
 }
 

@@ -3,7 +3,7 @@ import Mapper from 'url-mapper'
 import {h} from 'cycle-snabbdom'
 
 //Initialize url mapper
-const urlMapper = Mapper()
+const urlMapper = Mapper({query: true})
 
 const headerLinks = [
   {path: '/', text: 'Color Changer'},
@@ -37,10 +37,11 @@ function getRouteValue(location, sources) {
   //Pass current url into path matcher to get the appropriate value
   // match: The route component
   // values: Object of dynamic url segment values and query params
-  const {match, values} = urlMapper.map(location.pathname, routes)
+  const {match, values} = urlMapper.map(location.pathname + location.search, routes)
+  console.dir(values)
   //If function returned, pass it the sources object
   if (typeof match === 'function') {
-    return match(sources, values)
+    return match(sources, values, location.pathname)
   }
   //else just return the route value, which must be DOM.
   return {DOM: match}
@@ -48,11 +49,13 @@ function getRouteValue(location, sources) {
 
 const Content = (sources, ROOT_SELECTOR) => {
   const route$ = sources.History
+    .distinctUntilChanged(location => location.pathname) //dont' care if query string changes
     .map(location => getRouteValue(location, sources))
     .do(x => {
-      const hasDOM = x.DOM ? true : false
-      const hasHTTP = x.HTTP ? true : false
-      console.log(`Content state emitted - DOM: ${hasDOM}, HTTP: ${hasHTTP}`)
+      const hasDOM = !!x.DOM
+      const hasHTTP = !!x.HTTP
+      const hasQuery = !!x.Query
+      console.log(`Content state emitted - DOM: ${hasDOM}, HTTP: ${hasHTTP}, Query: ${hasQuery}`)
     })
     .shareReplay(1) //Hot Module Replacement needed this to be shareReplay(1) instead of just share()
 
@@ -64,6 +67,11 @@ const Content = (sources, ROOT_SELECTOR) => {
       .do(() => {console.log('Content HTTP plucked')})
       .filter(x => !!x).flatMapLatest(x => x)
       .do(() => {console.log('Content HTTP filtered')}),
+    Query: route$.pluck('Query')
+      .filter(x => !!x)
+      .do(() => {console.log('Content Query plucked')})
+      .flatMapLatest(x => x)
+      .do((x) => {console.log('Content Query - ' + JSON.stringify(x))}),
   }
 }
 

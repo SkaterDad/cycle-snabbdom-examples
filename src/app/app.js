@@ -1,3 +1,4 @@
+import Rx from 'rx'
 import Content from './Content'
 import {filterLinks} from '@cycle/history'
 const ROOT_SELECTOR = '.app-container'
@@ -24,13 +25,31 @@ const app = (sources) => {
     .filter(resp => resp.req.header && resp.req.header.redirectUrl)
     .map(resp => resp.req.header.redirectUrl)
 
-  const url$ = linkClicks$.merge(serverRedirects$)
+  //Combine the user & server initiated url changes
+  const url$ = Rx.Observable.merge(linkClicks$, serverRedirects$)
+    .shareReplay(1)
 
   const content = Content(sources, ROOT_SELECTOR)
 
+  //some routes will emit query params, which need to update the browser's url bar
+  const urlWithQuery$ = content.Query
+
+  //Potential spot to wrap the route component with an overall layout.
   const view$ = content.DOM
 
-  return {DOM: view$, HTTP: content.HTTP, History: url$}
+  return {
+    DOM: view$,
+    HTTP: content.HTTP,
+    History: Rx.Observable.merge(url$ ,urlWithQuery$)
+      .do(x => {
+        try {
+          console.log(`*** New url info sent to History driver *** ${JSON.stringify(x)}`)
+        } catch (error) {
+          console.log(`Error converting this to JSON`)
+          console.dir(x)
+        }
+      }),
+  }
 }
 
 export default app

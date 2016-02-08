@@ -69,6 +69,16 @@ server.get('/data', (req, res) => {
   res.json(theData)
 })
 
+//Fake api to troubleshoot github search page
+server.get('/mocksearch', (req, res) => {
+  const searchTerm = req.query.q || ''
+  //Log each request
+  console.log(`Github search for ${searchTerm} requested @ ${new Date().toString()}`)
+  let modifiedData = JSON.parse(JSON.stringify(theData)) //clone
+  modifiedData[0].full_name = `You searched for "${searchTerm}"!`
+  res.json(modifiedData)
+})
+
 //For now, any get requests will send the Index.html
 server.get('/*', (req, res) => {
   if (isDeveloping) {
