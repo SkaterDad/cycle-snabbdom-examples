@@ -35,8 +35,8 @@ function resultView({
 }
 
 function githubSearch({DOM, HTTP}, {search = ''}, pathname) {
-  //const GITHUB_SEARCH_API = 'https://api.github.com/search/repositories?q='
-  const GITHUB_SEARCH_API = 'http://localhost:3000/mocksearch?q='
+  const GITHUB_SEARCH_API = 'https://api.github.com/search/repositories?q='
+  //CAN USE THIS DURING TESTING -> const GITHUB_SEARCH_API = 'http://localhost:3000/mocksearch?q='
 
   //Query text
   const query$ = DOM.select('.field').events('input')
@@ -58,7 +58,7 @@ function githubSearch({DOM, HTTP}, {search = ''}, pathname) {
   const searchResponse$ = HTTP
     .filter(res$ => res$ && res$.request.url.indexOf(GITHUB_SEARCH_API) === 0)
     .flatMapLatest(x => x) //Needed because HTTP gives an Observable when you map it
-    .map(res => res.body)//.items)
+    .map(res => res.body.items)
     .startWith([])
     .do((x) => console.log(`GH search response emitted: ${x.length} items`))
     .share() //needed because multiple observables will subscribe
