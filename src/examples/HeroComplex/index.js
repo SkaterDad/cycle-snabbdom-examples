@@ -19,11 +19,10 @@ function mapContent(sources, action) {
 function HeroComplex(sources) {
   //User intents
   const listItemClick$ = sources.DOM.select('.hero-item').events('click')
-    .filter(ev => ev.target.detailUrl)
     .map(ev => {
       return {
         view: `details`,
-        url: ev.target.detailUrl,
+        url: ev.currentTarget.detailUrl,
       }
     })
 
