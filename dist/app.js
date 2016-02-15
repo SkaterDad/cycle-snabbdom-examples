@@ -42,26 +42,23 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _rx = __webpack_require__(/*! rx */ 1);
+	var _rx = __webpack_require__(1);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _core = __webpack_require__(/*! @cycle/core */ 4);
+	var _core = __webpack_require__(4);
 	
 	var _core2 = _interopRequireDefault(_core);
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	var _cycleSnabbdom = __webpack_require__(5);
 	
-	var _http = __webpack_require__(/*! @cycle/http */ 24);
+	var _http = __webpack_require__(24);
 	
-	var _Content = __webpack_require__(/*! ./Content */ 29);
+	var _Content = __webpack_require__(29);
 	
 	var _Content2 = _interopRequireDefault(_Content);
 	
@@ -88,15 +85,12 @@
 	}
 	
 	_core2.default.run(main, {
-	  DOM: (0, _cycleSnabbdom.makeDOMDriver)('#app-container', [__webpack_require__(/*! snabbdom/modules/class */ 20), __webpack_require__(/*! ./snabbdom_modules/hero */ 41), __webpack_require__(/*! snabbdom/modules/style */ 23), __webpack_require__(/*! snabbdom/modules/props */ 21), __webpack_require__(/*! snabbdom/modules/attributes */ 22)]),
+	  DOM: (0, _cycleSnabbdom.makeDOMDriver)('#app-container', [__webpack_require__(20), __webpack_require__(41), __webpack_require__(23), __webpack_require__(21), __webpack_require__(22)]),
 	  HTTP: (0, _http.makeHTTPDriver)()
 	});
 
 /***/ },
 /* 1 */
-/*!*****************************!*\
-  !*** ./~/rx/dist/rx.all.js ***!
-  \*****************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global, process) {// Copyright (c) Microsoft, All rights reserved. See License.txt in the project root for license information.
@@ -12295,13 +12289,10 @@
 	
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../webpack/buildin/module.js */ 2)(module), (function() { return this; }()), __webpack_require__(/*! ./~/process/browser.js */ 3)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module), (function() { return this; }()), __webpack_require__(3)))
 
 /***/ },
 /* 2 */
-/*!***********************************!*\
-  !*** (webpack)/buildin/module.js ***!
-  \***********************************/
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -12318,9 +12309,6 @@
 
 /***/ },
 /* 3 */
-/*!******************************!*\
-  !*** ./~/process/browser.js ***!
-  \******************************/
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -12418,14 +12406,11 @@
 
 /***/ },
 /* 4 */
-/*!************************************!*\
-  !*** ./~/@cycle/core/lib/cycle.js ***!
-  \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var Rx = __webpack_require__(/*! rx */ 1);
+	var Rx = __webpack_require__(1);
 	
 	function makeSinkProxies(drivers) {
 	  var sinkProxies = {};
@@ -12536,7 +12521,7 @@
 	
 	var Cycle = {
 	  /**
-	   * Takes an `main` function and circularly connects it to the given collection
+	   * Takes a `main` function and circularly connects it to the given collection
 	   * of driver functions.
 	   *
 	   * The `main` function expects a collection of "driver source" Observables
@@ -12561,61 +12546,58 @@
 
 /***/ },
 /* 5 */
-/*!***************************************!*\
-  !*** ./~/cycle-snabbdom/lib/index.js ***!
-  \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	exports.video = exports.ul = exports.u = exports.tr = exports.title = exports.thead = exports.th = exports.tfoot = exports.textarea = exports.td = exports.tbody = exports.table = exports.sup = exports.sub = exports.style = exports.strong = exports.span = exports.source = exports.small = exports.select = exports.section = exports.script = exports.samp = exports.s = exports.ruby = exports.rt = exports.rp = exports.q = exports.pre = exports.param = exports.p = exports.option = exports.optgroup = exports.ol = exports.object = exports.noscript = exports.nav = exports.meta = exports.menu = exports.mark = exports.map = exports.link = exports.li = exports.legend = exports.label = exports.keygen = exports.kbd = exports.ins = exports.input = exports.img = exports.iframe = exports.i = exports.html = exports.hr = exports.hgroup = exports.header = exports.head = exports.h6 = exports.h5 = exports.h4 = exports.h3 = exports.h2 = exports.h1 = exports.form = exports.footer = exports.figure = exports.figcaption = exports.fieldset = exports.embed = exports.em = exports.dt = exports.dl = exports.div = exports.dir = exports.dfn = exports.del = exports.dd = exports.colgroup = exports.col = exports.code = exports.cite = exports.caption = exports.canvas = exports.button = exports.br = exports.body = exports.blockquote = exports.bdo = exports.bdi = exports.base = exports.b = exports.audio = exports.aside = exports.article = exports.area = exports.address = exports.abbr = exports.a = exports.h = exports.makeDOMDriver = undefined;
 	
-	var _rx = __webpack_require__(/*! rx */ 1);
+	var _rx = __webpack_require__(1);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _snabbdom = __webpack_require__(/*! snabbdom */ 6);
+	var _snabbdom = __webpack_require__(6);
 	
 	var _snabbdom2 = _interopRequireDefault(_snabbdom);
 	
-	var _h = __webpack_require__(/*! snabbdom/h */ 9);
+	var _h = __webpack_require__(9);
 	
 	var _h2 = _interopRequireDefault(_h);
 	
-	var _map = __webpack_require__(/*! fast.js/array/map */ 10);
+	var _map = __webpack_require__(10);
 	
 	var _map2 = _interopRequireDefault(_map);
 	
-	var _reduce = __webpack_require__(/*! fast.js/array/reduce */ 12);
+	var _reduce = __webpack_require__(12);
 	
 	var _reduce2 = _interopRequireDefault(_reduce);
 	
-	var _filter = __webpack_require__(/*! fast.js/array/filter */ 14);
+	var _filter = __webpack_require__(14);
 	
 	var _filter2 = _interopRequireDefault(_filter);
 	
-	var _matchesSelector = __webpack_require__(/*! matches-selector */ 15);
+	var _matchesSelector = __webpack_require__(15);
 	
 	var _matchesSelector2 = _interopRequireDefault(_matchesSelector);
 	
-	var _utils = __webpack_require__(/*! ./utils */ 16);
+	var _utils = __webpack_require__(16);
 	
-	var _fromEvent = __webpack_require__(/*! ./fromEvent */ 17);
+	var _fromEvent = __webpack_require__(17);
 	
 	var _fromEvent2 = _interopRequireDefault(_fromEvent);
 	
-	var _parseTree = __webpack_require__(/*! ./parseTree */ 18);
+	var _parseTree = __webpack_require__(18);
 	
 	var _parseTree2 = _interopRequireDefault(_parseTree);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var _require = __webpack_require__(/*! hyperscript-helpers */ 19)(_h2.default);
+	var _require = __webpack_require__(19)(_h2.default);
 	
 	var a = _require.a;
 	var abbr = _require.abbr;
@@ -12722,7 +12704,7 @@
 	
 	var isolateSink = function isolateSink(sink, scope) {
 	  return sink.map(function (vtree) {
-	    var c = (vtree.sel + ' cycle-scope-' + scope).trim();
+	    var c = (vtree.sel + '.cycle-scope-' + scope).trim();
 	    vtree.sel = c;
 	    return vtree;
 	  });
@@ -12803,7 +12785,7 @@
 	};
 	
 	var makeDOMDriver = function makeDOMDriver(container) {
-	  var modules = arguments.length <= 1 || arguments[1] === undefined ? [__webpack_require__(/*! snabbdom/modules/class */ 20), __webpack_require__(/*! snabbdom/modules/props */ 21), __webpack_require__(/*! snabbdom/modules/attributes */ 22), __webpack_require__(/*! snabbdom/modules/style */ 23)] : arguments[1];
+	  var modules = arguments.length <= 1 || arguments[1] === undefined ? [__webpack_require__(20), __webpack_require__(21), __webpack_require__(22), __webpack_require__(23)] : arguments[1];
 	
 	  var patch = _snabbdom2.default.init(modules);
 	  var rootElem = (0, _utils.getDomElement)(container);
@@ -12936,17 +12918,14 @@
 
 /***/ },
 /* 6 */
-/*!********************************!*\
-  !*** ./~/snabbdom/snabbdom.js ***!
-  \********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	// jshint newcap: false
 	/* global require, module, document, Element */
 	'use strict';
 	
-	var VNode = __webpack_require__(/*! ./vnode */ 7);
-	var is = __webpack_require__(/*! ./is */ 8);
+	var VNode = __webpack_require__(7);
+	var is = __webpack_require__(8);
 	
 	function isUndef(s) { return s === undefined; }
 	function isDef(s) { return s !== undefined; }
@@ -13154,7 +13133,7 @@
 	    var i;
 	    var insertedVnodeQueue = [];
 	    for (i = 0; i < cbs.pre.length; ++i) cbs.pre[i]();
-	    if (oldVnode instanceof Element) {
+	    if (oldVnode.nodeType === Element.ELEMENT_NODE) {
 	      if (oldVnode.parentElement !== null) {
 	        createElm(vnode, insertedVnodeQueue);
 	        oldVnode.parentElement.replaceChild(vnode.elm, oldVnode);
@@ -13178,9 +13157,6 @@
 
 /***/ },
 /* 7 */
-/*!*****************************!*\
-  !*** ./~/snabbdom/vnode.js ***!
-  \*****************************/
 /***/ function(module, exports) {
 
 	module.exports = function(sel, data, children, text, elm) {
@@ -13192,9 +13168,6 @@
 
 /***/ },
 /* 8 */
-/*!**************************!*\
-  !*** ./~/snabbdom/is.js ***!
-  \**************************/
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -13205,13 +13178,19 @@
 
 /***/ },
 /* 9 */
-/*!*************************!*\
-  !*** ./~/snabbdom/h.js ***!
-  \*************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var VNode = __webpack_require__(/*! ./vnode */ 7);
-	var is = __webpack_require__(/*! ./is */ 8);
+	var VNode = __webpack_require__(7);
+	var is = __webpack_require__(8);
+	
+	function addNS(data, children) {
+	  data.ns = 'http://www.w3.org/2000/svg';
+	  if (children !== undefined) {
+	    for (var i = 0; i < children.length; ++i) {
+	      addNS(children[i].data, children[i].children);
+	    }
+	  }
+	}
 	
 	module.exports = function h(sel, b, c) {
 	  var data = {}, children, text, i;
@@ -13229,20 +13208,20 @@
 	      if (is.primitive(children[i])) children[i] = VNode(undefined, undefined, undefined, children[i]);
 	    }
 	  }
+	  if (sel[0] === 's' && sel[1] === 'v' && sel[2] === 'g') {
+	    addNS(data, children);
+	  }
 	  return VNode(sel, data, children, text, undefined);
 	};
 
 
 /***/ },
 /* 10 */
-/*!********************************!*\
-  !*** ./~/fast.js/array/map.js ***!
-  \********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 11);
+	var bindInternal3 = __webpack_require__(11);
 	
 	/**
 	 * # Map
@@ -13268,9 +13247,6 @@
 
 /***/ },
 /* 11 */
-/*!*********************************************!*\
-  !*** ./~/fast.js/function/bindInternal3.js ***!
-  \*********************************************/
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13288,14 +13264,11 @@
 
 /***/ },
 /* 12 */
-/*!***********************************!*\
-  !*** ./~/fast.js/array/reduce.js ***!
-  \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bindInternal4 = __webpack_require__(/*! ../function/bindInternal4 */ 13);
+	var bindInternal4 = __webpack_require__(13);
 	
 	/**
 	 * # Reduce
@@ -13332,9 +13305,6 @@
 
 /***/ },
 /* 13 */
-/*!*********************************************!*\
-  !*** ./~/fast.js/function/bindInternal4.js ***!
-  \*********************************************/
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13352,14 +13322,11 @@
 
 /***/ },
 /* 14 */
-/*!***********************************!*\
-  !*** ./~/fast.js/array/filter.js ***!
-  \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bindInternal3 = __webpack_require__(/*! ../function/bindInternal3 */ 11);
+	var bindInternal3 = __webpack_require__(11);
 	
 	/**
 	 * # Filter
@@ -13387,9 +13354,6 @@
 
 /***/ },
 /* 15 */
-/*!*************************************!*\
-  !*** ./~/matches-selector/index.js ***!
-  \*************************************/
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13424,9 +13388,6 @@
 
 /***/ },
 /* 16 */
-/*!***************************************!*\
-  !*** ./~/cycle-snabbdom/lib/utils.js ***!
-  \***************************************/
 /***/ function(module, exports) {
 
 	"use strict";
@@ -13453,14 +13414,11 @@
 
 /***/ },
 /* 17 */
-/*!*******************************************!*\
-  !*** ./~/cycle-snabbdom/lib/fromEvent.js ***!
-  \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var Rx = __webpack_require__(/*! rx */ 1);
+	var Rx = __webpack_require__(1);
 	
 	var disposableCreate = Rx.Disposable.create;
 	var CompositeDisposable = Rx.CompositeDisposable;
@@ -13523,34 +13481,31 @@
 
 /***/ },
 /* 18 */
-/*!*******************************************!*\
-  !*** ./~/cycle-snabbdom/lib/parseTree.js ***!
-  \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	
-	var _rx = __webpack_require__(/*! rx */ 1);
+	var _rx = __webpack_require__(1);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _map = __webpack_require__(/*! fast.js/array/map */ 10);
+	var _map = __webpack_require__(10);
 	
 	var _map2 = _interopRequireDefault(_map);
 	
-	var _filter = __webpack_require__(/*! fast.js/array/filter */ 14);
+	var _filter = __webpack_require__(14);
 	
 	var _filter2 = _interopRequireDefault(_filter);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 	
 	var combineVTreeStreams = function combineVTreeStreams(vTree) {
 	  for (var _len = arguments.length, children = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -13591,19 +13546,19 @@
 
 /***/ },
 /* 19 */
-/*!*********************************************!*\
-  !*** ./~/hyperscript-helpers/dist/index.js ***!
-  \*********************************************/
 /***/ function(module, exports) {
 
 	'use strict';
 	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 	var isValidString = function isValidString(param) {
 	  return typeof param === 'string' && param.length > 0;
 	};
 	
 	var startsWith = function startsWith(string, start) {
-	  return string.indexOf(start) === 0;
+	  return string[0] === start;
 	};
 	
 	var isSelector = function isSelector(param) {
@@ -13626,29 +13581,33 @@
 	  };
 	};
 	
-	var TAG_NAMES = ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hgroup', 'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'map', 'mark', 'menu', 'meta', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'p', 'param', 'pre', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'u', 'ul', 'video'];
+	var TAG_NAMES = ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hgroup', 'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'meta', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'p', 'param', 'pre', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'u', 'ul', 'video'];
 	
-	module.exports = function (h) {
-	  var exported = { TAG_NAMES: TAG_NAMES, isSelector: isSelector };
-	  var appliedNode = node(h);
+	exports['default'] = function (h) {
+	  var createTag = node(h);
+	  var exported = { TAG_NAMES: TAG_NAMES, isSelector: isSelector, createTag: createTag };
 	  TAG_NAMES.forEach(function (n) {
-	    exported[n] = appliedNode(n);
+	    exported[n] = createTag(n);
 	  });
 	  return exported;
 	};
+	
+	module.exports = exports['default'];
 
 
 /***/ },
 /* 20 */
-/*!*************************************!*\
-  !*** ./~/snabbdom/modules/class.js ***!
-  \*************************************/
 /***/ function(module, exports) {
 
 	function updateClass(oldVnode, vnode) {
 	  var cur, name, elm = vnode.elm,
 	      oldClass = oldVnode.data.class || {},
 	      klass = vnode.data.class || {};
+	  for (name in oldClass) {
+	    if (!klass[name]) {
+	      elm.classList.remove(name);
+	    }
+	  }
 	  for (name in klass) {
 	    cur = klass[name];
 	    if (cur !== oldClass[name]) {
@@ -13662,14 +13621,16 @@
 
 /***/ },
 /* 21 */
-/*!*************************************!*\
-  !*** ./~/snabbdom/modules/props.js ***!
-  \*************************************/
 /***/ function(module, exports) {
 
 	function updateProps(oldVnode, vnode) {
 	  var key, cur, old, elm = vnode.elm,
 	      oldProps = oldVnode.data.props || {}, props = vnode.data.props || {};
+	  for (key in oldProps) {
+	    if (!props[key]) {
+	      delete elm[key];
+	    }
+	  }
 	  for (key in props) {
 	    cur = props[key];
 	    old = oldProps[key];
@@ -13684,9 +13645,6 @@
 
 /***/ },
 /* 22 */
-/*!******************************************!*\
-  !*** ./~/snabbdom/modules/attributes.js ***!
-  \******************************************/
 /***/ function(module, exports) {
 
 	var booleanAttrs = ["allowfullscreen", "async", "autofocus", "autoplay", "checked", "compact", "controls", "declare", 
@@ -13732,12 +13690,9 @@
 
 /***/ },
 /* 23 */
-/*!*************************************!*\
-  !*** ./~/snabbdom/modules/style.js ***!
-  \*************************************/
 /***/ function(module, exports) {
 
-	var raf = requestAnimationFrame || setTimeout;
+	var raf = (window && window.requestAnimationFrame) || setTimeout;
 	var nextFrame = function(fn) { raf(function() { raf(fn); }); };
 	
 	function setNextFrame(obj, prop, val) {
@@ -13749,6 +13704,11 @@
 	      oldStyle = oldVnode.data.style || {},
 	      style = vnode.data.style || {},
 	      oldHasDel = 'delayed' in oldStyle;
+	  for (name in oldStyle) {
+	    if (!style[name]) {
+	      elm.style[name] = '';
+	    }
+	  }
 	  for (name in style) {
 	    cur = style[name];
 	    if (name === 'delayed') {
@@ -13800,14 +13760,11 @@
 
 /***/ },
 /* 24 */
-/*!************************************!*\
-  !*** ./~/@cycle/http/lib/index.js ***!
-  \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var _require = __webpack_require__(/*! ./http-driver */ 25);
+	var _require = __webpack_require__(25);
 	
 	var makeHTTPDriver = _require.makeHTTPDriver;
 	
@@ -13842,10 +13799,12 @@
 	   * the origin.
 	   * - `redirects` *(Number)*: number of redirects to follow.
 	   * - `eager` *(Boolean)*: whether or not to execute the request regardless of
-	   *   usage of its corresponding response. Default value is `false` (i.e.,
-	   *   the request is lazy). Main use case is: set this option to `true` if you
-	   *   send POST requests and you are not interested in its response.
-	   *
+	   *   usage of its corresponding response. By default the eager setting of the
+	   *   driver is used (whose default is `false`, i.e. the request is lazy).
+	   *   Explicitely setting eager in the request always overrides the driver
+	   *   setting. Main use case is: set this option to `true` if you send POST
+	   *   requests and you are not interested in its response.
+	    *
 	   * **Responses**. A metastream is an Observable of Observables. The response
 	   * metastream emits Observables of responses. These Observables of responses
 	   * have a `request` field attached to them (to the Observable object itself)
@@ -13858,6 +13817,7 @@
 	   * options are:
 	   * - `eager` *(Boolean)*: execute the HTTP eagerly, even if its
 	   *   response Observable is not subscribed to. Default: **false**.
+	   *   Can be overridden in the request.
 	   * @return {Function} the HTTP Driver function
 	   * @function makeHTTPDriver
 	   */
@@ -13868,15 +13828,12 @@
 
 /***/ },
 /* 25 */
-/*!******************************************!*\
-  !*** ./~/@cycle/http/lib/http-driver.js ***!
-  \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var Rx = __webpack_require__(/*! rx */ 1);
-	var superagent = __webpack_require__(/*! superagent */ 26);
+	var Rx = __webpack_require__(1);
+	var superagent = __webpack_require__(26);
 	
 	function optionsToSuperagent(_ref) {
 	  var url = _ref.url;
@@ -13966,6 +13923,7 @@
 	        if (err) {
 	          observer.onError(err);
 	        } else {
+	          res.request = reqOptions;
 	          observer.onNext(res);
 	          observer.onCompleted();
 	        }
@@ -14020,7 +13978,7 @@
 	    var response$$ = request$.map(function (request) {
 	      var reqOptions = normalizeRequestOptions(request);
 	      var response$ = createResponse$(reqOptions);
-	      if (eager || reqOptions.eager) {
+	      if (typeof reqOptions.eager === "boolean" ? reqOptions.eager : eager) {
 	        response$ = response$.replay(null, 1);
 	        response$.connect();
 	      }
@@ -14044,17 +14002,14 @@
 
 /***/ },
 /* 26 */
-/*!************************************!*\
-  !*** ./~/superagent/lib/client.js ***!
-  \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 	
-	var Emitter = __webpack_require__(/*! emitter */ 27);
-	var reduce = __webpack_require__(/*! reduce */ 28);
+	var Emitter = __webpack_require__(27);
+	var reduce = __webpack_require__(28);
 	
 	/**
 	 * Root reference for iframes.
@@ -15210,9 +15165,6 @@
 
 /***/ },
 /* 27 */
-/*!**************************************!*\
-  !*** ./~/component-emitter/index.js ***!
-  \**************************************/
 /***/ function(module, exports) {
 
 	
@@ -15383,9 +15335,6 @@
 
 /***/ },
 /* 28 */
-/*!*************************************!*\
-  !*** ./~/reduce-component/index.js ***!
-  \*************************************/
 /***/ function(module, exports) {
 
 	
@@ -15415,9 +15364,6 @@
 
 /***/ },
 /* 29 */
-/*!************************!*\
-  !*** ./src/Content.js ***!
-  \************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15426,33 +15372,34 @@
 	  value: true
 	});
 	
-	var _isolate = __webpack_require__(/*! @cycle/isolate */ 30);
+	var _isolate = __webpack_require__(30);
 	
 	var _isolate2 = _interopRequireDefault(_isolate);
 	
-	var _ColorChange = __webpack_require__(/*! ./examples/ColorChange */ 31);
+	var _ColorChange = __webpack_require__(31);
 	
 	var _ColorChange2 = _interopRequireDefault(_ColorChange);
 	
-	var _GithubSearch = __webpack_require__(/*! ./examples/GithubSearch */ 33);
+	var _GithubSearch = __webpack_require__(33);
 	
 	var _GithubSearch2 = _interopRequireDefault(_GithubSearch);
 	
-	var _HeroComplex = __webpack_require__(/*! ./examples/HeroComplex */ 35);
+	var _HeroComplex = __webpack_require__(35);
 	
 	var _HeroComplex2 = _interopRequireDefault(_HeroComplex);
 	
-	var _HeroSimple = __webpack_require__(/*! ./examples/HeroSimple */ 39);
+	var _HeroSimple = __webpack_require__(39);
 	
 	var _HeroSimple2 = _interopRequireDefault(_HeroSimple);
 	
-	var _HeroTests = __webpack_require__(/*! ./examples/HeroTests */ 40);
+	var _HeroTests = __webpack_require__(40);
 	
 	var _HeroTests2 = _interopRequireDefault(_HeroTests);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	//import Rx from 'rx'
+	
 	
 	function mapContent(sources, val) {
 	  switch (parseInt(val)) {
@@ -15501,9 +15448,6 @@
 
 /***/ },
 /* 30 */
-/*!***************************************!*\
-  !*** ./~/@cycle/isolate/lib/index.js ***!
-  \***************************************/
 /***/ function(module, exports) {
 
 	"use strict";
@@ -15588,9 +15532,6 @@
 
 /***/ },
 /* 31 */
-/*!*******************************************!*\
-  !*** ./src/examples/ColorChange/index.js ***!
-  \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15599,13 +15540,13 @@
 	  value: true
 	});
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	var _cycleSnabbdom = __webpack_require__(5);
 	
-	var _rx = __webpack_require__(/*! rx */ 1);
+	var _rx = __webpack_require__(1);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
+	var _styles = __webpack_require__(32);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -15651,9 +15592,6 @@
 
 /***/ },
 /* 32 */
-/*!******************************!*\
-  !*** ./src/global/styles.js ***!
-  \******************************/
 /***/ function(module, exports) {
 
 	'use strict';
@@ -15702,9 +15640,6 @@
 
 /***/ },
 /* 33 */
-/*!********************************************!*\
-  !*** ./src/examples/GithubSearch/index.js ***!
-  \********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15713,15 +15648,15 @@
 	  value: true
 	});
 	
-	var _rx = __webpack_require__(/*! rx */ 1);
+	var _rx = __webpack_require__(1);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	var _cycleSnabbdom = __webpack_require__(5);
 	
-	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
+	var _styles = __webpack_require__(32);
 	
-	var _loading = __webpack_require__(/*! ../../global/loading */ 34);
+	var _loading = __webpack_require__(34);
 	
 	var _loading2 = _interopRequireDefault(_loading);
 	
@@ -15817,9 +15752,6 @@
 
 /***/ },
 /* 34 */
-/*!*******************************!*\
-  !*** ./src/global/loading.js ***!
-  \*******************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15828,9 +15760,9 @@
 	  value: true
 	});
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	var _cycleSnabbdom = __webpack_require__(5);
 	
-	var _styles = __webpack_require__(/*! ./styles */ 32);
+	var _styles = __webpack_require__(32);
 	
 	var _styles2 = _interopRequireDefault(_styles);
 	
@@ -15844,9 +15776,6 @@
 
 /***/ },
 /* 35 */
-/*!*******************************************!*\
-  !*** ./src/examples/HeroComplex/index.js ***!
-  \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15855,17 +15784,18 @@
 	  value: true
 	});
 	
-	var _List = __webpack_require__(/*! ./List */ 36);
+	var _List = __webpack_require__(36);
 	
 	var _List2 = _interopRequireDefault(_List);
 	
-	var _Detail = __webpack_require__(/*! ./Detail */ 38);
+	var _Detail = __webpack_require__(38);
 	
 	var _Detail2 = _interopRequireDefault(_Detail);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	//import Rx from 'rx'
+	
 	
 	function mapContent(sources, action) {
 	  switch (action.view) {
@@ -15883,12 +15813,10 @@
 	
 	function HeroComplex(sources) {
 	  //User intents
-	  var listItemClick$ = sources.DOM.select('.hero-item').events('click').filter(function (ev) {
-	    return ev.target.detailUrl;
-	  }).map(function (ev) {
+	  var listItemClick$ = sources.DOM.select('.hero-item').events('click').map(function (ev) {
 	    return {
 	      view: 'details',
-	      url: ev.target.detailUrl
+	      url: ev.currentTarget.detailUrl
 	    };
 	  });
 	
@@ -15934,9 +15862,6 @@
 
 /***/ },
 /* 36 */
-/*!******************************************!*\
-  !*** ./src/examples/HeroComplex/List.js ***!
-  \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15945,19 +15870,19 @@
 	  value: true
 	});
 	
-	var _rx = __webpack_require__(/*! rx */ 1);
+	var _rx = __webpack_require__(1);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	var _cycleSnabbdom = __webpack_require__(5);
 	
-	var _utils = __webpack_require__(/*! ../../global/utils */ 37);
+	var _utils = __webpack_require__(37);
 	
-	var _loading = __webpack_require__(/*! ../../global/loading */ 34);
+	var _loading = __webpack_require__(34);
 	
 	var _loading2 = _interopRequireDefault(_loading);
 	
-	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
+	var _styles = __webpack_require__(32);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -16042,9 +15967,6 @@
 
 /***/ },
 /* 37 */
-/*!*****************************!*\
-  !*** ./src/global/utils.js ***!
-  \*****************************/
 /***/ function(module, exports) {
 
 	"use strict";
@@ -16063,9 +15985,6 @@
 
 /***/ },
 /* 38 */
-/*!********************************************!*\
-  !*** ./src/examples/HeroComplex/Detail.js ***!
-  \********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16074,15 +15993,15 @@
 	  value: true
 	});
 	
-	var _rx = __webpack_require__(/*! rx */ 1);
+	var _rx = __webpack_require__(1);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	var _cycleSnabbdom = __webpack_require__(5);
 	
-	var _utils = __webpack_require__(/*! ../../global/utils */ 37);
+	var _utils = __webpack_require__(37);
 	
-	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
+	var _styles = __webpack_require__(32);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -16151,9 +16070,6 @@
 
 /***/ },
 /* 39 */
-/*!******************************************!*\
-  !*** ./src/examples/HeroSimple/index.js ***!
-  \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16162,9 +16078,9 @@
 	  value: true
 	});
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	var _cycleSnabbdom = __webpack_require__(5);
 	
-	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
+	var _styles = __webpack_require__(32);
 	
 	var HERO_ID = 'test-hero-simple';
 	var HERO_TEXT = 'HERO';
@@ -16217,9 +16133,6 @@
 
 /***/ },
 /* 40 */
-/*!*****************************************!*\
-  !*** ./src/examples/HeroTests/index.js ***!
-  \*****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16228,9 +16141,9 @@
 	  value: true
 	});
 	
-	var _cycleSnabbdom = __webpack_require__(/*! cycle-snabbdom */ 5);
+	var _cycleSnabbdom = __webpack_require__(5);
 	
-	var _styles = __webpack_require__(/*! ../../global/styles */ 32);
+	var _styles = __webpack_require__(32);
 	
 	var HERO_ID_KITTY1 = 'heroKitty1';
 	var HERO_ID_KITTY2 = 'heroKitty2';
@@ -16264,9 +16177,6 @@
 
 /***/ },
 /* 41 */
-/*!**************************************!*\
-  !*** ./src/snabbdom_modules/hero.js ***!
-  \**************************************/
 /***/ function(module, exports) {
 
 	'use strict';
