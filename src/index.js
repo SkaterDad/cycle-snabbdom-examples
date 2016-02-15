@@ -1,6 +1,7 @@
 import Rx from 'rx'
 import Cycle from '@cycle/core'
-import {h, makeDOMDriver} from 'cycle-snabbdom'
+import {h, modules, makeDOMDriver} from 'cycle-snabbdom'
+const {StyleModule, PropsModule, AttrsModule, ClassModule, HeroModule} = modules
 import {makeHTTPDriver} from '@cycle/http'
 import Content from './Content'
 
@@ -32,12 +33,8 @@ function main(responses) {
 }
 
 Cycle.run(main, {
-  DOM: makeDOMDriver('#app-container', [
-    require(`snabbdom/modules/class`),
-    require(`./snabbdom_modules/hero`),
-    require(`snabbdom/modules/style`),
-    require(`snabbdom/modules/props`),
-    require(`snabbdom/modules/attributes`),
-  ]),
+  DOM: makeDOMDriver('.app-wrapper', {
+    modules: [StyleModule, PropsModule, AttrsModule, ClassModule, HeroModule],
+  }),
   HTTP: makeHTTPDriver(),
 })
