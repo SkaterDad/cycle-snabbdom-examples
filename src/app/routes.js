@@ -1,4 +1,4 @@
-import {h} from 'cycle-snabbdom'
+import {h} from '@cycle/dom'
 import isolate from '@cycle/isolate'
 import Colors from './components/ColorChange'
 import Github from './components/GithubSearch'

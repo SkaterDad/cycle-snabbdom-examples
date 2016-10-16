@@ -1,4 +1,4 @@
-import {h} from 'cycle-snabbdom'
+import {h} from '@cycle/dom'
 import {fadeInOutStyle} from '../../global/styles'
 import './styles.scss'
 

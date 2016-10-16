@@ -1,6 +1,7 @@
 'use strict'
 //Environment-related constants
 const isDeveloping = process.env.NODE_ENV !== 'production'
+const isExperimental = process.env.NODE_ENV === 'exp'
 const port = process.env.PORT ? process.env.PORT : 3000
 const host = process.env.IP ? process.env.IP : 'localhost'
 
@@ -8,31 +9,31 @@ const host = process.env.IP ? process.env.IP : 'localhost'
 const express = require('express')
 const server = express()
 
-// //During Development, set up Webpack Hot Module Replacement
-// if (isDeveloping) {
-//   console.log('Setting up Webpack hot loading! Wait for successful bundle creation before opening the app.')
-//   // Step 1: Create & configure a webpack compiler
-//   const webpack = require('webpack')
-//   const webpackConfig = require('../../webpack.config.js')
-//   const compiler = webpack(webpackConfig)
-//   const webpackDevMiddleware = require('webpack-dev-middleware')
-//   const webpackHotMiddleware = require('webpack-hot-middleware')
+//During Development, set up Webpack Hot Module Replacement
+if (isDeveloping) {
+  console.log('Setting up Webpack hot loading! Wait for successful bundle creation before opening the app.')
+  // Step 1: Create & configure a webpack compiler
+  const webpack = require('webpack')
+  const webpackConfig = isExperimental ? require('../../webpack.config.restart.js') : require('../../webpack.config.js')
+  const compiler = webpack(webpackConfig)
+  const webpackDevMiddleware = require('webpack-dev-middleware')
+  const webpackHotMiddleware = require('webpack-hot-middleware')
 
-//   server.use(webpackDevMiddleware(compiler, {
-//     hot: true,
-//     filename: 'bundle.js',
-//     publicPath: webpackConfig.output.publicPath,
-//     stats: {colors: true},
-//     inline: true,
-//     historyApiFallback: true,
-//   }))
+  server.use(webpackDevMiddleware(compiler, {
+    hot: true,
+    filename: 'bundle.js',
+    publicPath: webpackConfig.output.publicPath,
+    stats: {colors: true},
+    inline: true,
+    historyApiFallback: true,
+  }))
 
-//   server.use(webpackHotMiddleware(compiler, {
-//     log: console.log,
-//     path: '/__webpack_hmr',
-//     heartbeat: 10 * 1000,
-//   }))
-// }
+  server.use(webpackHotMiddleware(compiler, {
+    log: console.log,
+    path: '/__webpack_hmr',
+    heartbeat: 10 * 1000,
+  }))
+}
 
 //Define static asset directories which Express will serve
 //TODO: Use nginx in production.
@@ -42,20 +43,11 @@ server.use(`/img`, express.static(`img`))
 //Redirection test
 //This simulates a server which replies with a 302/303 redirection after a form POST.
 //The client code can't actually see this redirect url :(, so creative alternatives
-//must be brewed up.
+//must be brewed up.  See 'src/app/app.js'
 server.post('/redirect', (req, res) => {
+  console.log('Redirect POST received.')
   res.redirect(302, '/hero-simple')
 })
-
-//TODO: Add server-side rendering of our Cycle app
-//For now, any get requests will send the Index.html
-// server.get('/*', (req, res) => {
-//   if (isDeveloping) {
-//     res.sendFile(__dirname + '/index.dev.html')
-//   } else {
-//     res.sendFile(__dirname + '/index.html')
-//   }
-// })
 
 // Ignore favicon requests
 server.get('/favicon.ico',(req, res) => {
@@ -78,15 +70,23 @@ server.get('/data', (req, res) => {
   res.json(theData)
 })
 
-// Server Side Rendering Handler
-let serverApp = require('./ssr')
-
-server.get('/*', (req, res) => {
+//Fake api to troubleshoot github search page
+server.get('/mocksearch', (req, res) => {
+  const searchTerm = req.query.q || ''
   //Log each request
-  console.log(`req: ${req.method} ${req.url}`)
+  console.log(`Github search for ${searchTerm} requested @ ${new Date().toString()}`)
+  let modifiedData = JSON.parse(JSON.stringify(theData)) //clone
+  modifiedData[0].full_name = `You searched for "${searchTerm}"!`
+  res.json(modifiedData)
+})
 
-  //Cycle App
-  serverApp(req, res)
+//For now, any get requests will send the Index.html
+server.get('/*', (req, res) => {
+  if (isDeveloping) {
+    res.sendFile(__dirname + '/index.dev.html')
+  } else {
+    res.sendFile(__dirname + '/index.html')
+  }
 })
 
 //Start listening to HTTP requests
@@ -94,10 +94,3 @@ server.listen(port, host, () => {
   console.log('Server listening at http://%s:%s', host, port)
   console.log('Node environment = ' + process.env.NODE_ENV)
 })
-
-//Allow Server-side Hot Module Loading of the server side rendering module.
-if (module.hot) {
-  module.hot.accept('./ssr', () => {
-    serverApp = require('./ssr')
-  })
-}

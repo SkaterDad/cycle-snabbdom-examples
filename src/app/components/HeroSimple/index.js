@@ -1,4 +1,4 @@
-import {h} from 'cycle-snabbdom'
+import {h} from '@cycle/dom'
 import {fadeInOutStyle} from '../../global/styles'
 import './styles.scss'
 
@@ -57,7 +57,7 @@ const HeroSimple = ({DOM}) => {
     DOM.select('input').events('change')
       .map(ev => ev.target.checked)
       .startWith(false)
-      .do((x) => {console.log(`Checkbox value changed to ${x}`)})
+      .debug((x) => {console.log(`Checkbox value changed to ${x}`)})
       .map(view)
 
   return {DOM: vTree$}

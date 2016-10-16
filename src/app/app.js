@@ -1,10 +1,14 @@
-import Rx from 'rx'
+import xs from 'xstream'
 import Content from './Content'
-import {filterLinks} from '@cycle/history'
 const ROOT_SELECTOR = '.app-container'
 
 function extractPathName(event) {
   return event.target.pathname
+}
+
+//only capture link clicks which are on this domain
+function filterLinks(event) {
+  return event.target.hostname === 'localhost' //TODO: Find real hostname
 }
 
 const app = (sources) => {
@@ -13,21 +17,26 @@ const app = (sources) => {
     .select('a')
     .events('click')
     .filter(filterLinks)
-    .map(extractPathName)
-    .filter(x => x)
+    .map(event => {
+      event.preventDefault()
+      return extractPathName(event)
+    })
+    .filter(x => !!x)
 
   //POST requests which need redirection.
   //Intercepting server 302,303 destination url isn't possible.
   //Set custom header key 'redirectUrl' with each post request that will require redirection.
   const serverRedirects$ = sources.HTTP
+    .select()
     .filter(res$ => res$.request.method === 'POST')
-    .flatMap(x => x) //Needed because HTTP gives an Observable when you map it
-    .filter(resp => resp.req.header && resp.req.header.redirectUrl)
+    .flatten() //Needed because HTTP gives an Observable when you map it
+    .debug(resp => {console.log('POST response', resp)})
+    .filter(resp => resp.status === 200 && resp.req.header && resp.req.header.redirectUrl)
     .map(resp => resp.req.header.redirectUrl)
 
   //Combine the user & server initiated url changes
-  const url$ = Rx.Observable.merge(linkClicks$, serverRedirects$)
-    .shareReplay(1)
+  const url$ = xs.merge(linkClicks$, serverRedirects$)
+    .remember()
 
   const content = Content(sources, ROOT_SELECTOR)
 
@@ -40,8 +49,8 @@ const app = (sources) => {
   return {
     DOM: view$,
     HTTP: content.HTTP,
-    History: Rx.Observable.merge(url$ ,urlWithQuery$)
-      .do(x => {
+    History: xs.merge(url$ ,urlWithQuery$)
+      .debug(x => {
         try {
           console.log(`*** New url info sent to History driver *** ${JSON.stringify(x)}`)
         } catch (error) {

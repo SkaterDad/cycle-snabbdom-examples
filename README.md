@@ -1,7 +1,8 @@
 # DISCLAIMER
-This branch is still under heavy development! There may be broken pieces.
+This branch aims to update these examples to the latest & greatest version of Cycle.js w/ x-stream.
+
 # cycle-snabbdom-examples
-Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://github.com/paldepind/snabbdom) as the v-dom library (by way of the [cycle-snabbdom](https://github.com/TylorS/cycle-snabbdom) driver).
+Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://github.com/paldepind/snabbdom) as the v-dom library (this is now default).
 
 ## examples
 

@@ -1,5 +1,5 @@
-import Rx from 'rx'
-import {h} from 'cycle-snabbdom'
+import xs from 'xstream'
+import {h} from '@cycle/dom'
 import {checkRequestUrl} from '../../global/utils'
 import loadingSpinner from '../../global/loading'
 import {fadeInStyle} from '../../global/styles'
@@ -32,32 +32,36 @@ function HeroList({HTTP}) {
   //.shareReplay(1) is needed because this observable
   //immediately emmits its value before anything can
   //subscribe to it.
-  const dataRequest$ = Rx.Observable.just(GET_REQUEST_URL)
-    .do(() => console.log(`Hero list: Search request subscribed`))
-    .shareReplay(1)
+  const dataRequest$ = xs
+    .of({
+      url: GET_REQUEST_URL,
+      category: 'hero-list',
+    })
+    .debug(() => console.log(`Hero list: Search request subscribed`))
+    .remember()
 
   // Convert the stream of HTTP responses to virtual DOM elements.
   const dataResponse$ = HTTP
+    .select('hero-list')
     .filter(res$ => {
       console.dir(res$)
       return checkRequestUrl(res$, GET_REQUEST_URL)
     })
-    .flatMapLatest(x => x) //Needed because HTTP gives an Observable when you map it
+    .flatten() //Needed because HTTP gives an Observable when you map it
     .map(res => res.body)
     .startWith([])
-    .do((x) => console.log(`Hero list: HTTP response emitted: ${x.length} items`))
-    .share()
+    .debug((x) => console.log(`Hero list: HTTP response emitted: ${x.length} items`))
 
   //loading indication.  true if request is newer than response
-  const loading$ = dataRequest$.map(true).merge(dataResponse$.map(false))
-    .do((x) => console.log(`Hero List: loading status emitted: ${x}`))
+  const loading$ = xs.merge(dataRequest$.mapTo(true), dataResponse$.mapTo(false))
+    .debug((x) => console.log(`Hero List: loading status emitted: ${x}`))
 
   //Combined state observable which triggers view updates
-  const state$ = Rx.Observable.combineLatest(dataResponse$, loading$,
-    (res, loading) => {
+  const state$ = xs.combine(dataResponse$, loading$)
+    .map(([res, loading]) => {
       return {results: res, loading: loading}
     })
-    .do(() => console.log(`Hero List: state emitted`))
+    .debug(() => console.log(`Hero List: state emitted`))
 
   //Map state into DOM elements
   const vtree$ = state$
@@ -69,7 +73,7 @@ function HeroList({HTTP}) {
         ]),
       ])
     )
-    .do(() => console.log(`Hero list: DOM emitted`))
+    .debug(() => console.log(`Hero list: DOM emitted`))
 
   return {
     DOM: vtree$,

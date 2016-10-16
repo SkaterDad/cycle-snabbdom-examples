@@ -1,5 +1,5 @@
-import {h} from 'cycle-snabbdom'
-import Rx from 'rx'
+import xs from 'xstream'
+import {h} from '@cycle/dom'
 import {fadeInOutStyle} from '../../global/styles'
 import './styles.scss'
 
@@ -46,23 +46,23 @@ const view = (color) => {
 }
 
 const ColorChange = ({DOM}) => {
-  let action$ = Rx.Observable.merge(
-    DOM.select('button.colorBtn.next').events('click').map(increment),
-    DOM.select('button.colorBtn.prev').events('click').map(-increment)
+  let action$ = xs.merge(
+    DOM.select('button.colorBtn.next').events('click').mapTo(increment),
+    DOM.select('button.colorBtn.prev').events('click').mapTo(-increment)
   )
-    .do((x) => console.log(`Color change action emitted: ${x}`))
+    .debug((x) => console.log(`Color change action emitted: ${x}`))
 
   const postForm$ = DOM.select('form').events('submit')
-    .do(ev => {ev.preventDefault()})
-    .map({url: '/redirect', method: 'POST', eager: 'true', headers: {redirect: true, redirectUrl: '/hero-simple'}})
-    .do(console.log(`Form post via javascript.`))
+    .debug(ev => {ev.preventDefault()})
+    .mapTo({url: '/redirect', method: 'POST', eager: 'true', headers: {redirect: true, redirectUrl: '/hero-simple'}})
+    .debug(console.log(`Form post via javascript.`))
 
-  let color$ = action$.startWith(0).scan(nextColorIndex)
-    .do((x) => console.log(`Colors index emitted: ${x}`))
+  let color$ = action$.fold(nextColorIndex, 0)
+    .debug((x) => console.log(`Colors index emitted: ${x}`))
 
   let vTree$ = color$
     .map(view)
-    .do(() => console.log(`Colors DOM emitted`))
+    .debug(() => console.log(`Colors DOM emitted`))
 
   return {DOM: vTree$, HTTP: postForm$}
 }

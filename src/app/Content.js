@@ -1,6 +1,9 @@
 import routes from './routes'
 import Mapper from 'url-mapper'
-import {h} from 'cycle-snabbdom'
+import {h} from '@cycle/dom'
+//import xs from 'xstream'
+import dropRepeats from 'xstream/extra/dropRepeats'
+import sampleCombine from 'xstream/extra/sampleCombine'
 
 //Initialize url mapper
 const urlMapper = Mapper({query: true})
@@ -49,29 +52,37 @@ function getRouteValue(location, sources) {
 
 const Content = (sources, ROOT_SELECTOR) => {
   const route$ = sources.History
-    .distinctUntilChanged(location => location.pathname) //dont' care if query string changes
+    .compose(dropRepeats((x,y) => x.pathname === y.pathname)) //dont' care if query string changes
     .map(location => getRouteValue(location, sources))
-    .do(x => {
+    .debug(x => {
       const hasDOM = !!x.DOM
       const hasHTTP = !!x.HTTP
       const hasQuery = !!x.Query
       console.log(`Content state emitted - DOM: ${hasDOM}, HTTP: ${hasHTTP}, Query: ${hasQuery}`)
     })
-    .shareReplay(1) //Hot Module Replacement needed this to be shareReplay(1) instead of just share()
+    .remember() //Hot Module Replacement needed this to be shareReplay(1) instead of just share() when using Rxjs4
 
   return {
-    DOM: route$.pluck('DOM').withLatestFrom(sources.History, (dom, location) => {return {dom, location}})
-      .map(x => view(x.dom, ROOT_SELECTOR, x.location))
-      .do(() => {console.log('Content DOM plucked')}),
-    HTTP: route$.pluck('HTTP')
-      .do(() => {console.log('Content HTTP plucked')})
-      .filter(x => !!x).flatMapLatest(x => x)
-      .do(() => {console.log('Content HTTP filtered')}),
-    Query: route$.pluck('Query')
+    DOM: route$
+      .map(x => x.DOM)
       .filter(x => !!x)
-      .do(() => {console.log('Content Query plucked')})
-      .flatMapLatest(x => x)
-      .do((x) => {console.log('Content Query - ' + JSON.stringify(x))}),
+      .compose(sampleCombine(sources.History))
+      .map(([dom, location]) => {
+        return view(dom, ROOT_SELECTOR, location)
+      })
+      .debug(() => {console.log('Content DOM plucked')}),
+    HTTP: route$
+      .map(x => x.HTTP)
+      .filter(x => !!x)
+      .debug(() => {console.log('Content HTTP plucked')})
+      .filter(x => !!x).flatten()
+      .debug(() => {console.log('Content HTTP filtered')}),
+    Query: route$
+      .map(x => x.Query)
+      .filter(x => !!x)
+      .debug(() => {console.log('Content Query plucked')})
+      .flatten()
+      .debug((x) => {console.log('Content Query - ' + JSON.stringify(x))}),
   }
 }
 
