@@ -1,3 +1,6 @@
+# LATEST UPDATES
+Check out the `cycle-diversity` branch!
+
 # cycle-snabbdom-examples
 Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://github.com/paldepind/snabbdom) as the v-dom library (by way of the [cycle-snabbdom](https://github.com/TylorS/cycle-snabbdom) driver).
 
