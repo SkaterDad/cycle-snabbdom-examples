@@ -16,7 +16,7 @@ Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://gi
 
 * Route/Page transitions - currently just opacity fade, but you can easily extend to add transforms.
 * Search result items animate when added & removed.
-* Hero transitions (aka. shared element transitions).  An item which is common to two pages will smoothly animate to the new position.  My examples are relying on a modified version of the official snabbdom hero module, which will be submitted to the official snabbdom library soon.
+* Hero transitions (aka. shared element transitions).  An item which is common to two pages will smoothly animate to the new position.  This relies on the snabbdom hero module, so you'll need to pass a list of modules to the Cycle DOM driver.
 
 ## Future plans
 
