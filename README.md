@@ -1,5 +1,5 @@
-# DISCLAIMER
-This branch aims to update these examples to the latest & greatest version of Cycle.js w/ x-stream.
+# Cycle version & Stream Library
+This branch uses Cycle Diversity w/ xstream.
 
 # cycle-snabbdom-examples
 Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://github.com/paldepind/snabbdom) as the v-dom library (this is now default).
