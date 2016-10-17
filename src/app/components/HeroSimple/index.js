@@ -1,5 +1,6 @@
-import {h} from 'cycle-snabbdom'
+import {h} from '@cycle/dom'
 import {fadeInOutStyle} from '../../global/styles'
+import './styles.scss'
 
 const HERO_ID = 'test-hero-simple'
 const HERO_TEXT = 'HERO'
@@ -51,12 +52,12 @@ const view = (toggled) =>
       h('div#box-wrapper', {style: {position: 'relative'}}, [toggled ? trueView : falseView]),
     ])
 
-function HeroSimple({DOM}) {
+const HeroSimple = ({DOM}) => {
   let vTree$ =
     DOM.select('input').events('change')
       .map(ev => ev.target.checked)
       .startWith(false)
-      .do((x) => {console.log(`Checkbox value changed to ${x}`)})
+      .debug((x) => {console.log(`Checkbox value changed to ${x}`)})
       .map(view)
 
   return {DOM: vTree$}

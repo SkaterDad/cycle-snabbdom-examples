@@ -1,0 +1,51 @@
+@import '../../global/constants.scss';
+
+.hero-item {
+  display: block;
+  text-align: center;
+  padding: 1rem;
+  margin: 1rem;
+  width: 200px;
+  background-color: rgba(white,0.6);
+  box-shadow: 1px 2px 5px -1px black;
+  img {
+    height: 75px;
+  }
+  .repo {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0
+  }
+  .small {
+    font-size: 0.9rem;
+    color: rgb(100,100,100)
+  }
+}
+
+.hero-details-avatar {
+  display: block;
+  width: 100px;
+  height: 100px;
+  margin: 0.5rem auto;
+}
+.hero-detail {
+  text-align: center;
+  background-color: rgba(white,0.6);
+  padding: 1rem;
+  box-shadow: $standardShadow;
+  margin: 1rem;
+  color: $darkGray;
+
+  button {
+    background-color: rgba(white,0.7);
+    border: 1px solid $darkGray;
+    color: $darkGray;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: rgba(white,1);
+    }
+  }
+}

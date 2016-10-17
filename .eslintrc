@@ -1,12 +1,12 @@
 {
   "extends": "eslint-config-cycle",
   "env": {
-    browser: true,
-    node: true
+    "browser": true,
+    "node": true
   },
   "rules": {
     "quotes": [2, "single"],
     "comma-dangle": [1, "always-multiline"],
-    "max-len": [0, 80, 4, {"ignoreComments": true, "ignoreUrls": true}],
+    "max-len": [0, 80, 4, {"ignoreComments": true, "ignoreUrls": true}]
   }
 }

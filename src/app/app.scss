@@ -1,0 +1,103 @@
+/*! My App CSS */
+@import 'global/constants.scss';
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+h1 {
+  margin: 0
+}
+
+body {
+  background-color: $backgroundColor;
+  font-family: Helvetica, Sans;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+
+}
+a > * {
+  pointer-events:none;
+}
+
+header {
+  background: $darkGray;
+  line-height: $headerHeight;
+  margin-bottom: $headerBottom;
+  box-shadow: 1px 1px 1px 1px black;
+  color: white;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0rem;
+
+  select {
+    padding: 0.2rem;
+  }
+
+  a {
+    display: inline-block;
+    margin: 0.25rem;
+    margin-bottom: 0;
+    padding: 0.0em 0.5em;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    &:hover {
+      opacity: 1;
+    }
+    &.active {
+      border-bottom: 2px solid rgb(200,250,200);
+      opacity: 1;
+      color: rgb(200,250,200);
+    }
+  }
+}
+.app-container {
+  position: relative;
+  height: 100%;
+  padding-bottom: $pageBtmMarg;
+}
+.content-holder {
+  height: calc(100% - #{$overallHeaderHeight});
+  position: relative;
+}
+.page-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  position: relative;
+}
+.flexcenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* default hero transition */
+.hero {
+  transition: transform $heroTime ease-in-out, opacity $heroTime ease-in-out;
+}

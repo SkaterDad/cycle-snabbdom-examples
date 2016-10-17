@@ -1,5 +1,6 @@
-import {h} from 'cycle-snabbdom'
-import fadeInOutStyle from './styles'
+import {h} from '@cycle/dom'
+import fadeInOutStyle from './styles.js'
+import './loading.scss'
 
 function loadingSpinner() {
   return h('div.spinner-container', {style: fadeInOutStyle}, [

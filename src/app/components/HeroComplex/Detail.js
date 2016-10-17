@@ -1,8 +1,9 @@
-import Rx from 'rx'
-import {h} from 'cycle-snabbdom'
+import xs from 'xstream'
+import {h} from '@cycle/dom'
 import {checkRequestUrl} from '../../global/utils'
 import {fadeInOutStyle} from '../../global/styles'
 //import loadingSpinner from '../../global/loading'
+import './styles.scss'
 
 function detailView({
   id,
@@ -20,24 +21,30 @@ function detailView({
     h('h1', {}, full_name),
     h('span', {}, `Stars: ${stargazers_count}  -  Language: ${language}`),
     h('p', {}, description),
-    h('button.detail-close', {}, 'Back to List'),
   ])
   return html
 }
 
-function HeroDetail({HTTP}, repoUrl = 'https://api.github.com/repos/paldepind/snabbdom') {
-  const GET_REQUEST_URL = repoUrl
+function HeroDetail({HTTP}, values = {owner: 'cyclejs', repo: 'cyclejs'}) {
+  //create the api url from values passed from Url-Mapper
+  const GET_REQUEST_URL = 'https://api.github.com/repos/' + values.owner + '/' + values.repo
 
   //Send HTTP request to get data for the page
-  const searchRequest$ = Rx.Observable.just(GET_REQUEST_URL)
-    .do((x) => console.log(`Hero Detail: Sent GET request to: ${x}`))
+  const searchRequest$ = xs
+    .of({
+      url: GET_REQUEST_URL,
+      category: 'hero-detail',
+    })
+    .debug((x) => console.log(`Hero Detail: Sent GET request to: ${x.url}`))
+    .remember()
 
   // Convert the stream of HTTP responses to virtual DOM elements.
   const searchResponse$ = HTTP
+    .select('hero-detail')
     .filter(res$ => checkRequestUrl(res$, GET_REQUEST_URL))
-    .flatMapLatest(x => x) //Needed because HTTP gives an Observable when you map it
+    .flatten() //Needed because HTTP gives an Observable when you map it
     .map(res => res.body)
-    .do(() => console.log(`Hero Detail: HTTP response emitted`))
+    .debug(() => console.log(`Hero Detail: HTTP response emitted`))
 
   //Map current state to DOM elements
   const vtree$ = searchResponse$
@@ -50,7 +57,7 @@ function HeroDetail({HTTP}, repoUrl = 'https://api.github.com/repos/paldepind/sn
         ]),
       ])
     )
-    .do(() => console.log(`Hero Detail: DOM emitted`))
+    .debug(() => console.log(`Hero Detail: DOM emitted`))
 
   return {
     DOM: vtree$,

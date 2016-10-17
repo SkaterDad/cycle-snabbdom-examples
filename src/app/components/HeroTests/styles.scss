@@ -1,0 +1,53 @@
+/* HERO TESTS EXAMPLE */
+.heroTests {
+  .row {
+    width: 100%;
+    background: pink;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: space-between;
+  }
+  .col {
+    flex: 1;
+    text-align: left;
+    padding: 1rem;
+  }
+  .col-center {
+    flex: 2;
+    text-align: center;
+    padding: 1rem;
+    background: rgb(0,255,0);
+  }
+  .col-right {
+    flex: 1;
+    text-align: right;
+    padding: 1rem;
+    background: rgb(255,255,200);
+  }
+  img.fixed {
+    width: 100px;
+    height: 200px;
+  }
+  img.percent {
+    width: 50%;
+    height: auto;
+  }
+  .small {
+    font-size: 0.5rem;
+  }
+  .whitetext {
+    color: white;
+  }
+  .shadowy1 {
+    box-shadow: 1px 1px 2px 0px black;
+    width: 75%;
+    height: 100px;
+    background: white;
+  }
+  .shadowy2 {
+    box-shadow: 1px 1px 2px 0px black;
+    width: 10%;
+    height: 15px;
+    background: white;
+  }
+}

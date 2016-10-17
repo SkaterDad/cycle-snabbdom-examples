@@ -1,17 +1,13 @@
 /*eslint-disable*/
 var webpack = require('webpack'),
     path = require('path'),
+    ExtractTextPlugin = require('extract-text-webpack-plugin'),
     autoprefixer = require('autoprefixer');
 
 module.exports = {
-    devtool: 'source-map',
-    entry: [
-        'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
-        './src/client.js'
-    ],
+    entry: './src/client.js',
     output: {
         path: path.join(__dirname, 'dist'),
-        publicPath: '/dist/',
         filename: 'bundle.js'
     },
     module: {
@@ -20,14 +16,14 @@ module.exports = {
         ],
         loaders: [
             {
-                test: /\.s?css$/,
-                loaders: ['style', 'css', 'postcss', 'sass']
+                test: /\.s?css$/, //match css or scss
+                loader: ExtractTextPlugin.extract("style", "css!postcss!sass")
             },
             {
                 test: /\.js$/,
                 loaders: ['babel?cacheDirectory=true&presets=es2015'],
                 exclude: /node_modules.((?!snabbdom-to-html)).*/ //webpack pulls in snabbdom-to-html as part of cycle-snabbdom.  Uflify doesn't like es6 code.
-//                exclude: /node_modules/,
+                //exclude: /node_modules/
             }
         ]
     },
@@ -35,8 +31,9 @@ module.exports = {
         return [autoprefixer];
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin()
+        new ExtractTextPlugin("bundle.css"),
+        //new webpack.IgnorePlugin(/snabbdom-to-html/),
+        new webpack.optimize.OccurenceOrderPlugin()
     ]
 };
 /*eslint-enable*/
