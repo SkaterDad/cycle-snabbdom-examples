@@ -4,7 +4,12 @@ This branch aims to update these examples to the latest & greatest version of Cy
 # cycle-snabbdom-examples
 Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://github.com/paldepind/snabbdom) as the v-dom library (this is now default).
 
-## examples
+## To use:
+1. `npm install`
+2. `npm start`
+3. Open Index.html in your browser
+
+## Examples
 
 1. Color Changer - Basically just a counter app, but background color changes by looping through an array.
 2. Github Search - Clone of official Cycle example, with snabbdom-specific animations as search results are added/removed.
@@ -12,9 +17,9 @@ Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://gi
 4. Hero Transition (Complex) - 1st page pulls repo list from github.  2nd page is detail for a specific repo.  The owner avatar does a hero transition.
 5. Hero Transition (Tests) - Hero transitions on multiple types of DOM elements, including text which changes orientation and size.  Best viewed in Chrome.  Other browsers have problems with one of the text transitions.
 
-## snabbdom specific animations
+## snabbdom-specific animations
 
-* Route/Page transitions - currently just opacity fade, but you can easily extend to add transforms.
+* Route/Page transitions - currently just opacity fade, but you can easily extend to add transforms.  The important part is that your page wrappers are `position: absolute` so they can overlap while transitioning.
 * Search result items animate when added & removed.
 * Hero transitions (aka. shared element transitions).  An item which is common to two pages will smoothly animate to the new position.  This relies on the snabbdom hero module, so you'll need to pass a list of modules to the Cycle DOM driver.
 
