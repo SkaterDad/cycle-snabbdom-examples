@@ -11,6 +11,7 @@ function detailView({
   description = 'No description given.',
   stargazers_count = '?',
   language = '?',
+  html_url = 'http://github.com/',
   owner = {
     avatar_url: '',
     login: '?',
@@ -21,6 +22,7 @@ function detailView({
     h('h1', {}, full_name),
     h('span', {}, `Stars: ${stargazers_count}  -  Language: ${language}`),
     h('p', {}, description),
+    h('a', {attrs: {href: html_url}}, 'Check it out on Github!'),
   ])
   return html
 }
