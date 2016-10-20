@@ -7,10 +7,11 @@ Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://gi
 ## Examples
 
 1. Color Changer - Basically just a counter app, but background color changes by looping through an array.
-2. Github Search - Clone of official Cycle example, with snabbdom-specific animations as search results are added/removed.
-3. Hero Transition (Simple) - Checkbox toggles between pages.  Each page is a box with some text.  The text does a hero transition.
-4. Hero Transition (Complex) - 1st page pulls repo list from github.  2nd page is detail for a specific repo.  The owner avatar does a hero transition.
-5. Hero Transition (Tests) - Hero transitions on multiple types of DOM elements, including text which changes orientation and size.  Best viewed in Chrome.  Other browsers have problems with one of the text transitions.
+2. Redirect After Form Post - Shows one way of handling URL redirects after `<form>` posts.
+3. Github Search - Clone of official Cycle example, with snabbdom-specific animations as search results are added/removed.
+4. Hero Transition (Simple) - Checkbox toggles between pages.  Each page is a box with some text.  The text does a hero transition.
+5. Hero Transition (Complex) - 1st page pulls repo list from github.  2nd page is detail for a specific repo.  The owner avatar does a hero transition.
+6. Hero Transition (Tests) - Hero transitions on multiple types of DOM elements, including text which changes orientation and size.  Best viewed in Chrome.  Other browsers have problems with one of the text transitions.
 
 ## snabbdom-specific animations
 

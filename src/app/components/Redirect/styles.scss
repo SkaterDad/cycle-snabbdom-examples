@@ -1,0 +1,24 @@
+@import '../../global/constants.scss';
+
+form button {
+  border: none;
+  position: relative;
+  top: 0px;
+  background-color: rgb(230,250,230);
+  padding: 1rem;
+  border-radius: 2px;
+  box-shadow: 1px 2px 5px 0px rgba(black,0.75);
+  margin: 1rem;
+  transition: background-color 0.25s ease-in-out;
+  &:hover {
+    background-color: white;
+  }
+}
+.redirect-container {
+  background-color: white;
+  padding: 2rem;
+  box-shadow: $standardShadow;
+  width: 80%;
+  margin: 0 auto;
+  text-align: center;
+}
