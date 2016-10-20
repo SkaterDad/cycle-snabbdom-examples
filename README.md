@@ -4,11 +4,6 @@ This branch uses Cycle Diversity w/ xstream.
 # cycle-snabbdom-examples
 Examples using [Cycle.js](https://github.com/cyclejs) with [Snabbdom](https://github.com/paldepind/snabbdom) as the v-dom library (this is now default).
 
-## To use:
-1. `npm install`
-2. `npm start`
-3. Open Index.html in your browser
-
 ## Examples
 
 1. Color Changer - Basically just a counter app, but background color changes by looping through an array.
