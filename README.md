@@ -27,5 +27,5 @@ For client-side hot reloading:
  1. Clone the repo
  2. Choose a branch
  3. `npm install`
- 4. `npm run hot-client`
+ 4. `npm start`
  5. Open your browser to `http://localhost:3000/`
